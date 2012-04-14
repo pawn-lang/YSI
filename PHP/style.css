@@ -1,0 +1,75 @@
+p	{
+	font-family: Tahoma; 
+	font-size: 8pt;
+	color:#003366
+}
+
+td	{ 
+	font-family: Tahoma; 
+	font-size: 8pt;
+	color:#003366;
+}
+
+input {
+	font-size: 8pt;
+	font-family: tahoma,helvetica;
+	color: #000000;
+	background-color: #F0F0F0;
+	border:1px solid #BFBFBF;
+	border-top-width : 1px;
+	border-right-width : 1px;
+	border-bottom-width : 1px;
+	border-left-width : 1px;
+	text-indent : 2px
+}
+
+img {
+	border-width:0;
+}
+	
+a 	{ 
+	font-family: Tahoma; 
+	font-size: 8pt; 
+	color: #777777; 
+	text-decoration: none
+}
+
+a:hover	{ 
+	color:#003366;
+	text-decoration:underline
+}
+	
+.darkline {
+	background-color: #E2E5FF;
+	color:#003366;
+	font-size:8;
+	font-family:Tahoma;
+	font-weight:bold
+}
+	
+.content_back {
+	background-color: #ECEDFF
+}
+	
+.content_navigate {
+	background-color: #D2D5EF;
+	color:#003366;
+	font-size:8;
+	font-family:Tahoma;
+	font-weight:bold
+}
+	
+.nav_group {
+	background-image:url(images/nav_group_bg.png);
+	background-color:#777777;
+	font-weight:bold;
+	color:#FFFFFF
+}
+
+.nav_item {
+	text-indent:15px;
+}
+
+.anav_frame {
+	border:1px solid #BBBBCC
+}

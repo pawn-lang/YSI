@@ -1,0 +1,90 @@
+===================================
+ YSI Server Includes (YSI) Roadmap 
+===================================
+
+This is just a brief introduction to where I would like YSI to go, some parts are more urgent than others, but some of these parts have been on the cards for a long time because they're outside my area of expertise.  The tasks have been split in to three groups:
+
+ - Library Development,
+ - Mode Development (including mini-mode development),
+ - Web Development.
+
+=====================
+ Library Development 
+=====================
+
+This has often been the sole preserve of myself, but that is because few other people have as much knowledge of the internals of YSI as I do, which does make it hard for others to develop libraries for YSI.  I have attempted to document some of the processes, but it is still a skilled art (though for my own sake I have gone to great lengths to simplify the code).  However if people are willing to assist in this area I am VERY willing to offer help and support whenever possible.  My time for coding is very limited at the moment, however I am always on IRC and if people wish to chat about things I'm sure I can spend a few minutes helping them out.  There are a number of libraries already in development, and more in the pipeline or requiring attention:
+
+ - Require attention:
+	- y_ini - When the first version of this was released it was VASTLY faster than any other system available because it used a vastly different read system to the others.  I still maintain that it is a good system, however people seem intent on using dini style function calls so a dual system would seem to be the best bet.  In that regard I have an idea for a cache system which is a direct replacement for dini:
+	
+	[pawn]
+	LoadFunc(file)
+	{
+		gSomeVar = dini_Int(file, "value"); // Open and cache the file here.
+		gSomeFloat = dini_Float(file, "float"); // Detect that this is the same file as last used and so use cached data
+	} // Detect the end of the function and close the cached file to free up memory.  This is documented in Slice's tricks tutorial.
+	[/pawn]
+	
+	- y_stringhash - If ANYONE can solve the commas issue I will be eternally grateful!  I'm not convinced it's possible but I'd like to move from:
+	
+	[pawn]_H(H,e,l,l,o)[/pawn]
+	
+	To:
+	
+	[pawn]_H(Hello)[/pawn]
+	
+	The closest I came was using symbol truncation at 31 characters:
+	
+	[pawn]#include <a_samp>
+	
+	#define _A_LONG_SYMBOL_ENDING_WITH_AN_A%0> "A"_A_LONG_SYMBOL_ENDING_WITH_AN_%0
+	#define _A_LONG_SYMBOL_ENDING_WITH_AN_B%0> "A"_A_LONG_SYMBOL_ENDING_WITH_AN_%0
+	#define _A_LONG_SYMBOL_ENDING_WITH_AN_C%0> "A"_A_LONG_SYMBOL_ENDING_WITH_AN_%0
+	
+	#define _H(%0) _A_LONG_SYMBOL_ENDING_WITH_AN_%0>
+	
+	main()
+	{
+		print(_H(ABC));
+	}
+	[/pawn]
+	
+	That gives an error which lists, but doesn't find "_A_LONG_SYMBOL_ENDING_WITH_AN_A".  I tried forcing a reparse with a tagged function but that didn't work.  As I said, I doubt this is possible, so don't worry too much about it.
+	
+	- y_iterate - There's an error message "Something went wrong, please tell Y_Less".  I've had a few people report it but I don't know why it happens, only that it sometimes does.  I can't rule out the possibility that they're not using it right.
+	
+	- y_classes - Still needs some work to make usage smooth.
+	
+ - In development:
+	- y_text - This is probably the most urgent of the unwritten libraries, and I may have to just sit down and write it.  This is responsible for loading text from files and displaying it to players in their native languages.  This is the most urgent as most of the other unwritten libraries will need to use it to display data.
+	
+	- y_colours - A major update to my coloured chat text library unifying all the text formats, so you can do:
+	
+	[code]"Hello~r~ there,{00FF00} how are#BLUE you[/code]
+	
+	Plus some other fancy bits (fades and end colours).  I've already written the code for displaying that text correctly using SendClientMessage, but the other formats need doing.  Again this is more a case of me sitting down and knocking out the code (now that I've figured out how to get past a block I was having).
+	
+	- y_minimode - y_minimode is a plan for a major minimode wrapper.  Minimodes will be written as entirely separate scripts and compiled to the server/minimodes folder (which CAN be loaded from using loadfs).  The callbacks in the modes will be new, for example "OnMiniModeInit", "OnPlayerJoin", "OnMiniModeStart", plus all the other in-play callbacks ("OnPlayerDeath" etc) and YSI callbacks ("OnPlayerLogin", which will be called automatically for people logged in before they join the mode).  This will provide a subset of all available functions and callbacks so you can write modes essentially in a sandbox - calling things like "CreatePlayerCheckpoint" will automatically call the streamed version underneath (where applicable) for example, and all resources will be cleaned up after.  Any settings the player had before joining the mode will be automatically restored.  This will involve two includes being written - y_minimode and a_minimode, the former being the code included by the main gamemode to allow people to join and start modes, the latter being the include used to write minimodes.  More information available on request.  Note that although this is listed under "In development", it really isn't very far.
+	
+ - Planned:
+	I have plans for libraries for basically anything you can think of.  Jobs, properties (YSI 0.1 has one already, but it's intertwined with the CP streamer which has been dropped in favour of plugins), items, anything else anyone can think of.  This is probably the easiest job for a person new to YSI development to do because there's very little dependency on other libraries or code to learn.
+	
+	- y_mouse - Ages ago I wrote a topic on how to use the mouse from the SA:MP server, this needs wrapping up and making smoother.  Most of the problem with this is finding a way to force fast updates (as you get when in aim mode - possibly by setting a player's animation).
+	
+	- y_menu - Define menu systems generically.
+	
+	- y_gui - Read basic bitmap files and convert the apperance to a set of textdraws to draw GUIs on a person's screen.  This would ideally be combined with y_mouse to make a whole new set of input options (think inventories in other games).
+	
+	- y_player - A user system with interchangable backends (SQLite, MySQL, INI, XML etc) with dynamic code so that you don't need to define your databases in advance (Slice has also demonstrated this in the past).  Again this was in the old YSI but hasn't yet been ported (mostly due to the lack of y_text).
+
+==================
+ Mode Development 
+==================
+
+Basically YSI has always suffered from a lack of modes which demonstrate it's use.  This would just be developing small or large modes which use YSI well (and are prefereably well documented, but I know that can be hard).
+
+=================
+ Web Development 
+=================
+
+I'd like tighter integration between PHP and PAWN, this would involve the development of a decent communication between the two and a PHP API for server communication and control (as much as possible).  I have ideas on how a generic PHP and PAWN comm system can be written so most YSI functions can be called without too much development effort.

@@ -1,0 +1,496 @@
+[size=5][color=red][b][u][color=green]Introduction[/color][/u][/b][/color][/size]
+
+I know there has been a lack of documentation on YSI, especially with y_ini, and I appologise for this.  Hopefully this topic will clear some things up.
+
+y_ini is not like any other INI system which some people see as an issue and can be for some things, but for other uses it is much better.
+
+[size=5][color=red][b][u][color=green]Writing[/color][/u][/b][/color][/size]
+
+Writing using y_ini is much like any of the other ini systems about - you open a file, write data then close it, simple:
+
+[pawn]
+new
+	// The name of the file, can be any string variable or literal.
+	fileToWrite[] = "mine.INI",
+	
+	// "INI_Open" returns a variable with tag "INI".
+	INI:iniFile = INI_Open(fileToWrite);
+
+// 
+// y_ini supports tags, that is:
+// 
+//  [tag]
+//  key = value
+// 
+INI_SetTag(iniFile, "examples");
+
+// Write an integer value with the key "some_integer" under the current tag:
+INI_WriteInt(iniFile, "some_integer", 42);
+
+// Now close the current file:
+INI_Close(iniFile);
+[/pawn]
+
+The result of the code above will be a file in "scriptfiles" called "mine.INI" with the following contents:
+
+[code]
+[examples]
+some_integer = 42
+[/code]
+
+Note that by default y_ini places spaces around the equals sign between an entry key (the part before the equals sign) and it's value (the part after).  This is valid in an INI file, however is not supported by dini and thus means that files written by y_ini can't be read by dini (this can be altered in code and will be changed in a future version).
+
+[size=5][color=red][b][u][color=green]Reading[/color][/u][/b][/color][/size]
+
+There are two ways of reading, one is for when the name of a file is known in advance, the other is for when it is not, or for when more control is needed.
+
+An example of the first version would be the settings for a mode - settings are always stored in one file, and the name of this file is probably known at compile time.  An example of the second is a user system - filenames depend on player names, and there is no way of knowing those in advance.
+
+Both methods are based on callbacks, but one is slightly simpler than the other.
+
+[size=5][color=red][b][u][color=green]INI_Load[/color][/u][/b][/color][/size]
+
+When a filename is known in advance "INI_Load" can be used with special "INI:" functions.  The example above wrote to a file called "mine.INI".  If this filename will always be the same then the basic structure for reading the file will be:
+
+[pawn]
+INI:mine[examples](name[], value[])
+{
+}
+
+main()
+{
+	INI_Load("mine.INI");
+}
+[/pawn]
+
+A common mistake that people make is:
+
+[pawn]
+INI:mine[examples](name[], value[])
+{
+}
+
+main()
+{
+	new
+		mine[] = "other.INI"
+	INI_Load(mine);
+}
+[/pawn]
+
+Here the name of the VARIABLE is "mine", the name of the "FILE" is still "other.INI".  It is the name of the FILE which is important here.  The following code is valid because the variable name is not important:
+
+[pawn]
+INI:mine[examples](name[], value[])
+{
+}
+
+main()
+{
+	new
+		other[] = "mine.INI"
+	INI_Load(other);
+}
+[/pawn]
+
+If you had two files, "mine.INI" and "other.INI" you could do:
+
+[pawn]
+INI:mine[examples](name[], value[])
+{
+}
+
+INI:other[tag_name](name[], value[])
+{
+}
+
+main()
+{
+	new
+		fileName[];
+	switch (random(2))
+	{
+		case 0:
+		{
+			fileName = "mine.INI";
+		}
+		case 1:
+		{
+			fileName = "other.INI";
+		}
+	}
+	INI_Load(fileName);
+}
+[/pawn]
+
+Not very helpful code as it will load a random file, but the important thing is that either file can be loaded - the name of either file matches the name of an "INI:" function.
+
+The "INI:" functions have the following structure:
+
+[pawn]
+INI:file_name[tag_name](name[], value[])
+{
+}
+[/pawn]
+
+If we extend the earlier "mine.INI" writing example we could have something like:
+
+[code]
+[examples]
+some_integer = 42
+
+[more_examples]
+a_float = 5.5
+the_string = Hello there!
+[/code]
+
+There are two "sections" ("sections" start with a "tag" and contain "entries" ("key-value" pairs)), one called "examples" and one called "more_examples".  As the tag which starts a section is part of an "INI:" function header, we need two functions to load this file:
+
+[pawn]
+INI:mine[examples](name[], value[])
+{
+}
+
+INI:mine[more_examples](name[], value[])
+{
+}
+[/pawn]
+
+When "INI_Load" is called for the file "mine.INI" the function "INI:mine[examples]" will be called once and "INI:mine[more_examples]" will be called twice.  In all cases a single key/value pair will be passed, so WHICH pair is being passed must be determined.  Note that the current "key" is (slightly unhelpfully) stored in the variable "name":
+
+[pawn]
+INI:mine[examples](name[], value[])
+{
+	if (!strcmp(name, "some_integer"))
+	{
+	}
+}
+
+INI:mine[more_examples](name[], value[])
+{
+	if (!strcmp(name, "a_float"))
+	{
+	}
+	if (!strcmp(name, "the_string"))
+	{
+	}
+}
+[/pawn]
+
+Once this is known the data can be read and stored somewhere.  After you have read the current value the function can end, because there is very little more that can be done in the current call:
+
+[pawn]
+new
+	gSomeInteger,
+	Float:gAFloat,
+	gTheString[32];
+
+INI:mine[examples](name[], value[])
+{
+	if (!strcmp(name, "some_integer"))
+	{
+		gSomeInteger = strval(value);
+		return;
+	}
+}
+
+INI:mine[more_examples](name[], value[])
+{
+	if (!strcmp(name, "a_float"))
+	{
+		gAFloat = floatstr(value);
+		return;
+	}
+	if (!strcmp(name, "the_string"))
+	{
+		strcpy(gTheString, value, sizeof (gTheString));
+		return;
+	}
+}
+[/pawn]
+
+This is quite cumbersome, fortunately y_ini provides shortcuts (these shortcuts are the reason "key" is in "name").  These shorcuts include "return", so no code will be run after a value is read.  All the shortcuts take a key name and a destination in which to store the value, "INI_String" also takes a maximum length which MUST be included (or the compiler will complain that the function doesn't exist).
+
+[pawn]
+new
+	gSomeInteger,
+	Float:gAFloat,
+	gTheString[32];
+
+INI:mine[examples](name[], value[])
+{
+	INI_Int("some_integer", gSomeInteger);
+}
+
+INI:mine[more_examples](name[], value[])
+{
+	INI_Int("a_float", gAFloat);
+	INI_String("the_string", gTheString, sizeof (gTheString));
+}
+[/pawn]
+
+The final code looks something like:
+
+[pawn]
+// Variables in which to store the data.
+new
+	gSomeInteger,
+	Float:gAFloat,
+	gTheString[32];
+
+// Function to load the data from section "examples" of file "mine".
+INI:mine[examples](name[], value[])
+{
+	INI_Int("some_integer", gSomeInteger);
+}
+
+// Function to load the data from section "more_examples" of file "mine".
+INI:mine[more_examples](name[], value[])
+{
+	INI_Int("a_float", gAFloat);
+	INI_String("the_string", gTheString, sizeof (gTheString));
+}
+
+main()
+{
+	// Start the file loading.
+	INI_Load("mine.INI");
+	// File loading complete, display the results.
+	printf("examples->some_integer = %d", gSomeInteger);
+	printf("more_examples->a_float = %.2f", gAFloat);
+	printf("more_examples->the_string = %s", gTheString);
+}
+[/pawn]
+
+[size=5][color=red][b][u][color=green]INI_ParseFile[/color][/u][/b][/color][/size]
+
+"INI_ParseFile" is a more advanced version of "INI_Load", basically instead of having a function based on the filename called, the function to be called is explcitly specified.  As an example, the last example from "INI_Load" using "INI_ParseFile" instead would look like:
+
+[pawn]
+new
+	gSomeInteger,
+	Float:gAFloat,
+	gTheString[32];
+
+forward ini_examples_mine(name[], value[]);
+
+public ini_examples_mine(name[], value[])
+{
+	INI_Int("some_integer", gSomeInteger);
+}
+
+forward ini_more_examples_mine(name[], value[]);
+
+public ini_more_examples_mine(name[], value[])
+{
+	INI_Int("a_float", gAFloat);
+	INI_String("the_string", gTheString, sizeof (gTheString));
+}
+
+main()
+{
+	INI_ParseFile("mine.INI", "ini_%s_%s");
+}
+[/pawn]
+
+This should look familiar, but not exactly the same as the last version so lets go through the changes one by one:
+
+[pawn]
+// This:
+INI:mine[examples](name[], value[])
+
+// Became:
+forward ini_examples_mine(name[], value[]);
+public ini_examples_mine(name[], value[])
+[/pawn]
+
+This is not a big change, in fact that's basically what "INI:" does (see "y_ini.inc" for the exact macro definition, but note that there the tag and filename are the other way round).  Instead of being an "INI:" function it is now just a normal "public" function.  "INI:mine[more_examples]" changed in exactly the same way, and in both the file is now moved from the start to the end - the "INI:" macro is just designed to make the function look a little more obvious as to what it's doing (especially as the tag uses the syntax of a tag in an INI file).
+
+[pawn]
+// This:
+INI_Load("mine.INI");
+
+// Became:
+INI_ParseFile("mine.INI", "ini_%s_%s");
+[/pawn]
+
+"INI_ParseFile" taks a parameter that "INI_Load" doesn't - the name of the function to call with the data, or, as here, how to construct the function.  "ini_%s_%s" specifies the format for the function "format" which is used internally to create the function to call.  The two parameters are first the tag, then the filename (no path or extension), so "ini_%s_%s" for the section called "more_examples" in the file called "mine.INI" would be "ini_more_examples_mine" - a function which we know exists from above.
+
+The reason that the file comes second is so it can be ignored easilly, which is useful when you don't know the filename in advance:
+
+[pawn]
+new
+	gSomeInteger,
+	Float:gAFloat,
+	gTheString[32];
+
+forward anyini_examples(name[], value[]);
+public anyini_examples(name[], value[])
+{
+	INI_Int("some_integer", gSomeInteger);
+}
+
+forward anyini_more_examples(name[], value[]);
+public anyini_more_examples(name[], value[])
+{
+	INI_Int("a_float", gAFloat);
+	INI_String("the_string", gTheString, sizeof (gTheString));
+}
+
+main()
+{
+	INI_ParseFile("mine.INI", "anyini_%s");
+	INI_ParseFile("other.INI", "anyini_%s");
+}
+[/pawn]
+
+We now have two calls to "INI_ParseFile", both with the same function format ("anyini_%s").  The first "%s" represents tag, not filename, so BOTH the calls will use the SAME functions (assuming that the files have the same structure).  One issue with the above code is that both files will write to the same variables, to avoid this we need some way to separate them...
+
+[size=5][color=red][b][u][color=green]Extra Data[/color][/u][/b][/color][/size]
+
+[pawn]
+new
+	gSomeInteger[2],
+	Float:gAFloat[2],
+	gTheString[2][32];
+
+forward anyini_examples(idx, name[], value[]);
+public anyini_examples(idx, name[], value[])
+{
+	INI_Int("some_integer", gSomeInteger[idx]);
+}
+
+forward anyini_more_examples(idx, name[], value[]);
+public anyini_more_examples(idx, name[], value[])
+{
+	INI_Int("a_float", gAFloat[idx]);
+	INI_String("the_string", gTheString[idx], sizeof (gTheString[]));
+}
+
+main()
+{
+	INI_ParseFile("mine.INI", "anyini_%s", .bExtra = true, .extra = 0);
+	INI_ParseFile("other.INI", "anyini_%s", .bExtra = true, .extra = 1);
+}
+[/pawn]
+
+We have made more changes, so let's go through them one by one again:
+
+[pawn]
+// This:
+new
+	gSomeInteger,
+	Float:gAFloat,
+	gTheString[32];
+
+// Became:
+new
+	gSomeInteger[2],
+	Float:gAFloat[2],
+	gTheString[2][32];
+[/pawn]
+
+That's just changing variables in to arrays, if you need more information on this I would direct you to the wiki or other tutorials.
+
+[pawn]
+// This:
+public anyini_examples(idx, name[], value[])
+
+// Became:
+public anyini_examples(idx, name[], value[])
+[/pawn]
+
+All the publics (and their forwards) got a new parameter (here called "idx" but you can call it anything) at the start of their parameter list.  This is known as the "extra" parameter and is used to pass information to the function.  Note that you can't pass arrays or strings, only basic variables, but if you want to pass more data you can store it globally and pass the index of the data instead.
+
+[pawn]
+// This:
+INI_ParseFile("mine.INI", "anyini_%s");
+
+// Became:
+INI_ParseFile("mine.INI", "anyini_%s", .bExtra = true, .extra = 0);
+[/pawn]
+
+This code uses some of "INI_ParseFile"'s optional parameters.  The first, called "bExtra", tells "INI_ParseFile" to pass more data to the function, the second, called "extra" says what the data to pass is.  Note that the ".extra" format is a PAWN feature called "named parameters" and allows you to specify parameters in any order.  This can also be written using the default parameter order and no names as:
+
+[pawn]
+INI_ParseFile("mine.INI", "anyini_%s", false, true, 0);
+[/pawn]
+
+But that's more confusing as there is an extra parameter needed which has not been covered (it actually specifies wether the tag name or the filename should come first in the format specifier, the default (false) is tag name, as has been used, "INI_Load" sets this to "true" for filename).
+
+[size=5][color=red][b][u][color=green]User Files[/color][/u][/b][/color][/size]
+
+From the information covered so far constructing a basic user system should be fairly easy.  We know that the file names will not be known in advance and we know that we need to store all player's information separately, so that gives us a pretty good start point:
+
+[pawn]
+INI_ParseFile(userFile, "load_user_data_%s", .bExtra = true, .extra = playerid);
+[/pawn]
+
+The rest pretty much depends on your mode, this is a rough example:
+
+[pawn]
+enum E_PLAYER_DATA
+{
+	Float:E_PLAYER_HEALTH,
+	E_PLAYER_WEAPON,
+	E_PLAYER_CLAN[4]
+}
+
+new
+	gPlayerData[MAX_PLAYERS][E_PLAYER_DATA];
+
+public load_user_data_basic(playerid, name[], value[])
+{
+	INI_Float("health", gPlayerData[playerid][E_PLAYER_HEALTH]);
+	INI_Int("weapon", gPlayerData[playerid][E_PLAYER_WEAPON]);
+	INI_String("clan", gPlayerData[playerid][E_PLAYER_CLAN], 4);
+}
+
+OnPlayerLogin(playerid)
+{
+	// Make the filename.
+	new
+		playerNname[MAX_PLAYER_NAME];
+	GetPlayerName(playerid, playerName, MAX_PLAYER_NAME);
+	new
+		userFile[32];
+	format(userFile, sizeof (userFile), "users\%s.ini", playerName);
+	// Parse the file.
+	INI_ParseFile(userFile, "load_user_data_%s", .bExtra = true, .extra = playerid);
+}
+[/pawn]
+
+This would work for a user file something like:
+
+[code]
+[basic]
+health = 78.9
+weapon = 6
+clan = YSI
+[/code]
+
+For reference, the code to write this data would be something like:
+
+[pawn]
+OnPlayerLogout(playerid)
+{
+	// Make the filename.
+	new
+		playerNname[MAX_PLAYER_NAME];
+	GetPlayerName(playerid, playerName, MAX_PLAYER_NAME);
+	new
+		userFile[32];
+	format(userFile, sizeof (userFile), "users\%s.ini", playerName);
+	// Open the file.
+	new
+		INI:file = INI_Open(userFile);
+	// Set the tag.
+	INI_SetTag("basic");
+	// Write the data.
+	INI_WriteFloat(file, "health", gPlayerData[playerid][E_PLAYER_HEALTH]);
+	INI_WriteInt(file, "weapon", gPlayerData[playerid][E_PLAYER_WEAPON]);
+	INI_WriteString(file, "clan", gPlayerData[playerid][E_PLAYER_CLAN]);
+	// Close the file.
+	INI_Close(file);
+}
+[/pawn]

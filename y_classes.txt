@@ -1,0 +1,153 @@
+y_classes – The most flexible class library ever.
+
+[size=5][color=red][b][u][color=green]Introduction[/color][/u][/b][/color][/size]
+
+y_classes give you unparalleled control over the class selection menu.  In SA:MP you can only add skins, and you can only do that at the start of the mode.  With y_classes you can add skins, remove skins, make skins visible only to certain players and much more, at any time you like.  There is also no limit to the number of weapons that a skin can hold* and armour is a spawn option too.
+
+[size=5][color=red][b][u][color=green]How to use it[/color][/u][/b][/color][/size]
+
+[list][*][size=2][color=red][b][u][color=green]Adding[/color][/u][/b][/color][/size][/list]
+
+y_classes provides one main function: Class_Add.  This works in exactly the same way as AddStaticClass**, but is more dynamic in that it can be used anywhere in code and can have more than three weapons specified, including "WEAPON_ARMOUR" for spawn armour.  Example:
+
+[pawn]
+new cj = Class_Add(0, 0.0, 0.0, 4.0, 0.0, WEAPON_MP5, 500, WEAPON_ARMOUR, 50);
+[/pawn]
+
+That code will add a "CJ" skin which will spawn in the very center of SanAndreas (a random farm) with an MP5 with 500 bullets and 50 armour.  Class_Add returns the ID of the class, which is here stored in the variable "cj".
+
+[list][*][size=2][color=red][b][u][color=green]Deleting[/color][/u][/b][/color][/size][/list]
+
+Adding classes is done with "Class_Add", deleting classes is similarly done with "Class_Delete", this takes just one parameter – a class ID as returned by "Class_Add":
+
+[pawn]
+// Add the class.
+new cj = Class_Add(0, 0.0, 0.0, 4.0, 0.0, WEAPON_MP5, 500, WEAPON_ARMOUR, 50);
+// Remove the class.
+Class_Delete(cj);
+[/pawn]
+
+When a player enters the class selection menu now they will NOT see the "CJ" skin because it has been removed from the selection.
+
+[list][*][size=2][color=red][b][u][color=green]Visibility[/color][/u][/b][/color][/size][/list]
+
+Classes can be turned on and off for certain players.  This uses a very simple system:
+
+[pawn]
+Class_SetPlayer(classid, playerid, bool:set);
+[/pawn]
+
+This function takes the ID of a class, the ID of a player and a Boolean (true/false) value.  If "set" is "false" then the selected class will be invisible to the selected player, if "set" is "true" then the selected class will be visible to the selected player.  Obviously people who cannot see a skin cannot select the skin, making this system ideal for admin skins, president selections or other uses such as team/role selections as in Counter Strike and other games.
+
+[size=5][color=red][b][u][color=green]y_groups[/color][/u][/b][/color][/size]
+
+"Class_SetPlayer" on its own is a little hard to use (the syntax is easy, but updating for all players is cumbersome), this is why y_classes is very well integrated with "y_groups" to provide higher-level control over who can do what.  With "y_groups" you can group people together and perform actions on al those people at once – note that an admin level is a group, a team is a group, a gang or faction is a group etc.  Groups are just any collection of players with some attributes and abilities in common (note that you can be in multiple groups if, for example, you are a level 3 admin in a Police faction).
+
+y_groups is an optional system.  If you do not include it explicitly it will not be used (this was not as easy as it sounds), however when it is included y_classes has a few more functions available:
+
+[pawn]
+Class_AddForGroup(group, skin, x, y, z, a, (weapon, ammo)…);
+[/pawn]
+
+"Class_AddForGroup" is used the same as "Class_Add", but with an additional first parameter – the group which can see the skin.  If you use this function only people in the specified group (or added to the specified group) can see and select this skin.  This is useful for admin skins, only people in an admin group can see it to select it.
+
+[pawn]
+Class_AddWithGroupSet(group, skin, x, y, z, a, (weapon, amm)…);
+[/pawn]
+
+"Class_AddWithGroupSet" uses the normal rules for selection as "Class_Add" (i.e. anyone can select it unless you say otherwise with "Class_SetPlayer"), but once a player spawns with this skin, they will be automatically placed in the specified group.  This is useful for team selection, anyone who selects this skin will be automatically placed in the correct group, to use other group-restricted functions such as commands***.
+
+In addition to these is "Class_AddEx" – this is the function underlying all the others and can take both "forgroup", the group who can see the class; and "asgroup", the group a player will be added to on spawn when selecting this skin.
+
+[list][*][size=2][color=red][b][u][color=green]Examples[/color][/u][/b][/color][/size][/list]
+
+There are two released modes which demonstrate y_classes used with y_groups:
+
+[list][*][size=2][u]Class Menu[/u][/size][/list]
+
+This mode allows you to select which type of skin you would like from a menu and then allows you to select one of the skins of that type:
+
+http://forum.sa-mp.com/showthread.php?t=196200
+
+[list][*][size=2][u]City Selection[/u][/size][/list]
+
+This mode allows you to first select a city and then select a class for just that city.  The classes for the other cities are not available at all.  There is also an admin skin you can use by typing "/fl", which adds the skin to your class selection menu.  This could easilly be modified to select teams then roles instead of cities then skins:
+
+http://forum.sa-mp.com/showthread.php?t=244262
+
+[size=5][color=red][b][u][color=green]Callbacks[/color][/u][/b][/color][/size]
+
+y_classes adds "OnPlayerRequestSpawnEx" – this is "OnPlayerRequestSpawn" with a "classid" parameter, but this can be ignored, additionally, it adds an extra return value.  As in normal SA:MP "return 0;" refuses to let the player spawn with a given class and "return 1;" allows them to spawn.  With y_classes "return -1;" means they don’t spawn and their current selection is reprocessed, for example if you change the classes a player can see so they can’t see the current skin a re-process will be required to update which class is seen on screen.
+
+[list][*][size=2][color=red][b][u][color=green]Examples[/color][/u][/b][/color][/size][/list]
+
+Again the "City Selection" example is applicable here, the code for which is below:
+
+[pawn]
+public OnPlayerRequestSpawnEx(playerid, classid)
+{
+	// return 0 - Don't allow the spawn
+	// return 1 - Allow the spawn
+	// return -1 - Don't allow the spawn and re-process the current class
+	
+	// -1 is used here to show a different skin as they've selected a city
+	// thus their group has changed, thus their current skin selection
+	// options have changed
+	if (classid < 3)
+	{
+		// City selection
+		// Remove from the no city group
+		Group_SetPlayer(gGroupNC, playerid, false);
+		// Redo selection with new groups
+		return -1;
+	}
+	// Selected a skin - let them spawn.
+	return 1;
+}
+[/pawn]
+
+If the class selected has an id of less than 3 it is one of the cities (actually, this can't be guaranteed, you're always best off saving return values) and so the player's groups are changed and they are sent back to class selection.  Note that if "-1" is used with "Class_AddWithGroupSet" the player is still added to the specified group, even though they didn't spawn with that class.  So the code above (implicitly) adds the player to a city group and (explicitly) removes them from the no city group, meaning they can only select one of the skins for that one city.
+
+[size=5][color=red][b][u][color=green]Advanced[/color][/u][/b][/color][/size]
+
+There are a number of advanced functions available:
+
+[list][*][size=2][color=red][b][u][color=green]Functions[/color][/u][/b][/color][/size][/list]
+
+[list]
+[*][b]Class_Goto(playerid, classid);[/b]
+
+When a player is in class selection this function sets the class they can currently see.  In most scripts you must always start from the beginning of the skins list, this allows you to skip to anywhere in the list.
+
+[*][b]Class_DenySelection(playerid);[/b]
+
+Puts the player in a spectate mode where they can't select a class (e.g. for before they log in when they connect to the server).
+
+[*][b]Class_ReturnToSelection(playerid);[/b]
+
+Instantly sends a player back to class selection.  Can be used after "Class_DenySelection" to allow a player to select a class.
+
+[*][b]Class_Disable(classid);[/b]
+
+Entirely disables a class so no-one can use it, but keeps the information (for "protect the VIP" style modes).
+
+[*][b]Class_Enable(classid);[/b]
+
+Re-enables a previously disabled class.
+
+[*][b]Class_AllowReselection(set);[/b]
+
+Enable or disable returning to class selection for all players (i.e. enable or disable "F4").
+
+[list][*][size=2][color=red][b][u][color=green]y_master[/color][/u][/b][/color][/size][/list]
+
+y_master means that y_classes can be used from all scripts nicely.  Any script can add skins and any script can remove skins, even skins added by other scripts.  This allows for separation of concerns - your gamemode need not have anything to do with your admin system, it doesn't even need to add the admin skin for example.
+
+[size=5][color=red][b][u][color=green]Footnotes[/color][/u][/b][/color][/size]
+
+* There is a real limit of 13, but that’s only because players can (currently) only hold 13 weapons of certain types at once.
+
+** Future versions of the code will override AddStaticClass to make it the same as Class_Add.
+
+*** Group specific commands provided by y_commands.
+ 
