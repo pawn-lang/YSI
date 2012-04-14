@@ -119,9 +119,9 @@ Operators:
 	-
 -*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
-#include <YSI\y_debug>
-#include <YSI\internal\y_funcinc>
+#include "internal\y_version"
+#include "y_debug"
+#include "internal\y_funcinc"
 
 #define MALLOC_KB_TO_CELL ((1024 * 8) / cellbits)
 

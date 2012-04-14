@@ -92,9 +92,9 @@ Operators:
 	-
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
-#include <YSI\internal\y_funcinc>
-#include <YSI\y_utils>
+#include "internal\y_version"
+#include "internal\y_funcinc"
+#include "y_utils"
 
 //#define va_args<%0> %0
 #define va_args<%0> GLOBAL_TAG_TYPES:...

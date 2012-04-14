@@ -107,9 +107,9 @@ Compile options:
 	-
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
-#include <YSI\y_debug>
-#include <YSI\y_utils>
+#include "internal\y_version"
+#include "y_debug"
+#include "y_utils"
 
 // This is redefined below, don't worry.  It's like this so the function
 // prototypes can use a familiar syntax.

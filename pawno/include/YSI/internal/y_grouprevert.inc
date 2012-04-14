@@ -64,7 +64,7 @@ Changelog:
 	// GAAA?  Clearly something was annoying me...
 #endif
 
-#include <YSI\y_master>
+#include "..\y_master"
 
 #if defined GROUP_LIBRARY_NAME && defined GROUP_LIBRARY_SIZE
 	#undef _GROUP_MAKE_NAME

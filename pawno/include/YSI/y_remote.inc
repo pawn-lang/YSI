@@ -93,11 +93,11 @@ Natives:
 	-
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 
-#include <YSI\internal\y_shortfunc>
+#include "internal\y_shortfunc"
 
-#include <YSI\y_utils>
+#include "y_utils"
 
 // IMPORTANT NOTE!  To avoid polluting the global name space (any more that is),
 // "y_inline" uses @Ru, @Rv, @Rw, @Rx and @Ry, as both files are low usage.

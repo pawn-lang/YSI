@@ -71,20 +71,20 @@ Changelog:
 // Disable this version!
 #if defined USE_Y_TIMERS_V1
 	
-	#include <YSI\internal\y_timersold>
+	#include "internal\y_timersold"
 	#endinput
 	
 #endif
 
-#include <YSI\internal\y_version>
-#include <YSI\y_amx>
-#include <YSI\internal\y_shortfunc>
-#include <YSI\y_malloc>
-#include <YSI\y_iterate>
+#include "internal\y_version"
+#include "y_amx"
+#include "internal\y_shortfunc"
+#include "y_malloc"
+#include "y_iterate"
 // This will be called twice and means there are two separate OnScriptInit
 // functions in this file.
-#include <YSI\y_hooks>
-#include <YSI\y_debug>
+#include "y_hooks"
+#include "y_debug"
 
 #define task%0[%1](%2) %0@yT_(g,p);public%0@yT_(g,p){static s=-1;return _Timer_I(#%0,%1,g,s);}%0();public%0()
 

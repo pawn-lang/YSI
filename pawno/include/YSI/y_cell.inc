@@ -86,8 +86,8 @@ Compile options:
 	-
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
-#include <YSI\y_utils>
+#include "internal\y_version"
+#include "y_utils"
 
 stock Cell_ReverseBits(GLOBAL_TAG_TYPES:data)
 {

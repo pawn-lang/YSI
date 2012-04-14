@@ -11,7 +11,7 @@ Description:
 	want and include the script:
 	
 	  #define MASTER 14
-	  #include <YSI\Master>
+	  #include "Master"
 	
 	That will make the current script attempt to make itself the main master -
 	you don't need ANY other code for initialisation anywhere (which took a
@@ -129,13 +129,13 @@ Natives:
 
 #if !defined _INC_y_master
 	// Only do these once.
-	#include <YSI\internal\y_version>
-	#include <YSI\y_debug>
+	#include "internal\y_version"
+	#include "y_debug"
 	
 	// Don't do this at all - if they want to use hooks they need to include it.
-	//#include <YSI\y_hooks>
+	//#include "y_hooks"
 	
-	#include <YSI\internal\y_natives>
+	#include "internal\y_natives"
 	
 	#define _INC_y_master
 #endif
@@ -158,7 +158,7 @@ Natives:
 	#endif
 	//#define MASTER _YSIM_LAST_MANUAL
 	#define _YSIM_OVERRIDE _YSIM_LAST_MANUAL
-	#include <YSI\internal\y_overridemaster>
+	#include "internal\y_overridemaster"
 #elseif defined MASTER
 	#if !defined _YSIM_MANUAL_SET
 		#define _YSIM_MANUAL_SET
@@ -229,7 +229,7 @@ Natives:
 	//#define YSIM_STORED_SETTINGS YSIM_RECALL_19
 	//#define _YSIM_AUTODEF
 	#if defined _YSIM_OVERRIDE
-		#include <YSI\internal\y_overridemaster>
+		#include "internal\y_overridemaster"
 		#if !defined MASTER
 			#error _YSIM_OVERRIDE used with an invalid master value.
 		#endif
@@ -269,7 +269,7 @@ Natives:
 				#endif
 			#elseif defined _YSIM_LAST_MANUAL
 				#define _YSIM_OVERRIDE _YSIM_LAST_MANUAL
-				#include <YSI\internal\y_overridemaster>
+				#include "internal\y_overridemaster"
 			#else
 				// Default for user scripts.
 				#define MASTER 23
@@ -360,7 +360,7 @@ Natives:
 	// This section of code just got a lot more complicated given that you may
 	// want to define "YSI_IS_STUB" for custom libraries AND "YSI_IS_OTHER" for
 	// YSI libraries to default to when not stubs.
-	#include <YSI\internal\y_masterresolve>
+	#include "internal\y_masterresolve"
 	// Can't have a global stub (it makes no sense as all the YSI code exists).
 	/*#if defined YSI_IS_STUB
 		#error Cannot have a global stub, use YSIM_U_ENABLE.
@@ -436,9 +436,9 @@ Natives:
 	//#undef Master_Init
 #endif
 
-#include <YSI\y_utils>
+#include "y_utils"
 
-#include <YSI\internal\y_masteronce>
+#include "internal\y_masteronce"
 
 // Clear up some artifacts
 #if defined YSIM_DEFINED
@@ -1297,7 +1297,7 @@ Natives:
 				//  
 				//  #define YSIM_U_ENABLE
 				//  #define MASTER 10
-				//  #include <YSI\y_master>
+				//  #include "y_master"
 				//  
 				//  RF@p:CreateObject[ifff](modelid,Float:x,Float:y,Float:z)<modelid,x,y,z>;
 				//  

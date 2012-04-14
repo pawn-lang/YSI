@@ -67,17 +67,17 @@ Variables:
 	#error Please define "MODE_NAME" before including y_svar.
 #endif
 
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 
-#include <YSI\y_amx>
-#include <YSI\y_debug>
-#include <YSI\y_utils>
+#include "y_amx"
+#include "y_debug"
+#include "y_utils"
 
-#include <YSI\y_ini>
+#include "y_ini"
 
-#include <YSI\y_hooks>
+#include "y_hooks"
 
-#include <YSI\internal\y_stripnumbers>
+#include "internal\y_stripnumbers"
 
 // Third "uvar" version.
 #define _YS@LE@E%0>

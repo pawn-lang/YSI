@@ -89,11 +89,11 @@ Operators:
 	-
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 #define YSIM_U_DISABLE
-#include <YSI\y_master>
+#include "y_master"
 
-#include <YSI\y_hooks>
+#include "y_hooks"
 
 #if !defined MAX_LANGUAGES
 	#define MAX_LANGUAGES (4)
@@ -381,4 +381,4 @@ mhook OnPlayerConnect(playerid)
 }
 
 //#define YSI_SET_LAST_GROUP 21
-#include <YSI\internal\y_grouprevert>
+#include "internal\y_grouprevert"

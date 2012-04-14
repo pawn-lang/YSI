@@ -64,20 +64,20 @@ Variables:
 
 // y_dialog - does stuff with dialogs.
 
-#include <YSI\internal\y_version>
-#include <YSI\y_bit>
+#include "internal\y_version"
+#include "y_bit"
 
-#include <YSI\y_remote>
+#include "y_remote"
 
-#include <YSI\y_inline>
-#include <YSI\y_iterate>
+#include "y_inline"
+#include "y_iterate"
 
-#include <YSI\y_hooks>
+#include "y_hooks"
 
-#include <YSI\y_amx>
+#include "y_amx"
 
 #define YSIM_U_DISABLE
-#include <YSI\y_master>
+#include "y_master"
 
 #if !defined MAX_DIALOGS
 	#define MAX_DIALOGS (2000)
@@ -372,4 +372,4 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 }*/
 
 //#define YSI_SET_LAST_GROUP 19
-#include <YSI\internal\y_grouprevert>
+#include "internal\y_grouprevert"

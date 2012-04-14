@@ -60,7 +60,7 @@ Changelog:
 // unfortunately no longer has one function spread between two files, which was
 // a very unique (required) code feature.  However this version should be better
 // overall (at least slightly).
-#include <YSI\y_hooks>
+#include "..\y_hooks"
 	
 /*	// This is actually the second half of a function!
 	//_GROUP_INIT(group);

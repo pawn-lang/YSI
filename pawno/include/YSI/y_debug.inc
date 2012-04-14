@@ -108,13 +108,13 @@ Operators:
 	-
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 
-#include <YSI\internal\y_funcinc>
+#include "internal\y_funcinc"
 
-#include <YSI\y_scriptinit>
+#include "y_scriptinit"
 
-#include <YSI\internal\y_natives>
+#include "internal\y_natives"
 
 #if !defined _DEBUG
 	#define _DEBUG 0

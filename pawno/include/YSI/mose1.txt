@@ -87,8 +87,8 @@ Operators:
 	-
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
-#include <YSI\y_hooks>
+#include "internal\y_version"
+#include "y_hooks"
 
 enum E_MOUSE_PLAYER_RESTORE
 {

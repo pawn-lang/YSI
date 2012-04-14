@@ -109,10 +109,10 @@ Operators:
 	-
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 
-#include <YSI\y_debug>
-#include <YSI\y_utils>
+#include "y_debug"
+#include "y_utils"
 
 #define BINTREE_NO_BRANCH -1
 #define BINTREE_NOT_FOUND -1

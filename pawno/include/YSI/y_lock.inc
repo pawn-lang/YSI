@@ -109,10 +109,10 @@ Variables:
 #endif
 
 #define YSI_LOCK_MODE
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 
-#include <YSI\y_amx>
-#include <YSI\y_hooks>
+#include "y_amx"
+#include "y_hooks"
 
 _DoYLock(P:C(from);)
 {

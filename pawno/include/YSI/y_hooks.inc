@@ -65,7 +65,7 @@ Changelog:
 #undef _inc_y_hooks
 
 // Multiple includes!
-#include <YSI\internal\y_unique>
+#include "internal\y_unique"
 
 #if defined _INC_y_hooks
 	#endinput
@@ -73,4 +73,4 @@ Changelog:
 // Everything except including "y_unique" is done once only.
 #define _INC_y_hooks
 
-#include <YSI\internal\y_dohooks>
+#include "internal\y_dohooks"

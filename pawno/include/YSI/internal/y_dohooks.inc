@@ -62,11 +62,11 @@ Changelog:
 		First version
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
+#include "y_version"
 #include <a_samp>
-#include <YSI\y_debug>
+#include "..\y_debug"
 
-#include <YSI\y_amx>
+#include "..\y_amx"
 
 #define ALS_PREFIX S@@
 
@@ -81,7 +81,7 @@ Changelog:
 
 #define Hook:%0On%1(%2) UNIQUE_FUNCTION<@yH_%1...%0>(%2);UNIQUE_FUNCTION<@yH_%1...%0>(%2)
 
-#include <YSI\y_als>
+#include "..\y_als"
 
 /*#if !defined OnPlayerLogin
 #endif

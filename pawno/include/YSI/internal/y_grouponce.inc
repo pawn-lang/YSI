@@ -55,21 +55,21 @@ Changelog:
 \*----------------------------------------------------------------------------*/
 
 #include <a_samp>
-//#include <YSI\y_scriptinit>
+//#include "..\y_scriptinit"
 
 #define YSIM_U_DISABLE
-#include <YSI\y_master>
-#include <YSI\y_playerarray>
+#include "..\y_master"
+#include "..\y_playerarray"
 
-#include <YSI\y_stringhash>
-#include <YSI\y_debug>
+#include "..\y_stringhash"
+#include "..\y_debug"
 
-//#include <YSI\y_hooks>
-#include <YSI\y_amx>
+//#include "..\y_hooks"
+#include "..\y_amx"
 
-#include <YSI\y_iterate>
+#include "..\y_iterate"
 
-#include <YSI\y_hooks>
+#include "..\y_hooks"
 
 //#define _YSI_HAS_GROUP_SYSTEM
 
@@ -787,4 +787,4 @@ stock _Group_ChainCall2(s, g, p, n)
 //#define PlayerGroups(%0)_YSII_Sg;_:%1!=-1;%2=_Y_ITER_ARRAY:%8PlayerGroups(%3)_YSII_Ag[%4] YSI_gSPlayerGroupsFunc(%0);_:%1!=-1;%2=YSI_gAPlayerGroupsFunc(%3,%4)
 
 #define _YSIM_RESET_USER
-#include <YSI\y_master>
+#include "..\y_master"
