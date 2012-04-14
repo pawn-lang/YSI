@@ -385,7 +385,7 @@ static stock Format_AddColour(str[], pos, &rem, &curCol, newCol) <y_render_show 
 	}
 	format(str[pos], rem + 1, "{%06x}", rgb);
 	rem -= Y_RENDER_SCM_COLOUR_LEN;
-	//curCol = newCol;
+	curCol = newCol;
 	return Y_RENDER_SCM_COLOUR_LEN;
 }
 
