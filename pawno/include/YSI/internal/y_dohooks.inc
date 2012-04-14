@@ -50,6 +50,8 @@ Legal:
 Version:
 	2.0
 Changelog:
+	14/04/12:
+		Added crash fix from Slice, now returning correct values.
 	25/02/12:
 		Extracted most of the code to a separate file.
 	17/03/11:
@@ -120,7 +122,23 @@ static stock
 	YSI_g_sCallbackData[ALS][E_FUNC_HOOK_DATA],
 	YSI_g_sLastFoundIndex;
 
-Hooks_RedirectPublic(from[], to[])
+static Hooks_Blank_Return1N()
+{
+	// Bug fix from Slice.
+	return -1;
+}
+
+static Hooks_Blank_Return0()
+{
+	return 0;
+}
+
+static Hooks_Blank_Return1()
+{
+	return 1;
+}
+
+Hooks_RedirectPublic(from[], to[], final = 1)
 {
 	P:4("Hooks_RedirectPublic called: \"%s\", \"%s\"", from, to);
 	new
@@ -144,7 +162,26 @@ Hooks_RedirectPublic(from[], to[])
 			// it, however, the callback will no longer exist (unless PAWN
 			// buffers callbacks in an efficient structure, which is possible).
 			// UPDATE: Clearly not.
-			AMX_Write(addr, -1);
+			//AMX_Write(addr, -1);
+			switch (final)
+			{
+				case 0:
+				{
+					#emit CONST.pri   Hooks_Blank_Return0
+					#emit STOR.S.pri  pointer
+				}
+				case -1:
+				{
+					#emit CONST.pri   Hooks_Blank_Return1N
+					#emit STOR.S.pri  pointer
+				}
+				default:
+				{
+					#emit CONST.pri   Hooks_Blank_Return1
+					#emit STOR.S.pri  pointer
+				}
+			}
+			AMX_Write(addr, pointer);
 		}
 		return ret;
 	}
@@ -191,14 +228,14 @@ static Hooks_FindAll(name[], &toaddidx, struc[E_FUNC_HOOK_DATA]) //, &count)
 	{
 		P:W("y_hooks buffer exhausted, resorting to slow method.");
 	}
-	//count = struc[E_FUNC_HOOK_DATA_END] - struc[E_FUNC_HOOK_DATA_START];
-	return struc[E_FUNC_HOOK_DATA_END] - struc[E_FUNC_HOOK_DATA_START];
 	// Don't store the end, if the count goes off the end of the addresses array
 	// then we need to just start reading from the AMX directly.
-	P:4("Hooks_FindAll end: %s %d %d", name, toaddidx, count);
+	P:4("Hooks_FindAll end: %s %d %d", name, toaddidx, struc[E_FUNC_HOOK_DATA_END] - struc[E_FUNC_HOOK_DATA_START]);
+	//count = struc[E_FUNC_HOOK_DATA_END] - struc[E_FUNC_HOOK_DATA_START];
+	return struc[E_FUNC_HOOK_DATA_END] - struc[E_FUNC_HOOK_DATA_START];
 }
 
-#define HOOKS_DO_ONE_CALLBACK<%0> ALS_DETECT<%0>if(!Hooks_FindAll(#%0,cidx,YSI_g_sCallbackData[ALS_On%0]))Hooks_RedirectPublic(#On%0,#S@@_On%0);
+#define HOOKS_DO_ONE_CALLBACK<%0> ALS_DETECT<%0>if(!Hooks_FindAll(#%0,cidx,YSI_g_sCallbackData[ALS_On%0]))Hooks_RedirectPublic(#On%0,#S@@_On%0,ALS_R_%0);
 #define HOOKS_DO_ONE_SPECIAL<%0> if(Hooks_FindAll(#%0,cidx,YSI_g_sCallbackData[ALS_On%0]))state y_hooks_%0 : y_hooks_%0_some;else state y_hooks_%0 : y_hooks_%0_none;
 
 static Hooks_OnScriptInit()
@@ -214,6 +251,12 @@ static Hooks_OnScriptInit()
 	//HOOKS_DO_ONE_CALLBACK<GameModeExit>
 	//HOOKS_DO_ONE_CALLBACK<FilterScriptInit>
 	//HOOKS_DO_ONE_CALLBACK<FilterScriptExit>
+	ALS_DETECT<ScriptInit>
+	ALS_DETECT<ScriptExit>
+	ALS_DETECT<GameModeInit>
+	ALS_DETECT<GameModeExit>
+	ALS_DETECT<FilterScriptInit>
+	ALS_DETECT<FilterScriptExit>
 	Hooks_FindAll(#ScriptInit, cidx, YSI_g_sCallbackData[ALS_OnScriptInit]);
 	if (YSI_FILTERSCRIPT)
 	{

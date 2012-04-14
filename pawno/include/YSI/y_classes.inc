@@ -162,6 +162,9 @@ Operators:
 //forward OnPlayerRequestClassEx_(playerid, classid);
 //forward OnPlayerRequestSpawnEx_(playerid, classid);
 forward _Class_OnPlayerRequestClass(playerid, classid);
+forward _Class_OnPlayerRequestSpawn(playerid);
+forward _Class_OtherRequestClass(playerid, classid);
+forward _Class_OtherRequestSpawn(playerid);
 
 #define INFINATE_ARMOUR                 (0x00800000)
 
@@ -234,7 +237,9 @@ static stock
 	YSI_g_sRight,
 	e_CLASS_SETTINGS:YSI_g_sSettings,
 	YSI_g_sClassCount,
-	YSI_g_sHook;
+	YSI_g_sHookC,
+	YSI_g_sHookS,
+	YSI_g_sLastRefuse[MAX_PLAYERS];
 
 stock
 	bool:YSI_gOPRCE = true;
@@ -401,8 +406,10 @@ hook OnScriptInit()
 			#endif
 		}
 	#endif
-	Hooks_RedirectPublic("OnPlayerRequestClass", "_Class_OnPlayerRequestClass");
-	//YSI_g_sHook = Hooks_RedirectPublic("OnPlayerRequestClass", "_Class_OnPlayerRequestClass");
+	//Hooks_RedirectPublic("OnPlayerRequestClass", "_Class_OnPlayerRequestClass");
+	//Hooks_RedirectPublic("OnPlayerRequestSpawn", "_Class_OnPlayerRequestSpawn");
+	YSI_g_sHookC = Hooks_RedirectPublic("OnPlayerRequestClass", "_Class_OnPlayerRequestClass");
+	YSI_g_sHookS = Hooks_RedirectPublic("OnPlayerRequestSpawn", "_Class_OnPlayerRequestSpawn");
 	return 1;
 }
 
@@ -440,160 +447,198 @@ static stock Class_FindNew(playerid, playerclass, dir)
 	return playerclass;
 }
 
-//mhook OnPlayerRequestClass(playerid, classid)
-public _Class_OnPlayerRequestClass(playerid, classid)
+public _Class_OtherRequestClass(playerid, classid)
 {
-	if (YSI_g_sPlayerClass[playerid] & (e_PLAYER_CLASS_IGNORE_ONCE))
+	if (YSI_g_sHookC)
 	{
-		SetTimerEx("_Class_SpawnPlayer3", 10, 0, "i", playerid);
+		#emit PUSH.S     classid
+		#emit PUSH.S     playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.pri   YSI_g_sHookC
+		#emit SCTRL      6
+		#emit RETN
+	}
+}
+
+#if !defined YSI_NO_MASTER && _YSIM_IS_CLIENT
+	public _Class_OnPlayerRequestClass(playerid, classid)
+	{
 		return 1;
 	}
-	P:1("_Class_OnPlayerRequestClass called: %d %d", playerid, classid);
-	Class_TK(playerid);
-	new
-		dir = CLASS_MOVE_RIGHT;
-	// Spawned from returning to class selection but not meant to.
-	//P:5("Class_OnPlayerRequestClass(): Spawn check %d %d", playerclass, playerclass); //(playerclass & e_PLAYER_CLASS_SPAWN_CHECK), e_PLAYER_CLASS_SPAWN_CHECK);
-	// Find which direction they pressed.
-	switch (YSI_g_sPlayerClass[playerid] & e_PLAYER_CLASS_PRESS)
-	{
-		case e_PLAYER_CLASS_RIGHT:
+#else
+	#if !defined YSI_NO_MASTER && _YSIM_IS_CLOUD
+		//mhook OnPlayerRequestClass(playerid, classid)
+		public _Class_OnPlayerRequestClass(playerid, classid) <>
 		{
+			return 1;
+		}
+		
+		//mhook OnPlayerRequestClass(playerid, classid)
+		public _Class_OnPlayerRequestClass(playerid, classid) <_YCM:y>
+		{
+	#else
+		//mhook OnPlayerRequestClass(playerid, classid)
+		public _Class_OnPlayerRequestClass(playerid, classid)
+		{
+	#endif
+			if (YSI_g_sPlayerClass[playerid] & (e_PLAYER_CLASS_IGNORE_ONCE))
+			{
+				SetTimerEx("_Class_SpawnPlayer3", 10, 0, "i", playerid);
+				return 1;
+			}
+			P:1("_Class_OnPlayerRequestClass called: %d %d", playerid, classid);
+			Class_TK(playerid);
+			new
+				dir = CLASS_MOVE_RIGHT;
+			// Spawned from returning to class selection but not meant to.
+			//P:5("Class_OnPlayerRequestClass(): Spawn check %d %d", playerclass, playerclass); //(playerclass & e_PLAYER_CLASS_SPAWN_CHECK), e_PLAYER_CLASS_SPAWN_CHECK);
+			// Find which direction they pressed.
+			switch (YSI_g_sPlayerClass[playerid] & e_PLAYER_CLASS_PRESS)
+			{
+				case e_PLAYER_CLASS_RIGHT:
+				{
+					if (classid == YSI_g_sMiddle)
+					{
+						// Went from the right to the middle - that's a move left.
+						dir = CLASS_MOVE_LEFT;
+					}
+					else if (classid != YSI_g_sLeft)
+					{
+						dir = CLASS_MOVE_NONE;
+					}
+				}
+				case e_PLAYER_CLASS_MIDDLE:
+				{
+					if (classid == YSI_g_sLeft)
+					{
+						// Went from the middle to the left - that's a move left.
+						dir = CLASS_MOVE_LEFT;
+					}
+					else if (classid != YSI_g_sRight)
+					{
+						dir = CLASS_MOVE_NONE;
+					}
+				}
+				default:
+				{
+					if (classid == YSI_g_sRight)
+					{
+						// Went from the left to the right - that's a wrap move left.
+						dir = CLASS_MOVE_LEFT;
+					}
+					else if (classid != YSI_g_sMiddle)
+					{
+						dir = CLASS_MOVE_NONE;
+					}
+				}
+			}
+			// Store which class they are now on.
+			//printf("%d %d %d %d", classid, YSI_g_sMiddle, YSI_g_sLeft, YSI_g_sRight);
 			if (classid == YSI_g_sMiddle)
 			{
-				// Went from the right to the middle - that's a move left.
-				dir = CLASS_MOVE_LEFT;
+				YSI_g_sPlayerClass[playerid] = (YSI_g_sPlayerClass[playerid] & ~e_PLAYER_CLASS_PRESS) | e_PLAYER_CLASS_MIDDLE | e_PLAYER_CLASS_INSELECT;
 			}
-			else if (classid != YSI_g_sLeft)
+			else if (classid == YSI_g_sLeft)
 			{
-				dir = CLASS_MOVE_NONE;
+				YSI_g_sPlayerClass[playerid] = (YSI_g_sPlayerClass[playerid] & ~e_PLAYER_CLASS_PRESS) | e_PLAYER_CLASS_LEFT | e_PLAYER_CLASS_INSELECT;
 			}
-		}
-		case e_PLAYER_CLASS_MIDDLE:
-		{
-			if (classid == YSI_g_sLeft)
+			else if (classid == YSI_g_sRight)
 			{
-				// Went from the middle to the left - that's a move left.
-				dir = CLASS_MOVE_LEFT;
+				YSI_g_sPlayerClass[playerid] = (YSI_g_sPlayerClass[playerid] & ~e_PLAYER_CLASS_PRESS) | e_PLAYER_CLASS_RIGHT | e_PLAYER_CLASS_INSELECT;
 			}
-			else if (classid != YSI_g_sRight)
+			P:C(else {P:E("y_classes unidentified classid.");YSI_g_sPlayerClass[playerid] |= e_PLAYER_CLASS_INSELECT;});
+			classid = (YSI_g_sPlayerClass[playerid] & e_PLAYER_CLASS_SKIN);
+			if (YSI_g_sClassCount)
 			{
-				dir = CLASS_MOVE_NONE;
+				// Find the next available skin for this player.  I'm still not sure how
+				// this handles the case where you can't use any skin.  I'll have to
+				// look in to that.
+				// Don't want to get stuck constantly adding "0".
+				classid = Class_FindNew(playerid, classid, dir);
+				P:5("Class_OnPlayerRequestClass() selected: %d", classid);
+				Class_Goto(playerid, _:classid);
 			}
-		}
-		default:
-		{
-			if (classid == YSI_g_sRight)
+			else
 			{
-				// Went from the left to the right - that's a wrap move left.
-				dir = CLASS_MOVE_LEFT;
+				SetSpawnInfo(playerid, NO_TEAM, 0, 1958.0, 1343.0, 15.0, 269.0, 0, 0, 0, 0, 0, 0);
+				SetPlayerSkin(playerid, 0);
+				P:E("No YSI classes found");
+				classid = -1;
 			}
-			else if (classid != YSI_g_sMiddle)
+			// Now sort out if they actually should be spawned.
+			/*if (YSI_g_sPlayerClass[playerid] & (e_PLAYER_CLASS_IGNORE_ONCE))
 			{
-				dir = CLASS_MOVE_NONE;
+				YSI_g_sPlayerClass[playerid] &= ~(e_PLAYER_CLASS_IGNORE_ONCE);
+				return 1;
 			}
+			else*/
+			if (YSI_g_sPlayerClass[playerid] & (e_PLAYER_CLASS_RETURNED | e_PLAYER_CLASS_SPAWNSINCE) == (e_PLAYER_CLASS_RETURNED | e_PLAYER_CLASS_SPAWNSINCE))
+			{
+				YSI_g_sPlayerClass[playerid] &= ~(e_PLAYER_CLASS_RETURNED | e_PLAYER_CLASS_SPAWNSINCE);
+				Class_Spectate(playerid);
+				//SpawnPlayer(playerid);
+				//printf("0");
+				SetTimerEx("_Class_SpawnPlayer2", 10, 0, "i", playerid);
+				YSI_g_sTimer[playerid] = SetTimerEx("_Class_SpawnPlayer4", 50, 0, "i", playerid);
+				/*if (YSI_g_sHookC)
+				{
+					#emit PUSH.C     0xFFFFFFFF
+					#emit PUSH.S     playerid
+					#emit PUSH.C     8
+					#emit LCTRL      6
+					#emit ADD.C      28
+					#emit PUSH.pri
+					#emit LOAD.pri   YSI_g_sHookC
+					#emit SCTRL      6
+					//#emit RETN
+				}*/
+				CallRemoteFunction("_Class_OtherRequestClass", "ii", playerid, -1);
+			}
+			else if (YSI_g_sPlayerClass[playerid] & (e_PLAYER_CLASS_RETURNED | e_PLAYER_CLASS_DISABLED | e_PLAYER_CLASS_HADFIRST) == (e_PLAYER_CLASS_DISABLED | e_PLAYER_CLASS_HADFIRST))
+			{
+				// If class selection is disabled for this player, they have already selected
+				// a class and we haven't manually sent them back to the menu.
+				//YSI_g_sPlayerClass[playerid] &= ~(e_PLAYER_CLASS_RETURNED | e_PLAYER_CLASS_SPAWNSINCE);
+				Class_Spectate(playerid);
+				//SpawnPlayer(playerid);
+				//printf("1");
+				SetTimerEx("_Class_SpawnPlayer1", 10, 0, "i", playerid);
+				/*if (YSI_g_sHookC)
+				{
+					#emit PUSH.C     0xFFFFFFFF
+					#emit PUSH.S     playerid
+					#emit PUSH.C     8
+					#emit LCTRL      6
+					#emit ADD.C      28
+					#emit PUSH.pri
+					#emit LOAD.pri   YSI_g_sHookC
+					#emit SCTRL      6
+					//#emit RETN
+				}*/
+				CallRemoteFunction("_Class_OtherRequestClass", "ii", playerid, -1);
+			}
+			else
+			{
+				/*if (YSI_g_sHookC)
+				{
+					#emit PUSH.S     classid
+					#emit PUSH.S     playerid
+					#emit PUSH.C     8
+					#emit LCTRL      6
+					#emit ADD.C      28
+					#emit PUSH.pri
+					#emit LOAD.pri   YSI_g_sHookC
+					#emit SCTRL      6
+					//#emit RETN
+				}*/
+				CallRemoteFunction("_Class_OtherRequestClass", "ii", playerid, classid);
+			}
+			return 1;
 		}
-	}
-	// Store which class they are now on.
-	//printf("%d %d %d %d", classid, YSI_g_sMiddle, YSI_g_sLeft, YSI_g_sRight);
-	if (classid == YSI_g_sMiddle)
-	{
-		YSI_g_sPlayerClass[playerid] = (YSI_g_sPlayerClass[playerid] & ~e_PLAYER_CLASS_PRESS) | e_PLAYER_CLASS_MIDDLE | e_PLAYER_CLASS_INSELECT;
-	}
-	else if (classid == YSI_g_sLeft)
-	{
-		YSI_g_sPlayerClass[playerid] = (YSI_g_sPlayerClass[playerid] & ~e_PLAYER_CLASS_PRESS) | e_PLAYER_CLASS_LEFT | e_PLAYER_CLASS_INSELECT;
-	}
-	else if (classid == YSI_g_sRight)
-	{
-		YSI_g_sPlayerClass[playerid] = (YSI_g_sPlayerClass[playerid] & ~e_PLAYER_CLASS_PRESS) | e_PLAYER_CLASS_RIGHT | e_PLAYER_CLASS_INSELECT;
-	}
-	P:C(else {P:E("y_classes unidentified classid.");YSI_g_sPlayerClass[playerid] |= e_PLAYER_CLASS_INSELECT;});
-	classid = (YSI_g_sPlayerClass[playerid] & e_PLAYER_CLASS_SKIN);
-	if (YSI_g_sClassCount)
-	{
-		// Find the next available skin for this player.  I'm still not sure how
-		// this handles the case where you can't use any skin.  I'll have to
-		// look in to that.
-		// Don't want to get stuck constantly adding "0".
-		classid = Class_FindNew(playerid, classid, dir);
-		P:5("Class_OnPlayerRequestClass() selected: %d", classid);
-		//Class_Goto(playerid, _:classid);
-	}
-	else
-	{
-		SetSpawnInfo(playerid, NO_TEAM, 0, 1958.0, 1343.0, 15.0, 269.0, 0, 0, 0, 0, 0, 0);
-		SetPlayerSkin(playerid, 0);
-		P:E("No YSI classes found");
-		classid = -1;
-	}
-	// Now sort out if they actually should be spawned.
-	/*if (YSI_g_sPlayerClass[playerid] & (e_PLAYER_CLASS_IGNORE_ONCE))
-	{
-		YSI_g_sPlayerClass[playerid] &= ~(e_PLAYER_CLASS_IGNORE_ONCE);
-		return 1;
-	}
-	else*/
-	if (YSI_g_sPlayerClass[playerid] & (e_PLAYER_CLASS_RETURNED | e_PLAYER_CLASS_SPAWNSINCE) == (e_PLAYER_CLASS_RETURNED | e_PLAYER_CLASS_SPAWNSINCE))
-	{
-		YSI_g_sPlayerClass[playerid] &= ~(e_PLAYER_CLASS_RETURNED | e_PLAYER_CLASS_SPAWNSINCE);
-		Class_Spectate(playerid);
-		//SpawnPlayer(playerid);
-		//printf("0");
-		SetTimerEx("_Class_SpawnPlayer2", 10, 0, "i", playerid);
-		YSI_g_sTimer[playerid] = SetTimerEx("_Class_SpawnPlayer4", 50, 0, "i", playerid);
-		if (YSI_g_sHook)
-		{
-			#emit PUSH.C     0xFFFFFFFF
-			#emit PUSH.S     playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.pri   YSI_g_sHook
-			#emit SCTRL      6
-			//#emit RETN
-		}
-	}
-	else if (YSI_g_sPlayerClass[playerid] & (e_PLAYER_CLASS_RETURNED | e_PLAYER_CLASS_DISABLED | e_PLAYER_CLASS_HADFIRST) == (e_PLAYER_CLASS_DISABLED | e_PLAYER_CLASS_HADFIRST))
-	{
-		// If class selection is disabled for this player, they have already selected
-		// a class and we haven't manually sent them back to the menu.
-		//YSI_g_sPlayerClass[playerid] &= ~(e_PLAYER_CLASS_RETURNED | e_PLAYER_CLASS_SPAWNSINCE);
-		Class_Spectate(playerid);
-		//SpawnPlayer(playerid);
-		//printf("1");
-		SetTimerEx("_Class_SpawnPlayer1", 10, 0, "i", playerid);
-		if (YSI_g_sHook)
-		{
-			#emit PUSH.C     0xFFFFFFFF
-			#emit PUSH.S     playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.pri   YSI_g_sHook
-			#emit SCTRL      6
-			//#emit RETN
-		}
-	}
-	else
-	{
-		if (YSI_g_sHook)
-		{
-			#emit PUSH.S     classid
-			#emit PUSH.S     playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.pri   YSI_g_sHook
-			#emit SCTRL      6
-			//#emit RETN
-		}
-	}
-	return 1;
-}
+#endif
 
 foreign Class_Goto(playerid, playerclass);
 
@@ -609,6 +654,118 @@ global Class_Goto(playerid, playerclass)
 	P:2("Class_Goto() end %08h %08h %d", YSI_g_sSettings, _:e_CLASS_SETTING_OPRCE, playerclass);
 	return 1;
 }
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Class_OnPlayerRequestSpawn
+Params:
+	playerid - Player who selected a spawn.
+Return:
+	-
+Notes:
+	Has inbuilt protection for a bug where selections aren't correctly
+	debounced so you can press shift twice at once which can mess up some
+	scripts (e.g. the example team selection script).  Calls
+	OnPlayerRequestSpawnEx with an additional class parameter.
+\*----------------------------------------------------------------------------*/
+
+public _Class_OtherRequestSpawn(playerid)
+{
+	if (YSI_g_sHookS)
+	{
+		#emit PUSH.S     playerid
+		#emit PUSH.C     4
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.pri   YSI_g_sHookC
+		#emit SCTRL      6
+		#emit RETN
+	}
+}
+
+//mhook OnPlayerRequestSpawn(playerid)
+
+#if !defined YSI_NO_MASTER && _YSIM_IS_CLIENT
+	public _Class_OnPlayerRequestSpawn(playerid)
+	{
+		return 1;
+	}
+#else
+	#if !defined YSI_NO_MASTER && _YSIM_IS_CLOUD
+		//mhook OnPlayerRequestClass(playerid, classid)
+		public _Class_OnPlayerRequestSpawn(playerid) <>
+		{
+			return 1;
+		}
+		
+		//mhook OnPlayerRequestClass(playerid, classid)
+		public _Class_OnPlayerRequestSpawn(playerid) <_YCM:y>
+		{
+	#else
+		//mhook OnPlayerRequestClass(playerid, classid)
+		public _Class_OnPlayerRequestSpawn(playerid)
+		{
+	#endif
+			P:2("hook Class_OnPlayerRequestSpawn called: %d", playerid);
+			new
+				time = GetTickCount();
+			if ((time - YSI_g_sLastRefuse[playerid]) >= 1000)
+			{
+				//YSI_gOPRSE = false;
+				//new
+				//	ret = 1;
+				//if (YSI_g_sClassOptions & e_CLASS_OPTION_HAS_RS_CALLBACK)
+				//{
+				//	YSI_gOPRSE = true;
+				//	ret = CallLocalFunction("OnPlayerRequestSpawnEx_", "ii", playerid, playerclass);
+				//}
+				new
+					ret = CallRemoteFunction("_Class_OtherRequestSpawn", "i", playerid);
+				P:4("Class_OnPlayerRequestSpawn() return: %d", ret);
+				if (ret)
+				{
+					//#if defined _YSI_SYSTEM_GROUPS
+					new
+						Group:newgroup = YSI_g_sClasses[(YSI_g_sPlayerClass[playerid] & e_PLAYER_CLASS_SKIN)][E_CLASS_GROUP];
+					P:4("Class_OnPlayerRequestSpawn() newgroup: %d", _:newgroup);
+					if (newgroup != Group:-1) Class_ResolveGroups(playerid, newgroup, true); //Group_AddPlayer(newgroup, playerid);
+					//#endif
+					if (ret == -1)
+					{
+						YSI_g_sPlayerClass[playerid] |= e_PLAYER_CLASS_SKIN;
+						// The order is VERY important here - this will actually
+						// call the function further down (directly below in fact).
+						//OnPlayerRequestClass(playerid, YSI_g_sLeft);
+						//Class_DoOnPlayerRequestClass(playerid, YSI_g_sLeft);
+						switch (YSI_g_sPlayerClass[playerid] & e_PLAYER_CLASS_PRESS)
+						{
+							case e_PLAYER_CLASS_RIGHT:
+							{
+								_Class_OnPlayerRequestClass(playerid, YSI_g_sLeft);
+							}
+							case e_PLAYER_CLASS_MIDDLE:
+							{
+								_Class_OnPlayerRequestClass(playerid, YSI_g_sRight);
+							}
+							case e_PLAYER_CLASS_LEFT:
+							{
+								_Class_OnPlayerRequestClass(playerid, YSI_g_sMiddle);
+							}
+						}
+					}
+					else
+					{
+						return 1;
+					}
+				}
+			}
+			YSI_g_sLastRefuse[playerid] = time;
+			//Class_ResumeRefresh(playerid);
+			P:5("Class_OnPlayerRequestSpawn: Return 0");
+			return 0;
+		}
+#endif
 
 /*----------------------------------------------------------------------------*\
 Function:
