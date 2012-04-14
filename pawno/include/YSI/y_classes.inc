@@ -50,6 +50,10 @@ Legal:
 Version:
 	0.1
 Changelog:
+	14/04/12:
+		Readded OnRequestSpawn logic.
+		Fixed Class_AddWithGroupSet.
+		Improved GM/FS interaction.
 	02/01/08:
 		First '08 edit - Fixed minus numbers in spawn points.
 	18/11/07:

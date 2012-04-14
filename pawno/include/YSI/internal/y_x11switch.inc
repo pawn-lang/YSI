@@ -54,7 +54,7 @@ Version:
 	1.1
 Changelog:
 	14/04/12:
-		Added pre-cached values from Slice to improve compilation.
+		Added pre-cached values from Slice to improve compilation speed.
 	29/11/10:
 		Added the ability to use "X11" prefixes in strings.
 		Added colourspace resolution for converting {FF0000} to ~r~.

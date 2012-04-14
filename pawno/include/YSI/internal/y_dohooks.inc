@@ -52,6 +52,7 @@ Version:
 Changelog:
 	14/04/12:
 		Added crash fix from Slice, now returning correct values.
+		Fixed ALS detection of mode callbacks.
 	25/02/12:
 		Extracted most of the code to a separate file.
 	17/03/11:
