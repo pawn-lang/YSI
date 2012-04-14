@@ -60,7 +60,7 @@ Changelog:
 
 #include <a_samp>
 
-#include <YSI\internal\y_natives>
+#include "internal\y_natives"
 
 forward _ScriptInit_FixState();
 

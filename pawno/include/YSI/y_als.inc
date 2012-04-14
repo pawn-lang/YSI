@@ -56,9 +56,9 @@ Changelog:
 		First version
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
-#include <YSI\y_amx>
-#include <YSI\y_utils>
+#include "internal\y_version"
+#include "y_amx"
+#include "y_utils"
 
 // Allow multiple inclusions.
 #if !defined _inc_y_als
@@ -70,8 +70,8 @@ Changelog:
 	// This is an include guard with a purpose - we need more control than the
 	// standard include guards give.
 	#define _Y_ALS_INCLUDED
-	#include <YSI\y_bit>
-	#include <YSI\internal\y_shortfunc>
+	#include "y_bit"
+	#include "internal\y_shortfunc"
 	
 	enum ALS
 	{

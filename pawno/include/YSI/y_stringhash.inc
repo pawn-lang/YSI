@@ -67,8 +67,8 @@ Definitions:
 	_I - Generate a case insensitive string hash at compile time.
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
-#include <YSI\y_debug>
+#include "internal\y_version"
+#include "y_debug"
 
 // Note: H_a, H_b, H_c, H_d, H_f and H_g are defined here, H_e in y_amx, H_z in
 // y_masteronce, H_u in y_users, H_y in y_timers.

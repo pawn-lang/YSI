@@ -112,12 +112,12 @@ Natives:
 // These parts should only be defined once ever.  This code is not dependent on
 // the current MASTER value, it's all generic.
 
-#include <YSI\internal\y_version>
-#include <YSI\y_debug>
-#include <YSI\y_hooks>
-#include <YSI\internal\y_shortfunc>
+#include "y_version"
+#include "..\y_debug"
+#include "..\y_hooks"
+#include "y_shortfunc"
 
-#include <YSI\internal\y_natives>
+#include "y_natives"
 
 #define _YSIM_COMPARE -1
 
@@ -289,7 +289,7 @@ forward Master_OnScriptClose(script);
 
 #define YSIM_NOT_CLIENT (!YSIM_HAS_MASTER || !_YSIM_IS_CLIENT)
 
-#include <YSI\internal\y_shortfunc>
+#include "y_shortfunc"
 
 #if defined YSI_NO_MASTER
 	#endinput

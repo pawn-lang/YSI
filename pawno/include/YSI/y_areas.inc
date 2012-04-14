@@ -105,21 +105,21 @@ Operators:
 	-
 -*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 
-#include <YSI\y_bit>
-#include <YSI\y_playerarray>
+#include "y_bit"
+#include "y_playerarray"
 
-#include <YSI\y_iterate>
-#include <YSI\y_debug>
+#include "y_iterate"
+#include "y_debug"
 
-#include <YSI\y_inline>
-#include <YSI\y_remote>
+#include "y_inline"
+#include "y_remote"
 
 #if defined AREAS_USE_TIMER
-	#include <YSI\y_timers>
+	#include "y_timers"
 #endif
-#include <YSI\internal\y_natives>
+#include "internal\y_natives"
 
 #if !defined MAX_AREAS
 	#define MAX_AREAS (1024)
@@ -130,12 +130,12 @@ Operators:
 #define _GROUP_MAKE_NAME_AREAS<%0...%1>   %0Area%1
 #define _GROUP_MAKE_LIMIT_AREAS           MAX_AREAS
 
-#include <YSI\y_groups>
+#include "y_groups"
 
 #define YSIM_U_DISABLE
-#include <YSI\y_master>
+#include "y_master"
 
-#include <YSI\y_hooks>
+#include "y_hooks"
 
 #define NO_AREA          (-1)
 #define SINGLE_SLOT_AREA (e_AREA_FLAGS_NEXT)
@@ -2200,4 +2200,4 @@ remotefunc Area_DoLeave(playerid, areaid)
 forward OnPlayerLeaveArea(playerid, areaid);
 
 //#define YSI_SET_LAST_GROUP 19
-#include <YSI\internal\y_grouprevert>
+#include "internal\y_grouprevert"

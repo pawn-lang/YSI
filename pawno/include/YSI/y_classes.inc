@@ -135,18 +135,18 @@ Operators:
 	-
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
-#include <YSI\y_bit>
-#include <YSI\y_debug>
+#include "internal\y_version"
+#include "y_bit"
+#include "y_debug"
 
 #define YSIM_U_DISABLE
-#include <YSI\y_master>
+#include "y_master"
 
-#include <YSI\y_iterate>
+#include "y_iterate"
 
-#include <YSI\y_hooks>
+#include "y_hooks"
 
-#include <YSI\internal\y_natives>
+#include "internal\y_natives"
 
 #if !defined MAX_CLASSES
 	#define MAX_CLASSES                 (256)
@@ -179,10 +179,10 @@ forward _Class_OtherRequestSpawn(playerid);
 
 forward Class_ResolveGroups(class, Group:forgroup, bool:cp);
 
-#include <YSI\y_groups>
-#include <YSI\y_playerarray>
+#include "y_groups"
+#include "y_playerarray"
 
-#include <YSI\y_iterate>
+#include "y_iterate"
 
 enum e_CLASS_FLAGS (<<= 1)
 {
@@ -1320,4 +1320,4 @@ static stock Class_Spectate(playerid)
 #define AddPlayerClass Class_Add
 
 //#define YSI_SET_LAST_GROUP 22	
-#include <YSI\internal\y_grouprevert>
+#include "internal\y_grouprevert"

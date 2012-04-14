@@ -211,10 +211,10 @@ Iterators:
 	#error "Please include a_samp or a_npc before foreach"
 #endif
 
-//#include <YSI\y_debug>
-//#include <YSI\y_hooks>
+//#include "y_debug"
+//#include "y_hooks"
 
-#include <YSI\internal\y_natives>
+#include "internal\y_natives"
 
 #if defined SendChat || defined FOREACH_NO_PLAYERS
 	#define BOTSYNC_IS_BOT     (true)

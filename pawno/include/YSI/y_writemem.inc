@@ -92,9 +92,9 @@ Operators:
 \*----------------------------------------------------------------------------*/
 
 #include <a_samp>
-#include <YSI\y_amx>
-#include <YSI\y_hooks>
-#include <YSI\y_utils>
+#include "y_amx"
+#include "y_hooks"
+#include "y_utils"
 
 forward WriteMem(addr, value);
 

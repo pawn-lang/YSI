@@ -61,12 +61,12 @@ Changelog:
 		First version
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
-#include <YSI\internal\y_funcinc>
-#include <YSI\y_amx>
-#include <YSI\y_utils>
-#include <YSI\y_malloc>
-#include <YSI\y_hooks>
+#include "internal\y_version"
+#include "internal\y_funcinc"
+#include "y_amx"
+#include "y_utils"
+#include "y_malloc"
+#include "y_hooks"
 
 #if defined YSI_MALLOC_SECURE
 	#error y_inline does not work with "YSI_MALLOC_SECURE" defined.

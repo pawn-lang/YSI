@@ -2,9 +2,9 @@
 //#define Y_GUI_Y_ADJUST (3.0)
 //#define Y_GUI_Y_ADJUST (3.1060948081)
 
-#include <YSI\y_iterate>
-#include <YSI\y_playerset>
-#include <YSI\y_hooks>
+#include "y_iterate"
+#include "y_playerset"
+#include "y_hooks"
 
 #define MAX_GUI_TEXT_LENGTH (32)
 #define MAX_GUI_ELEMENTS (256)

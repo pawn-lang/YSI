@@ -89,9 +89,9 @@ Operators:
 	-
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
-#include <YSI\y_hooks>
-#include <YSI\y_debug>
+#include "internal\y_version"
+#include "y_hooks"
+#include "y_debug"
 
 enum e_FLOOD_ACTION (+= 0x00010000)
 {

@@ -108,10 +108,10 @@ native GangZoneStopPulseForAll(zone);
 */
 
 #include <a_samp>
-#include <YSI\internal\y_version>
-#include <YSI\y_playerset>
-#include <YSI\y_iterate>
-#include <YSI\y_debug>
+#include "internal\y_version"
+#include "y_playerset"
+#include "y_iterate"
+#include "y_debug"
 
 #if !defined ZONE_PULSE_STAGE_TIME
 	#define ZONE_PULSE_STAGE_TIME (50)

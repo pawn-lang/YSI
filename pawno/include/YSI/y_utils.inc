@@ -72,10 +72,10 @@ Variables:
 		NULL - 1 long string for passing via Call(Remote|Local)Function.
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 
-#include <YSI\y_debug>
-#include <YSI\y_amx>
+#include "y_debug"
+#include "y_amx"
 //#tryinclude <sscanf>
 
 /*// "File,Float," must remain last always.
@@ -85,7 +85,7 @@ Variables:
 	#define File,Float, Float,File
 #endif*/
 // Add new tags to the START of this list.
-#include <YSI\internal\y_globaltags>
+#include "internal\y_globaltags"
 
 // VERY VERY VERY IMPORTANT!!! y_inline uses "130" instead of "YSI_MAX_STRING"
 // for two lines (one is "520" for "130 * 4").
@@ -655,4 +655,4 @@ stock ftouch(const filename[])
 	}
 }
 
-#include <YSI\y_va>
+#include "y_va"

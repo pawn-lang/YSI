@@ -54,14 +54,14 @@ Changelog:
 		First version
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 
 #if !defined _inc_y_groups
 	#error Did you do <YSI/y_groups> instead of the required <YSI\y_groups>?
 #endif
 #undef _inc_y_groups
 
-#include <YSI\internal\y_nogroups>
+#include "internal\y_nogroups"
 
 /*#if defined YSI_GROUPS_LAST
 	#if YSI_GROUPS_LAST == 25
@@ -101,17 +101,17 @@ Changelog:
 		#define _YSI_GROUP_CLASSES_INCLUDED
 		// These all need doing twice - once here and once below.
 		//#if defined _YSI_HAS_GROUP_SYSTEM
-		//	#include <YSI\internal\y_groupfirst>
+		//	#include "internal\y_groupfirst"
 		//#endif
 		#undef _GROUP_MAKE_NAME
 		#undef _GROUP_MAKE_LIMIT
 		#define _GROUP_MAKE_NAME        _GROUP_MAKE_NAME_CLASSES
 		#define _GROUP_MAKE_LIMIT       _GROUP_MAKE_LIMIT_CLASSES
 		#if defined _YSI_HAS_GROUP_SYSTEM
-			#include <YSI\internal\y_groupsecond>
-			#include <YSI\internal\y_classgroups>
+			#include "internal\y_groupsecond"
+			#include "internal\y_classgroups"
 		#endif
-		#include <YSI\internal\y_groupsingle>
+		#include "internal\y_groupsingle"
 		// End.
 		#endinput
 	#endif
@@ -124,16 +124,16 @@ Changelog:
 		#define _YSI_GROUP_COMMANDS_INCLUDED
 		// These all need doing twice - once here and once below.
 		//#if defined _YSI_HAS_GROUP_SYSTEM
-		//	#include <YSI\internal\y_groupfirst>
+		//	#include "internal\y_groupfirst"
 		//#endif
 		#undef _GROUP_MAKE_NAME
 		#undef _GROUP_MAKE_LIMIT
 		#define _GROUP_MAKE_NAME        _GROUP_MAKE_NAME_CMD
 		#define _GROUP_MAKE_LIMIT       _GROUP_MAKE_LIMIT_CMD
 		#if defined _YSI_HAS_GROUP_SYSTEM
-			#include <YSI\internal\y_groupsecond>
+			#include "internal\y_groupsecond"
 		#endif
-		#include <YSI\internal\y_groupsingle>
+		#include "internal\y_groupsingle"
 		// End.
 		#endinput
 	#endif
@@ -146,16 +146,16 @@ Changelog:
 		#define _YSI_GROUP_AREAS_INCLUDED
 		// These all need doing twice - once here and once below.
 		//#if defined _YSI_HAS_GROUP_SYSTEM
-		//	#include <YSI\internal\y_groupfirst>
+		//	#include "internal\y_groupfirst"
 		//#endif
 		#undef _GROUP_MAKE_NAME
 		#undef _GROUP_MAKE_LIMIT
 		#define _GROUP_MAKE_NAME        _GROUP_MAKE_NAME_AREAS
 		#define _GROUP_MAKE_LIMIT       _GROUP_MAKE_LIMIT_AREAS
 		#if defined _YSI_HAS_GROUP_SYSTEM
-			#include <YSI\internal\y_groupsecond>
+			#include "internal\y_groupsecond"
 		#endif
-		#include <YSI\internal\y_groupsingle>
+		#include "internal\y_groupsingle"
 		// End.
 		#endinput
 	#endif
@@ -167,16 +167,16 @@ Changelog:
 			#define _YSI_GROUP_INTTEST_INCLUDED
 			// These all need doing twice - once here and once below.
 			//#if defined _YSI_HAS_GROUP_SYSTEM
-			//	#include <YSI\internal\y_groupfirst>
+			//	#include "internal\y_groupfirst"
 			//#endif
 			#undef _GROUP_MAKE_NAME
 			#undef _GROUP_MAKE_LIMIT
 			#define _GROUP_MAKE_NAME    _GROUP_MAKE_NAME_INTTEST
 			#define _GROUP_MAKE_LIMIT   _GROUP_MAKE_LIMIT_INTTEST
 			#if defined _YSI_HAS_GROUP_SYSTEM
-				#include <YSI\internal\y_groupsecond>
+				#include "internal\y_groupsecond"
 			#endif
-			#include <YSI\internal\y_groupsingle>
+			#include "internal\y_groupsingle"
 			// End.
 			#endinput
 		#endif
@@ -187,16 +187,16 @@ Changelog:
 			#define _YSI_GROUP_INTTEST2_INCLUDED
 			// These all need doing twice - once here and once below.
 			//#if defined _YSI_HAS_GROUP_SYSTEM
-			//	#include <YSI\internal\y_groupfirst>
+			//	#include "internal\y_groupfirst"
 			//#endif
 			#undef _GROUP_MAKE_NAME
 			#undef _GROUP_MAKE_LIMIT
 			#define _GROUP_MAKE_NAME    _GROUP_MAKE_NAME_INTTEST2
 			#define _GROUP_MAKE_LIMIT   _GROUP_MAKE_LIMIT_INTTEST2
 			#if defined _YSI_HAS_GROUP_SYSTEM
-				#include <YSI\internal\y_groupsecond>
+				#include "internal\y_groupsecond"
 			#endif
-			#include <YSI\internal\y_groupsingle>
+			#include "internal\y_groupsingle"
 			// End.
 			#endinput
 		#endif
@@ -216,70 +216,70 @@ Changelog:
 	#define _YSI_HAS_GROUP_SYSTEM
 	// Include the main code.
 	#include <a_samp>
-	#include <YSI\internal\y_grouponce>
+	#include "internal\y_grouponce"
 	
 	// Include code for previous libraries.
 	#if defined _YSI_GROUP_CLASSES_INCLUDED
 		// This only needs to be done if the library was previously included.
 		#define _YSIM_OVERRIDE          22
-		#include <YSI\y_master>
+		#include "y_master"
 		// Include the first half of the file for the call chain.
-		//#include <YSI\internal\y_groupfirst>
+		//#include "internal\y_groupfirst"
 		#undef _GROUP_MAKE_NAME
 		#undef _GROUP_MAKE_LIMIT
 		#define _GROUP_MAKE_NAME        _GROUP_MAKE_NAME_CLASSES
 		#define _GROUP_MAKE_LIMIT       _GROUP_MAKE_LIMIT_CLASSES
 		// Include the second half of the file for the methods.
-		#include <YSI\internal\y_groupsecond>
-		#include <YSI\internal\y_classgroups>
+		#include "internal\y_groupsecond"
+		#include "internal\y_classgroups"
 	#endif
 	#if defined _YSI_GROUP_COMMANDS_INCLUDED
 		// This only needs to be done if the library was previously included.
 		#define _YSIM_OVERRIDE          25
-		#include <YSI\y_master>
+		#include "y_master"
 		// Include the first half of the file for the call chain.
-		//#include <YSI\internal\y_groupfirst>
+		//#include "internal\y_groupfirst"
 		#undef _GROUP_MAKE_NAME
 		#undef _GROUP_MAKE_LIMIT
 		#define _GROUP_MAKE_NAME        _GROUP_MAKE_NAME_CMD
 		#define _GROUP_MAKE_LIMIT       _GROUP_MAKE_LIMIT_CMD
 		// Include the second half of the file for the methods.
-		#include <YSI\internal\y_groupsecond>
+		#include "internal\y_groupsecond"
 	#endif
 	#if defined _YSI_GROUP_AREAS_INCLUDED
 		// This only needs to be done if the library was previously included.
 		#define _YSIM_OVERRIDE          18
-		#include <YSI\y_master>
+		#include "y_master"
 		// Include the first half of the file for the call chain.
-		//#include <YSI\internal\y_groupfirst>
+		//#include "internal\y_groupfirst"
 		#undef _GROUP_MAKE_NAME
 		#undef _GROUP_MAKE_LIMIT
 		#define _GROUP_MAKE_NAME        _GROUP_MAKE_NAME_AREAS
 		#define _GROUP_MAKE_LIMIT       _GROUP_MAKE_LIMIT_AREAS
 		// Include the second half of the file for the methods.
-		#include <YSI\internal\y_groupsecond>
+		#include "internal\y_groupsecond"
 	#endif
 	// Internal test library.
 	#if defined _YSI_ALLOW_INTERNAL_TEST
 		#if defined _YSI_GROUP_INTTEST_INCLUDED
 			#define _YSIM_OVERRIDE      9
-			#include <YSI\y_master>
-			//#include <YSI\internal\y_groupfirst>
+			#include "y_master"
+			//#include "internal\y_groupfirst"
 			#undef _GROUP_MAKE_NAME
 			#undef _GROUP_MAKE_LIMIT
 			#define _GROUP_MAKE_NAME    _GROUP_MAKE_NAME_INTTEST
 			#define _GROUP_MAKE_LIMIT   _GROUP_MAKE_LIMIT_INTTEST
-			#include <YSI\internal\y_groupsecond>
+			#include "internal\y_groupsecond"
 		#endif
 		#if defined _YSI_GROUP_INTTEST2_INCLUDED
 			#define _YSIM_OVERRIDE      8
-			#include <YSI\y_master>
-			//#include <YSI\internal\y_groupfirst>
+			#include "y_master"
+			//#include "internal\y_groupfirst"
 			#undef _GROUP_MAKE_NAME
 			#undef _GROUP_MAKE_LIMIT
 			#define _GROUP_MAKE_NAME    _GROUP_MAKE_NAME_INTTEST2
 			#define _GROUP_MAKE_LIMIT   _GROUP_MAKE_LIMIT_INTTEST2
-			#include <YSI\internal\y_groupsecond>
+			#include "internal\y_groupsecond"
 		#endif
 	#endif
 #endif
@@ -291,18 +291,18 @@ Changelog:
 		#if defined _YSIM_MANUAL_SET
 			#define _YSIM_RESET_USER
 		#endif
-		#include <YSI\y_master>
-		//#include <YSI\internal\y_groupsingle>
-		//#include <YSI\internal\y_groupfirst>
+		#include "y_master"
+		//#include "internal\y_groupsingle"
+		//#include "internal\y_groupfirst"
 		#undef _GROUP_MAKE_NAME
 		#undef _GROUP_MAKE_LIMIT
 		#define _GROUP_MAKE_NAME        GROUP_LIBRARY_NAME
 		#define _GROUP_MAKE_LIMIT       GROUP_LIBRARY_SIZE
 		#undef _YSI_GROUPS_FIRST_HALF
 		// Include the second half of the file for the methods.
-		#include <YSI\internal\y_groupsecond>
+		#include "internal\y_groupsecond"
 		#define _YSI_GROUPS_FIRST_HALF
-		#include <YSI\internal\y_groupsingle>
+		#include "internal\y_groupsingle"
 		// Remove the definitions.
 		//#undef GROUP_LIBRARY_SIZE
 		//#undef GROUP_LIBRARY_NAME
@@ -317,7 +317,7 @@ Changelog:
 
 // Revert to the user's included definition if y_groups was included after all
 // group using libraries and after explicit y_master inclusion.
-//#include <YSI\internal\y_grouprevert>
+//#include "internal\y_grouprevert"
 
 //#define YSI_SET_LAST_GROUP 24
-#include <YSI\internal\y_grouprevert>
+#include "internal\y_grouprevert"

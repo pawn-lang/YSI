@@ -131,15 +131,15 @@ Operators:
 	-
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\y_bit>
-#include <YSI\y_debug>
+#include "y_bit"
+#include "y_debug"
 
-#include <YSI\y_master>
+#include "y_master"
 
-#include <YSI\y_hooks>
-#include <YSI\y_playerarray>
+#include "y_hooks"
+#include "y_playerarray"
 
-#include <YSI\y_iterate>
+#include "y_iterate"
 
 #if !defined MAX_CLASSES
 	#define MAX_CLASSES                 (256)

@@ -72,4 +72,4 @@ public _@_y_funcinc_@_()
 	CallRemoteFunction("", "");
 }
 
-//#include <YSI\y_utils>
+//#include "..\y_utils"

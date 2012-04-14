@@ -62,13 +62,13 @@ Changelog:
 		First version.
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 
-#include <YSI\y_stringhash>
-#include <YSI\y_debug>
-#include <YSI\y_remote>
+#include "y_stringhash"
+#include "y_debug"
+#include "y_remote"
 
-#include <YSI\y_utils>
+#include "y_utils"
 
 #if !defined MAX_TEXT_COLOURS
 	#if defined MAX_TEXT_COLORS
@@ -176,10 +176,10 @@ Changelog:
 #define COLOUR_NAME_HASH(%0)            YHash((%0), false, hash_bernstein, (YSI_g_sCheckSpaces) ? (-1) : (strfind((%0), " ")))
 #define COLOR_NAME_HASH                 COLOUR_NAME_HASH
 
-//#include <YSI\internal\y_colourparse>
+//#include "internal\y_colourparse"
 
 #if _YSI_USE_X11
-	#include <YSI\internal\y_x11def>
+	#include "internal\y_x11def"
 #endif
 
 #if !defined X11_ALLOW_SPACES
@@ -360,7 +360,7 @@ stock GetColourHash(hash, alpha = 0xAA)
 	alpha &= 0xFF;
 	// Do the REVERSE hash from YHash
 	#if _YSI_USE_X11
-		#include <YSI\internal\y_x11switch>
+		#include "internal\y_x11switch"
 	#endif
 	// Do the default code here.
 	for (new i = 0; i != MAX_TEXT_COLOURS; ++i)
@@ -386,7 +386,7 @@ stock GetColourHash(hash, alpha = 0xAA)
 		// with the "{COLOR}" format, this is to save on memory.  It is in
 		// theory possible to get it working with the hash format using an
 		// incremental hash and compare.  NOW SUPPORTED!
-		#include <YSI\internal\y_x11parse>
+		#include "internal\y_x11parse"
 		#pragma tabsize 4
 		return -1;
 	}

@@ -147,10 +147,10 @@ Operators:
 	-
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 
 // Include "y_unique" multiple times.
-#include <YSI\internal\y_unique>
+#include "internal\y_unique"
 
 #if !defined _inc_y_text
 	#error Did you do <YSI/y_text> instead of the required <YSI\y_text>?
@@ -166,7 +166,7 @@ Operators:
 #include <a_samp>
 
 // Make sure this is included early.
-#include <YSI\y_playerset>
+#include "y_playerset"
 
 // Apparently I'd already written the internal code to support this and forgot!
 #define Y_TEXT_UNIQUE
@@ -183,14 +183,14 @@ Operators:
 	#define MAX_TEXT_ENTRIES (Y_TEXT_PER_SET * Y_TEXT_MAX_SETS)
 #endif
 
-#include <YSI\internal\y_styles>
+#include "internal\y_styles"
 
 // This is a horribly eclectic collection of libraries from all over the place
 // and written at different times with different aims - frankly I'll be AMAZED
 // if it all comes together and works.
-#include <YSI\internal\y_formatin>
-#include <YSI\internal\y_textrender>
-#include <YSI\internal\y_textint>
+#include "internal\y_formatin"
+#include "internal\y_textrender"
+#include "internal\y_textint"
 
 #define UNDO_MOVE|||
 #define DO_MOVE|||%0£££ %0DO_MOVE|||

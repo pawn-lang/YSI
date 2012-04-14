@@ -95,7 +95,7 @@ Natives:
 
 #include <a_samp>
 #tryinclude <a_http>
-#include <YSI\internal\y_natives>
+#include "y_natives"
 
 #if MAX_PLAYER_NAME != (24)
 	#error Unknown MAX_PLAYER_NAME size.
@@ -105,7 +105,7 @@ Natives:
 	#define MAX_PLAYER_NAME 24
 #endif
 
-#include <YSI\y_scriptinit>
+#include "..\y_scriptinit"
 
 #define YSI_VERSION_RESPO               2
 

@@ -165,7 +165,7 @@ Compile options:
 	#error y_commands must be included before y_text
 #endif
 
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 
 #if !defined MAX_COMMANDS
 	#define MAX_COMMANDS                (1024)
@@ -175,18 +175,18 @@ Compile options:
 #define _GROUP_MAKE_LIMIT_CMD           MAX_COMMANDS
 
 #define YSIM_U_DISABLE
-#include <YSI\y_master>
-#include <YSI\y_groups>
+#include "y_master"
+#include "y_groups"
 
-#include <YSI\y_debug>
-#include <YSI\y_hooks>
+#include "y_debug"
+#include "y_hooks"
 
-#include <YSI\y_bintree>
-#include <YSI\y_amx>
-#include <YSI\y_playerarray>
-#include <YSI\y_utils>
+#include "y_bintree"
+#include "y_amx"
+#include "y_playerarray"
+#include "y_utils"
 
-#include <YSI\internal\y_natives>
+#include "internal\y_natives"
 
 // Define the CMD: macro.  This uses the prefix "@yC_" as it's 32 bits so allows
 // for fast command string searching in the publics table and makes the commands
@@ -2715,7 +2715,7 @@ global string:Command_GetNext(index, playerid)
 // think this is completely pointless now thanks to "y_hooks".
 
 //#define YSI_SET_LAST_GROUP 25
-#include <YSI\internal\y_grouprevert>
+#include "internal\y_grouprevert"
 
 // So we can use custom syntax on these two functions and allow command names to
 // be sort of used...

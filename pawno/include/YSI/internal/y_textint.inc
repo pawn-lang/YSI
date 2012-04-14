@@ -87,21 +87,21 @@ Operators:
 	-
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\y_amx>
-#include <YSI\y_utils>
-#include <YSI\y_ini>
-#include <YSI\y_debug>
-#include <YSI\y_iterate>
+#include "..\y_amx"
+#include "..\y_utils"
+#include "..\y_ini"
+#include "..\y_debug"
+#include "..\y_iterate"
 
-#include <YSI\y_scriptinit>
+#include "..\y_scriptinit"
 
-#include <YSI\y_languages>
+#include "..\y_languages"
 
-#include <YSI\y_dialog>
+#include "..\y_dialog"
 
-#include <YSI\y_inline>
+#include "..\y_inline"
 
-#include <YSI\internal\y_natives>
+#include "y_natives"
 
 enum e_TEXT_DISPLAY_TYPE
 {
@@ -119,7 +119,7 @@ enum e_TEXT_DISPLAY_TYPE
 	text_type_game6
 }
 
-//#include <YSI\y_master>
+//#include "..\y_master"
 
 // End conditions for the recursive calls (strings and publics).
 #define _YT@LE@E%0>
@@ -209,8 +209,8 @@ enum e_TEXT_ENTRY
 	#define MAX_SINGLE_TEXT_ITEM (1024)
 #endif
 
-#include <YSI\y_styles>
-#include <YSI\y_hooks>
+#include "..\y_styles"
+#include "..\y_hooks"
 
 static stock
 	YSI_g_sTextSets[Y_TEXT_MAX_SETS][e_TEXT_SETS],

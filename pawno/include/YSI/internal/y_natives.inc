@@ -61,7 +61,7 @@ Variables:
 		-
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_globaltags>
+#include "y_globaltags"
 
 /*#if defined _YSI_MINI_MODE
 	// Remove all of "file" now.

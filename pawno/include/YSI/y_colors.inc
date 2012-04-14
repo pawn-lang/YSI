@@ -57,4 +57,4 @@ Changelog:
 		First version
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\y_colours>
+#include "y_colours"

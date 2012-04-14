@@ -63,12 +63,12 @@ Variables:
 
 #include <a_http>
 
-#include <YSI\y_utils>
-#include <YSI\internal\y_funcinc>
-#include <YSI\y_debug>
-#include <YSI\y_timers>
-#include <YSI\y_master>
-#include <YSI\y_hooks>
+#include "y_utils"
+#include "internal\y_funcinc"
+#include "y_debug"
+#include "y_timers"
+#include "y_master"
+#include "y_hooks"
 
 #if !defined PHP_RECEIVE || !defined PHP_SEND
 	#error You must define PHP_RECEIVE and PHP_SEND before including y_php.
@@ -521,4 +521,4 @@ public _PHP_Result(index, response, data[])
 #define phpdata%0(%1) %0@yP_(%1);public%0@yP_(%1)
 #define phpfunc%0(%1) %0_yP@(%1);public%0_yP@(%1)
 
-#include <YSI\internal\y_grouprevert>
+#include "internal\y_grouprevert"

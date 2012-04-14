@@ -56,23 +56,23 @@ Changelog:
 		First version
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 
-#include <YSI\y_debug>
-#include <YSI\y_bit>
+#include "y_debug"
+#include "y_bit"
 
-#include <YSI\y_xml>
+#include "y_xml"
 
-#include <YSI\y_utils>
-#include <YSI\y_colours>
-#include <YSI\y_stringhash>
+#include "y_utils"
+#include "y_colours"
+#include "y_stringhash"
 
-#include <YSI\y_timers>
+#include "y_timers"
 
-#include <YSI\y_iterate>
-#include <YSI\y_hooks>
+#include "y_iterate"
+#include "y_hooks"
 
-//#include <YSI\y_timer>
+//#include "y_timer"
 
 #include <a_samp>
 

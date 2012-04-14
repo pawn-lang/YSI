@@ -61,14 +61,14 @@ Changelog:
 		First version
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 
 #include <a_samp>
 
-#include <YSI\y_debug>
-#include <YSI\y_utils>
+#include "y_debug"
+#include "y_utils"
 
-#include <YSI\internal\y_natives>
+#include "internal\y_natives"
 
 #if !defined MAX_XML_FILES
 	#define MAX_XML_FILES               (5)

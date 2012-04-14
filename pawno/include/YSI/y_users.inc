@@ -104,23 +104,23 @@ forward OnPlayerLogout(playerid, yid);
 //	#define HAS_USER_CALLBACKS
 //#endif
 
-#include <YSI\internal\y_version>
+#include "internal\y_version"
 
-#include <YSI\y_text>
+#include "y_text"
 
-#include <YSI\y_remote>
-#include <YSI\y_debug>
-#include <YSI\y_ini>
-#include <YSI\y_utils>
-#include <YSI\y_timers>
+#include "y_remote"
+#include "y_debug"
+#include "y_ini"
+#include "y_utils"
+#include "y_timers"
 
 #define YSIM_U_DISABLE
-#include <YSI\y_master>
+#include "y_master"
 #define MAX_INDEX_LENGTH                8
 
-#include <YSI\y_hooks>
+#include "y_hooks"
 
-#include <YSI\internal\y_natives>
+#include "internal\y_natives"
 
 #if defined PP_ADLER32
 #elseif defined PP_MD5 && defined MD5_Hash
@@ -1370,4 +1370,4 @@ static stock Player_CreateNewID()
 // Get the data on a registered player from a file.  Also returns their language
 // now that I've promoted that to index file data (it's the ONLY thing though).
 
-#include <YSI\internal\y_grouprevert>
+#include "internal\y_grouprevert"
