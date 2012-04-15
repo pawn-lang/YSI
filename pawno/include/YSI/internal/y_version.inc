@@ -256,7 +256,6 @@ Natives:
 	
 	public YVers_Callback(index, code, data[])
 	{
-		print(" ");
 		if (code == 200)
 		{
 			// Got the remote page.
@@ -268,6 +267,7 @@ Natives:
 			if (strcmp(data[pos], YSI_VERSION, false, 9))
 			{
 				//data[pos + 9] = '\0';
+				print(" ");
 				print(" ========================================== ");
 				print(" |                                        | ");
 				printf(" |  A new version (v%.9s) of YSI is  | ", data[pos]);
@@ -299,6 +299,7 @@ Natives:
 				}
 				print(" |                                        | ");
 				print(" ========================================== ");
+				print(" ");
 			}
 			//else
 			//{
@@ -321,7 +322,6 @@ Natives:
 			//print(" |                                      | ");
 			//print(" ======================================== ");
 		//}
-		print(" ");
 	}
 	
 #endif
