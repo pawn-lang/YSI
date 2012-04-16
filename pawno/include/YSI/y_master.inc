@@ -234,7 +234,7 @@ Natives:
 			#error _YSIM_OVERRIDE used with an invalid master value.
 		#endif
 	#else
-		#tryinclude <YSI\internal\y_automasters>
+		#tryinclude "internal\y_automasters"
 		#if !defined MASTER
 			//#error "You must define a unique MASTER number from 0 to 25."
 			#if defined LIBRARY_MASTER
