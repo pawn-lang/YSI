@@ -539,6 +539,11 @@ public _Class_OtherRequestClass(playerid, classid)
 					}
 				}
 			}
+			new Group:oldgroup = YSI_g_sClasses[(YSI_g_sPlayerClass[playerid] & e_PLAYER_CLASS_SKIN)][E_CLASS_GROUP];
+			
+			if (oldgroup != GROUP_GLOBAL)
+				Group_SetPlayer(oldgroup, playerid, false);
+			
 			// Store which class they are now on.
 			//printf("%d %d %d %d", classid, YSI_g_sMiddle, YSI_g_sLeft, YSI_g_sRight);
 			if (classid == YSI_g_sMiddle)
