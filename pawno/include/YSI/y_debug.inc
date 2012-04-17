@@ -259,16 +259,16 @@ Notes:
 #endif
 
 #define Debug_PrintE(%1); \
-	Debug_Print0("*** YSI Error: " #%1);
+	Debug_Print0("\7\7\7*** YSI Error: " #%1);
 
 #define Debug_PrintW(%1); \
-	Debug_Print0("*** YSI Warning: " #%1);
+	Debug_Print0("\7*** YSI Warning: " #%1);
 
 #define Debug_PrintI(%1); \
 	Debug_Print0("*** YSI Info: " #%1);
 
 #define Debug_PrintF(%1); \
-	Debug_Print0("*** YSI Fatal Error: " #%1);
+	Debug_Print0("\7\7\7\7\7*** YSI Fatal Error: " #%1);
 
 #define Debug_PrintC(%1); \
 	Debug_Code1(%1);
