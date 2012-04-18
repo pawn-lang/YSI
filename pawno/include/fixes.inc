@@ -1267,7 +1267,7 @@ forward OnGameModeInit();
  *     SetPlayerName
  */
 #if FIX_SetPlayerName
-	stock FIXES_SetPlayerName(playerid, const name[])
+	stock FIXES_SetPlayerName(playerid, name[])
 	{
 		if (strcmp(name, "FIXES_TEMP_NAME") == 0)
 		{
