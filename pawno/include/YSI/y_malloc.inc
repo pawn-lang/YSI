@@ -69,6 +69,7 @@ Functions:
 		Malloc_Allocate - Do the memory allocation (may be static).
 		Malloc_Free - Do the memory freeing (may be static).
 		Malloc_SlotSize - Get the size of an allocated block (may be inline).
+		Malloc_NewS - Allocate for and store a given string.
 	Static:
 		Malloc_Allocate - Do the memory allocation (may be stock).
 		Malloc_Free - Do the memory freeing (may be stock).
@@ -198,6 +199,34 @@ Notes:
 		Malloc_GetSlotSize(%1)
 
 #endif
+
+/*----------------------------------------------------------------------------*-
+Function:
+	Malloc_NewS
+Params:
+	string[] - The string to store.
+	pack - Whether or not the string will be packed.
+Return:
+	0 on fail or a data handle on sucess.
+Notes:
+	-
+-*----------------------------------------------------------------------------*/
+
+stock Alloc:Malloc_NewS(const string[], bool:pack = false) {
+	new
+		      size = pack ? ((strlen(string) + 1) char) : (strlen(string) + 1),
+		Alloc:alloc = Malloc_Allocate(size)
+	;
+	
+	if (alloc) {
+		if (pack)
+			strpack(YSI_gMallocMemory[_:alloc], string, size);
+		else
+			strunpack(YSI_gMallocMemory[_:alloc], string, size);
+	}
+	
+	return alloc;
+}
 
 /*----------------------------------------------------------------------------*-
 Function:
