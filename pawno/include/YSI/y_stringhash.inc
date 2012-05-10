@@ -1672,6 +1672,9 @@ native Hash(str[]);
 stock YHash(const str[], bool:sensitive = true, e_HASH_TYPE:type = hash_bernstein, len = -1, pack = false)
 {
 	P:3("YHash called: \"%s\", %i, %i, %i, %i", str, _:sensitive, _:type, len, pack);
+	
+	pack = str[0] > 255;
+
 	if (len == -1)
 	{
 		len = strlen(str);
