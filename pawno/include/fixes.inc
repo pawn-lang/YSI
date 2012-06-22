@@ -1273,8 +1273,26 @@ forward OnGameModeInit();
 		{
 			return 0;
 		}
+		
+		new old_name[MAX_PLAYER_NAME];
+		
+		GetPlayerName(playerid, old_name, sizeof(old_name));
+		
+		if (strcmp(name, old_name, true) == 0)
+		{
+			return 0;
+		}
+		
 		SetPlayerName(playerid, "FIXES_TEMP_NAME");
-		return SetPlayerName(playerid, name);
+		
+		new retval = SetPlayerName(playerid, name);
+		
+		if (retval != 1)
+		{
+			SetPlayerName(playerid, old_name);
+		}
+		
+		return retval;
 	}
 	#if defined _ALS_SetPlayerName
 		#undef SetPlayerName
