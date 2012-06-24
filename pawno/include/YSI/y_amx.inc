@@ -261,29 +261,35 @@ stock AMX_GetGlobalAddress(...)
 	return 0;
 }
 
+static AMX_DoNothing() {
+    return 0;
+}
+
 static AMX_GetGlobal()
 {
-	new
-		addr = -1;
-	// Get the return address.
-	#emit LOAD.S.pri 4
-	#emit ADD.C      0xFFFFFFFC
-	#emit LOAD.alt   AMX_HEADER_COD
-	#emit ADD
-	#emit STOR.S.pri addr
-	// Get the data 4 bytes before the return address.
-	#emit LREF.S.alt addr
-	#emit CONST.pri  AMX_GetGlobal
-	#emit SUB.alt
-	#emit LOAD.alt   AMX_HEADER_COD
-	#emit SUB
-	#emit LOAD.alt   AMX_BASE_ADDRESS
-	#emit ADD
-	// Return
-	#emit STACK 4
-	#emit RETN
-	// Find base address, not cod address (both operands relative to DAT.
-	return 0;
+    new
+        addr = -1;
+    // Call dummy function and read its (absolute) address from code.
+    AMX_DoNothing();
+    #emit LCTRL      6
+    #emit CONST.alt  12
+    #emit SUB
+    #emit LOAD.alt   AMX_HEADER_COD
+    #emit ADD
+    #emit STOR.S.pri addr
+    #emit LREF.S.pri addr
+    // Get difference between absolute and relative addresses.
+    #emit SUB
+    #emit CONST.alt  AMX_DoNothing
+    #emit SUB
+    #emit MOVE.alt
+    #emit LCTRL      1
+    #emit XCHG
+    #emit SUB
+    // Return
+    #emit STACK 4
+    #emit RETN
+    return 0;
 }
 
 #undef OnScriptInit
