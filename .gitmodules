@@ -1,0 +1,3 @@
+[submodule "pawno/include/YSI"]
+	path = pawno/include/YSI
+	url = git@github.com:Y-Less/YSI-Includes.git
