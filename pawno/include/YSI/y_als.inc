@@ -140,7 +140,7 @@ Changelog:
 	#define ALS_DATA<> static stock BitArray:gs_ALS<_:ALS>;
 	
 	//#define ALS_DETECT<%0>
-	#define ALS_DETECT<%0> if(funcidx(#ALS_PREFIX"_On"#%0)!=-1)Bit_Let(gs_ALS,_:ALS_On%0);
+	#define ALS_DETECT<%0> if(funcidx(#ALS_PREFIX"_On"#%0)==-1){}else Bit_Let(gs_ALS,_:ALS_On%0);
 	
 	//#define ALS_DETECT_SHORT<On%0> if(funcidx(#ALS_PREFIX"_"#%0)!=-1)Bit_Let(gs_ALS,_:ALS_On%0);
 	
@@ -215,14 +215,14 @@ Changelog:
 	#define ALS_R_PlayerEditObject 1
 	#define ALS_R_PlayerEditAttachedObject 1
 	#define ALS_R_PlayerSelectObject 1
-
+	
 	// Chain call declarations.
-	#define ALS_DO_ScriptInit<%0>                %0<ScriptInit               ,>(end:)
-	#define ALS_DO_ScriptExit<%0>                %0<ScriptExit               ,>(end:)
-	#define ALS_DO_GameModeInit<%0>              %0<GameModeInit             ,>(end:)
-	#define ALS_DO_GameModeExit<%0>              %0<GameModeExit             ,>(end:)
-	#define ALS_DO_FilterScriptInit<%0>          %0<FilterScriptInit         ,>(end:)
-	#define ALS_DO_FilterScriptExit<%0>          %0<FilterScriptExit         ,>(end:)
+	#define ALS_DO_ScriptInit<%0>                %0<ScriptInit               ,>(none:)
+	#define ALS_DO_ScriptExit<%0>                %0<ScriptExit               ,>(none:)
+	#define ALS_DO_GameModeInit<%0>              %0<GameModeInit             ,>(none:)
+	#define ALS_DO_GameModeExit<%0>              %0<GameModeExit             ,>(none:)
+	#define ALS_DO_FilterScriptInit<%0>          %0<FilterScriptInit         ,>(none:)
+	#define ALS_DO_FilterScriptExit<%0>          %0<FilterScriptExit         ,>(none:)
 	#define ALS_DO_PlayerConnect<%0>             %0<PlayerConnect            ,i>(end:playerid)
 	#define ALS_DO_PlayerDisconnect<%0>          %0<PlayerDisconnect         ,ii>(more:playerid,end:reason)
 	#define ALS_DO_PlayerSpawn<%0>               %0<PlayerSpawn              ,i>(end:playerid)
@@ -272,9 +272,9 @@ Changelog:
 	// 0.3e
 	#define ALS_DO_PlayerClickTextDraw<%0>    %0<PlayerClickTextDraw,ii>(more:playerid,end_tag:Text:clickedid)
 	#define ALS_DO_PlayerClickPlayerTextDraw<%0>    %0<PlayerClickPlayerTextDraw,iii>(more:playerid,end_tag:PlayerText:playertextid)
-	#define ALS_DO_PlayerEditObject<%0>    %0<PlayerEditObject,iiiiiiiiii>(more:playerid,more:playerobject,more:objectid,more:response,tag:Float:fX,tag:Float:fY,tag:Float:fZ,tag:Float:fRotX,tag:Float:fRotY,end_tag:Float:fRotZ)
-	#define ALS_DO_PlayerEditAttachedObject<%0>    %0<PlayerEditAttachedObject,iiiiiiiiiiiiii>(more:playerid,more:response,more:index,more:modelid,more:boneid,tag:Float:fOffsetX,tag:Float:fOffsetY,tag:Float:fOffsetZ,tag:Float:fRotX,tag:Float:fRotY,tag:Float:fRotZ,tag:Float:fScaleX,tag:Float:fScaleY,end_tag:Float:fScaleZ)
-	#define ALS_DO_PlayerSelectObject<%0>    %0<PlayerSelectObject,iiiiiii>(more:playerid,more:type,more:objectid,more:modelid,tag:Float:fX,tag:Float:fY,end_tag:Float:fZ)
+	#define ALS_DO_PlayerEditObject<%0>    %0<PlayerEditObject,iiiiffffff>(more:playerid,more:playerobject,more:objectid,more:response,tag:Float:fX,tag:Float:fY,tag:Float:fZ,tag:Float:fRotX,tag:Float:fRotY,end_tag:Float:fRotZ)
+	#define ALS_DO_PlayerEditAttachedObject<%0>    %0<PlayerEditAttachedObject,iiiiifffffffff>(more:playerid,more:response,more:index,more:modelid,more:boneid,tag:Float:fOffsetX,tag:Float:fOffsetY,tag:Float:fOffsetZ,tag:Float:fRotX,tag:Float:fRotY,tag:Float:fRotZ,tag:Float:fScaleX,tag:Float:fScaleY,end_tag:Float:fScaleZ)
+	#define ALS_DO_PlayerSelectObject<%0>    %0<PlayerSelectObject,iiiifff>(more:playerid,more:type,more:objectid,more:modelid,tag:Float:fX,tag:Float:fY,end_tag:Float:fZ)
 	//#define ALS_CALL<%0> ALS_C_%0
 	//#define ALS_FORWARD<%0> ALS_F_%0
 	
@@ -284,13 +284,15 @@ Changelog:
 	#define ALS_KS_string:%0[],     %0[],ALS_KS_
 	#define ALS_KS_tag:%3:%0,       %3:%0,ALS_KS_
 	#define ALS_KS_end:%0)          %0)
+	#define ALS_KS_none:)           )
 	#define ALS_KS_end_string:%0[]) %0[])
 	#define ALS_KS_end_tag:%3:%0)   %3:%0)
-
+	
 	#define ALS_RS_more:%0,         %0,ALS_RS_
 	#define ALS_RS_string:%0[],     ((%0[0])?(%0):NULL),ALS_RS_
 	#define ALS_RS_tag:%3:%0,       (_:%0),ALS_RS_
 	#define ALS_RS_end:%0)          %0)
+	#define ALS_RS_none:)           )
 	#define ALS_RS_end_string:%0[]) ((%0[0])?(%0):NULL))
 	#define ALS_RS_end_tag:%3:%0)   (_:%0))
 	
