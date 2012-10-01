@@ -62,11 +62,11 @@ Changelog:
 		First version
 \*----------------------------------------------------------------------------*/
 
-#include "y_version"
+#include <YSI\internal\y_version>
 #include <a_samp>
-#include "..\y_debug"
+#include <YSI\y_debug>
 
-#include "..\y_amx"
+#include <YSI\y_amx>
 
 #define ALS_PREFIX S@@
 
@@ -81,7 +81,7 @@ Changelog:
 
 #define Hook:%0On%1(%2) UNIQUE_FUNCTION<@yH_%1...%0>(%2);UNIQUE_FUNCTION<@yH_%1...%0>(%2)
 
-#include "..\y_als"
+#include <YSI\y_als>
 
 /*#if !defined OnPlayerLogin
 #endif
@@ -324,6 +324,12 @@ static Hooks_OnScriptInit()
 	HOOKS_DO_ONE_CALLBACK<PlayerTakeDamage>
 	HOOKS_DO_ONE_CALLBACK<PlayerClickMap>
 	HOOKS_DO_ONE_CALLBACK<UnoccupiedVehicleUpdate>
+	// 0.3e
+	HOOKS_DO_ONE_CALLBACK<PlayerClickTextDraw>
+	HOOKS_DO_ONE_CALLBACK<PlayerClickPlayerTextDraw>
+	HOOKS_DO_ONE_CALLBACK<PlayerEditObject>
+	HOOKS_DO_ONE_CALLBACK<PlayerEditAttachedObject>
+	HOOKS_DO_ONE_CALLBACK<PlayerSelectObject>
 	// YSI callbacks.
 	HOOKS_DO_ONE_SPECIAL<PlayerLogin>
 	HOOKS_DO_ONE_SPECIAL<PlayerLogout>
@@ -3778,5 +3784,379 @@ public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 #endif
 #define OnPlayerClickMap S@@_OnPlayerClickMap
 ALS_FORWARD<PlayerClickMap>
+
+public OnPlayerClickTextDraw(playerid, Text:clickedid)
+{
+	P:2("Hooks_OnPlayerClickTextDraw called: %d, %f, %f, %f", playerid, fX, fY, fZ);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnPlayerClickTextDraw][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnPlayerClickTextDraw][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_PlayerClickTextDraw;
+	if (start == end)
+	{
+		P:2("Hooks_OnPlayerClickTextDraw end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerClickTextDraw));
+		HOOK_CALL<PlayerClickTextDraw>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S clickedid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerClickTextDraw");
+		#emit PUSH.S clickedid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnPlayerClickTextDraw end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerClickTextDraw));
+	HOOK_RETURN<PlayerClickTextDraw>
+}
+#if defined _ALS_OnPlayerClickTextDraw
+	#undef OnPlayerClickTextDraw
+#else
+	#define _ALS_OnPlayerClickTextDraw
+#endif
+#define OnPlayerClickTextDraw S@@_OnPlayerClickTextDraw
+ALS_FORWARD<PlayerClickTextDraw>
+
+public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
+{
+	P:2("Hooks_OnPlayerClickPlayerTextDraw called: %d, %f, %f, %f", playerid, fX, fY, fZ);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnPlayerClickPlayerTextDraw][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnPlayerClickPlayerTextDraw][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_PlayerClickPlayerTextDraw;
+	if (start == end)
+	{
+		P:2("Hooks_OnPlayerClickPlayerTextDraw end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerClickPlayerTextDraw));
+		HOOK_CALL<PlayerClickPlayerTextDraw>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S playertextid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerClickPlayerTextDraw");
+		#emit PUSH.S playertextid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnPlayerClickPlayerTextDraw end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerClickPlayerTextDraw));
+	HOOK_RETURN<PlayerClickPlayerTextDraw>
+}
+#if defined _ALS_OnPlayerClickPlayerID
+#else
+	#define _ALS_OnPlayerClickPlayerTD
+#endif
+#define OnPlayerClickPlayerTextDraw S@@_OnPlayerClickPlayerTextDraw
+ALS_FORWARD<PlayerClickPlayerTextDraw>
+
+public OnPlayerEditObject(playerid, playerobject, objectid, response, Float:fX, Float:fY, Float:fZ, Float:fRotX, Float:fRotY, Float:fRotZ)
+{
+	P:2("Hooks_OnPlayerEditObject called: %d, %f, %f, %f", playerid, fX, fY, fZ);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnPlayerEditObject][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnPlayerEditObject][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_PlayerEditObject;
+	if (start == end)
+	{
+		P:2("Hooks_OnPlayerEditObject end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEditObject));
+		HOOK_CALL<PlayerEditObject>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S fRotZ
+		#emit PUSH.S fRotY
+		#emit PUSH.S fRotX
+		#emit PUSH.S fZ
+		#emit PUSH.S fY
+		#emit PUSH.S fX
+		#emit PUSH.S response
+		#emit PUSH.S objectid
+		#emit PUSH.S playerobject
+		#emit PUSH.S playerid
+		#emit PUSH.C     40
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerEditObject");
+		#emit PUSH.S fRotZ
+		#emit PUSH.S fRotY
+		#emit PUSH.S fRotX
+		#emit PUSH.S fZ
+		#emit PUSH.S fY
+		#emit PUSH.S fX
+		#emit PUSH.S response
+		#emit PUSH.S objectid
+		#emit PUSH.S playerobject
+		#emit PUSH.S playerid
+		#emit PUSH.C     40
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnPlayerEditObject end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEditObject));
+	HOOK_RETURN<PlayerEditObject>
+}
+#if defined _ALS_OnPlayerEditObject
+	#undef OnPlayerEditObject
+#else
+	#define _ALS_OnPlayerEditObject
+#endif
+#define OnPlayerEditObject S@@_OnPlayerEditObject
+ALS_FORWARD<PlayerEditObject>
+
+public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Float:fOffsetX, Float:fOffsetY, Float:fOffsetZ, Float:fRotX, Float:fRotY, Float:fRotZ, Float:fScaleX, Float:fScaleY, Float:fScaleZ)
+{
+	P:2("Hooks_OnPlayerEditAttachedObject called: %d, %f, %f, %f", playerid, fX, fY, fZ);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnPlayerEditAttachedObject][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnPlayerEditAttachedObject][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_PlayerEditAttachedObject;
+	if (start == end)
+	{
+		P:2("Hooks_OnPlayerEditAttachedObject end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEditAttachedObject));
+		HOOK_CALL<PlayerEditAttachedObject>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S fScaleZ
+		#emit PUSH.S fScaleY
+		#emit PUSH.S fScaleX
+		#emit PUSH.S fRotZ
+		#emit PUSH.S fRotY
+		#emit PUSH.S fRotX
+		#emit PUSH.S fOffsetZ
+		#emit PUSH.S fOffsetY
+		#emit PUSH.S fOffsetX
+		#emit PUSH.S boneid
+		#emit PUSH.S modelid
+		#emit PUSH.S index
+		#emit PUSH.S response
+		#emit PUSH.S playerid
+		#emit PUSH.C     56
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerEditAttachedObject");
+		#emit PUSH.S fScaleZ
+		#emit PUSH.S fScaleY
+		#emit PUSH.S fScaleX
+		#emit PUSH.S fRotZ
+		#emit PUSH.S fRotY
+		#emit PUSH.S fRotX
+		#emit PUSH.S fOffsetZ
+		#emit PUSH.S fOffsetY
+		#emit PUSH.S fOffsetX
+		#emit PUSH.S boneid
+		#emit PUSH.S modelid
+		#emit PUSH.S index
+		#emit PUSH.S response
+		#emit PUSH.S playerid
+		#emit PUSH.C     56
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnPlayerEditAttachedObject end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEditAttachedObject));
+	HOOK_RETURN<PlayerEditAttachedObject>
+}
+#if defined _ALS_OnPlayerEditAttachedObject
+	#undef OnPlayerEditAttachedObject
+#else
+	#define _ALS_OnPlayerEditAttachedObject
+#endif
+#define OnPlayerEditAttachedObject S@@_OnPlayerEditAttachedObject
+ALS_FORWARD<PlayerEditAttachedObject>
+
+public OnPlayerSelectObject(playerid, type, objectid, modelid, Float:fX, Float:fY, Float:fZ)
+{
+	P:2("Hooks_OnPlayerSelectObject called: %d, %f, %f, %f", playerid, fX, fY, fZ);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnPlayerSelectObject][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnPlayerSelectObject][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_PlayerSelectObject;
+	if (start == end)
+	{
+		P:2("Hooks_OnPlayerSelectObject end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerSelectObject));
+		HOOK_CALL<PlayerSelectObject>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S fZ
+		#emit PUSH.S fY
+		#emit PUSH.S fX
+		#emit PUSH.S modelid
+		#emit PUSH.S objectid
+		#emit PUSH.S type
+		#emit PUSH.S playerid
+		#emit PUSH.C     28
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerSelectObject");
+		#emit PUSH.S fZ
+		#emit PUSH.S fY
+		#emit PUSH.S fX
+		#emit PUSH.S modelid
+		#emit PUSH.S objectid
+		#emit PUSH.S type
+		#emit PUSH.S playerid
+		#emit PUSH.C     28
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnPlayerSelectObject end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerSelectObject));
+	HOOK_RETURN<PlayerSelectObject>
+}
+#if defined _ALS_OnPlayerSelectObject
+	#undef OnPlayerSelectObject
+#else
+	#define _ALS_OnPlayerSelectObject
+#endif
+#define OnPlayerSelectObject S@@_OnPlayerSelectObject
+ALS_FORWARD<PlayerSelectObject>
 
 #undef ALS_PREFIX
