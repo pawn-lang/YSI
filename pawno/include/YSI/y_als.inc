@@ -57,7 +57,7 @@ Changelog:
 \*----------------------------------------------------------------------------*/
 
 #include "internal\y_version"
-#include "y_amx"
+//#include "y_amx"
 #include "y_utils"
 
 // Allow multiple inclusions.
@@ -128,11 +128,18 @@ Changelog:
 		Bit:ALS_OnPlayerClickMap,
 		Bit:ALS_OnPlayerCommandReceived,
 		Bit:ALS_OnPlayerCommandPerformed,
-		Bit:ALS_OnUnoccupiedVehicleUpdate
+		Bit:ALS_OnUnoccupiedVehicleUpdate,
+		Bit:ALS_OnPlayerClickTextDraw,
+		Bit:ALS_OnPlayerClickPlayerTextDraw,
+		Bit:ALS_OnPlayerEditObject,
+		Bit:ALS_OnPlayerEditAttachedObject,
+		Bit:ALS_OnPlayerSelectObject
 	}
 	
+	//#define ALS_DATA<>
 	#define ALS_DATA<> static stock BitArray:gs_ALS<_:ALS>;
 	
+	//#define ALS_DETECT<%0>
 	#define ALS_DETECT<%0> if(funcidx(#ALS_PREFIX"_On"#%0)!=-1)Bit_Let(gs_ALS,_:ALS_On%0);
 	
 	//#define ALS_DETECT_SHORT<On%0> if(funcidx(#ALS_PREFIX"_"#%0)!=-1)Bit_Let(gs_ALS,_:ALS_On%0);
@@ -202,7 +209,13 @@ Changelog:
 	#define ALS_R_PlayerCommandReceived     1
 	#define ALS_R_PlayerCommandPerformed    -1
 	#define ALS_R_UnoccupiedVehicleUpdate   1
-	
+	// 0.3e
+	#define ALS_R_PlayerClickTextDraw 1
+	#define ALS_R_PlayerClickPlayerTextDraw 1
+	#define ALS_R_PlayerEditObject 1
+	#define ALS_R_PlayerEditAttachedObject 1
+	#define ALS_R_PlayerSelectObject 1
+
 	// Chain call declarations.
 	#define ALS_DO_ScriptInit<%0>                %0<ScriptInit               ,>(end:)
 	#define ALS_DO_ScriptExit<%0>                %0<ScriptExit               ,>(end:)
@@ -256,6 +269,12 @@ Changelog:
 	#define ALS_DO_PlayerCommandReceived<%0>     %0<PlayerCommandReceived    ,is>(more:playerid,end_string:cmdtext[])
 	#define ALS_DO_PlayerCommandPerformed<%0>    %0<PlayerCommandPerformed   ,isi>(more:playerid,string:cmdtext[],end:success)
 	#define ALS_DO_UnoccupiedVehicleUpdate<%0>    %0<UnoccupiedVehicleUpdate   ,iii>(more:vehicleid,more:playerid,end:passenger_seat)
+	// 0.3e
+	#define ALS_DO_PlayerClickTextDraw<%0>    %0<PlayerClickTextDraw,ii>(more:playerid,end_tag:Text:clickedid)
+	#define ALS_DO_PlayerClickPlayerTextDraw<%0>    %0<PlayerClickPlayerTextDraw,iii>(more:playerid,end_tag:PlayerText:playertextid)
+	#define ALS_DO_PlayerEditObject<%0>    %0<PlayerEditObject,iiiiiiiiii>(more:playerid,more:playerobject,more:objectid,more:response,tag:Float:fX,tag:Float:fY,tag:Float:fZ,tag:Float:fRotX,tag:Float:fRotY,end_tag:Float:fRotZ)
+	#define ALS_DO_PlayerEditAttachedObject<%0>    %0<PlayerEditAttachedObject,iiiiiiiiiiiiii>(more:playerid,more:response,more:index,more:modelid,more:boneid,tag:Float:fOffsetX,tag:Float:fOffsetY,tag:Float:fOffsetZ,tag:Float:fRotX,tag:Float:fRotY,tag:Float:fRotZ,tag:Float:fScaleX,tag:Float:fScaleY,end_tag:Float:fScaleZ)
+	#define ALS_DO_PlayerSelectObject<%0>    %0<PlayerSelectObject,iiiiiii>(more:playerid,more:type,more:objectid,more:modelid,tag:Float:fX,tag:Float:fY,end_tag:Float:fZ)
 	//#define ALS_CALL<%0> ALS_C_%0
 	//#define ALS_FORWARD<%0> ALS_F_%0
 	
@@ -270,10 +289,10 @@ Changelog:
 
 	#define ALS_RS_more:%0,         %0,ALS_RS_
 	#define ALS_RS_string:%0[],     ((%0[0])?(%0):NULL),ALS_RS_
-	#define ALS_RS_tag:%3:%0,       %0,ALS_RS_
+	#define ALS_RS_tag:%3:%0,       (_:%0),ALS_RS_
 	#define ALS_RS_end:%0)          %0)
 	#define ALS_RS_end_string:%0[]) ((%0[0])?(%0):NULL))
-	#define ALS_RS_end_tag:%3:%0)   %0)
+	#define ALS_RS_end_tag:%3:%0)   (_:%0))
 	
 	#define ALS_DO:%9<%0> ALS_DO_%0<%9>
 	
