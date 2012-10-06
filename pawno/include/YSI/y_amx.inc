@@ -261,6 +261,23 @@ stock AMX_GetGlobalAddress(...)
 	return 0;
 }
 
+stock AMX_GetRelativeAddress(...)
+{
+	new
+		addr;
+	// addr = numargs();
+	#emit LOAD.S.pri 8
+	#emit STOR.S.pri addr
+	if (addr >= 4)
+	{
+		// getargptr(0);
+		#emit LOAD.S.pri 12
+		#emit STACK 4
+		#emit RETN
+	}
+	return 0;
+}
+
 static AMX_DoNothing() {
     return 0;
 }
