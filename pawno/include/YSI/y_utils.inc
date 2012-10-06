@@ -49,6 +49,8 @@ Legal:
 Version:
 	0.1.3
 Changelog:
+	06/10/12:
+		Upgraded "memset" to use "FILL".
 	22/12/11:
 		Changed "ceildiv" to only evaluate arguments once.
 	05/12/11:
@@ -604,14 +606,13 @@ stock memset(arr[], size = sizeof (arr), val = 0)
 		addr;
 	#emit LOAD.S.pri arr
 	#emit STOR.S.pri addr
-	rawMemset(addr, size, val);
+	// Convert the size from cells to bytes.
+	rawMemset(addr, size * 4, val);
 	return 0;
 }
 
 stock rawMemset(iAddress, iSize, iValue)
 {
-	// Convert the size from cells to bytes.
-	iSize *= 4;
 	// Loop until there are only little bits left to fill.
 	while (iSize >= 4096)
 	{
