@@ -261,7 +261,7 @@ stock AMX_GetGlobalAddress(...)
 	return 0;
 }
 
-stock AMX_GetRelativeAddress(...)
+stock AMX_GetDataAddress(...)
 {
 	new
 		addr;
