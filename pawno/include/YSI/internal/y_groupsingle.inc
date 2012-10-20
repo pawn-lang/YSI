@@ -61,16 +61,16 @@ Changelog:
 #endif
 
 #if !defined _YSI_HAS_GROUP_SYSTEM
-	forward bool:_GROUP_INITIALISE(_GROUP_MAKE_TAG:x = _GROUP_MAKE_LIMIT);
+	forward bool:_GROUP_INITIALISE(_GROUP_MAKE_TAG:x = _GROUP_MAKE_TAG:_GROUP_MAKE_LIMIT);
 #endif
 
-stock bool:_GROUP_INITIALISE(_GROUP_MAKE_TAG:x = _GROUP_MAKE_LIMIT) <YSI_has_groups:n>
+stock bool:_GROUP_INITIALISE(_GROUP_MAKE_TAG:x = _GROUP_MAKE_TAG:_GROUP_MAKE_LIMIT) <YSI_has_groups:n>
 {
 	#pragma unused x
 	return false;
 }
 
-stock bool:_GROUP_INITIALISE(_GROUP_MAKE_TAG:x = _GROUP_MAKE_LIMIT) <>
+stock bool:_GROUP_INITIALISE(_GROUP_MAKE_TAG:x = _GROUP_MAKE_TAG:_GROUP_MAKE_LIMIT) <>
 {
 	#pragma unused x
 	return false;

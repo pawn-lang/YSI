@@ -418,6 +418,9 @@ native Group_Destroy(Group:group);
 native Group_SetPlayer(Group:group, playerid, bool:s);
 native bool:Group_GetPlayer(Group:group, playerid);
 native 
+native Group_SetGroup(Group:parent, Group:child, bool:s);
+native Group_SetGlobalGroup(Group:child, bool:s);
+naitve 
 native Group_SetCommand(Group:group, commandid, bool:s);
 native Group_SetCommandDefault(Group:group, bool:s);
 native Group_SetGlobalCommand(commandid, bool:s);

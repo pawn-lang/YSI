@@ -259,6 +259,21 @@ Changelog:
 		// Include the second half of the file for the methods.
 		#include "internal\y_groupsecond"
 	#endif
+	#if defined _inc_streamer
+		#if defined _YCM_q@
+			#define _YSIM_OVERRIDE          16
+		#endif
+		#include "y_master"
+		// Include the first half of the file for the call chain.
+		//#include "internal\y_groupfirst"
+		//#undef _GROUP_MAKE_NAME
+		//#undef _GROUP_MAKE_LIMIT
+		//#define _GROUP_MAKE_NAME<%0...%1> %0SObject%1
+		//#define _GROUP_MAKE_LIMIT<%0...%1> 
+		// Include the second half of the file for the methods.
+		//#include "internal\y_groupsecond"
+		#include "internal\y_incognitostreamer"
+	#endif
 	// Internal test library.
 	#if defined _YSI_ALLOW_INTERNAL_TEST
 		#if defined _YSI_GROUP_INTTEST_INCLUDED

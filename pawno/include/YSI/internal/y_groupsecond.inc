@@ -171,7 +171,7 @@ static stock Group_FU(playerid, el, Bit:previous[], Bit:current[], Bit:reference
 			return;
 		}
 		// Now can't.
-		_GROUP_SET_PLAYER(el, playerid, false);
+		_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, false);
 		return;
 	}
 	// Couldn't see it before.
@@ -181,7 +181,7 @@ static stock Group_FU(playerid, el, Bit:previous[], Bit:current[], Bit:reference
 		// MULTIPLE times for an element, without anything actually changing.
 		// I.e. this could be set to "true" repeatedly while never being set
 		// to "false".
-		_GROUP_SET_PLAYER(el, playerid, true);
+		_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, true);
 		// We use "return" here because "_GROUPS_CHECK" MAY be a loop.
 		return;
 	}
@@ -305,22 +305,22 @@ Notes:
 \*----------------------------------------------------------------------------*/
 
 #if !defined _YSI_GROUPS_FIRST_HALF
-	forward bool:_GROUP_INITIALISE(x = _GROUP_MAKE_LIMIT);
+	forward bool:_GROUP_INITIALISE(_GROUP_MAKE_TAG:x = _GROUP_MAKE_TAG:_GROUP_MAKE_LIMIT);
 #endif
 
-stock bool:_GROUP_INITIALISE(x = _GROUP_MAKE_LIMIT) <YSI_has_groups:y>
+stock bool:_GROUP_INITIALISE(_GROUP_MAKE_TAG:x = _GROUP_MAKE_TAG:_GROUP_MAKE_LIMIT) <YSI_has_groups:y>
 {
 	P:4(#_GROUP_INITIALISE " called: %i", x);
 	// A new item has been added to the system - update all players according to
 	// the default settings for a group.
-	if (x != _GROUP_MAKE_LIMIT)
+	if (x != _GROUP_MAKE_TAG:_GROUP_MAKE_LIMIT)
 	{
 		static
 			BitArray:sEmpty<_MAX_GROUPS_G>;
-		_GROUP_GROUP_NAME[x] = _GROUP_DEFAULTS;
+		_GROUP_GROUP_NAME[_:x] = _GROUP_DEFAULTS;
 		foreach (new playerid : Player)
 		{
-			Group_FU(playerid, x, sEmpty, _GROUP_DEFAULTS, YSI_gGroupPlayers[playerid]);
+			Group_FU(playerid, _:x, sEmpty, _GROUP_DEFAULTS, YSI_gGroupPlayers[playerid]);
 		}
 	}
 	return true;
@@ -443,13 +443,13 @@ Notes:
 	removed.
 \*----------------------------------------------------------------------------*/
 
-gforeign Group_Set...(Group:g,el,bool:s);
+gforeign Group_Set...(Group:g,_GROUP_MAKE_TAG:el,bool:s);
 
-gglobal Group_Set...(Group:g,el,bool:s)
+gglobal Group_Set...(Group:g,_GROUP_MAKE_TAG:el,bool:s)
 {
-	P:2(#_GROUP_MAKE_NAME<Group_Set...> " called: %i, %i, %i", _:g, el, s);
+	P:2(#_GROUP_MAKE_NAME<Group_Set...> " called: %i, %i, %i", _:g, _:el, s);
 	// Set wether a group can use this item.
-	if (0 <= el < _GROUP_MAKE_LIMIT && GROUP_MASK <= g <= GROUP_GLOBAL)
+	if (0 <= _:el < _GROUP_MAKE_LIMIT && GROUP_MASK <= g <= GROUP_GLOBAL)
 	{
 		// There is now NO validity check for reasons of distruibution.
 		GROUP_FIX(g);
@@ -460,7 +460,7 @@ gglobal Group_Set...(Group:g,el,bool:s)
 			BitArray:sNext<_MAX_GROUPS_G>;
 		if (s)
 		{
-			sNext = _GROUP_GROUP_NAME[el];
+			sNext = _GROUP_GROUP_NAME[_:el];
 			if (sNext[slot] & mask)
 			{
 				// No point adding an element to a group that it is already in.
@@ -471,7 +471,7 @@ gglobal Group_Set...(Group:g,el,bool:s)
 		}
 		else
 		{
-			sNext = _GROUP_GROUP_NAME[el];
+			sNext = _GROUP_GROUP_NAME[_:el];
 			if (!(sNext[slot] & mask))
 			{
 				return 1;
@@ -485,10 +485,10 @@ gglobal Group_Set...(Group:g,el,bool:s)
 			{
 				// The player is in the group in question, so they need a full
 				// update.
-				Group_FU(playerid, el, _GROUP_GROUP_NAME[el], sNext, YSI_gGroupPlayers[playerid]);
+				Group_FU(playerid, _:el, _GROUP_GROUP_NAME[_:el], sNext, YSI_gGroupPlayers[playerid]);
 			}
 		}
-		_GROUP_GROUP_NAME[el] = sNext;
+		_GROUP_GROUP_NAME[_:el] = sNext;
 		return 1;
 	}
 	return 0;
@@ -507,11 +507,11 @@ Notes:
 	removed.
 \*----------------------------------------------------------------------------*/
 
-gforeign Group_SetGlobal...(el,bool:s);
+gforeign Group_SetGlobal...(_GROUP_MAKE_TAG:el,bool:s);
 
-gglobal Group_SetGlobal...(el,bool:s)
+gglobal Group_SetGlobal...(_GROUP_MAKE_TAG:el,bool:s)
 {
-	P:2(#_GROUP_MAKE_NAME<Group_SetGlobal...> " called: %i, %i", el, s);
+	P:2(#_GROUP_MAKE_NAME<Group_SetGlobal...> " called: %i, %i", _:el, s);
 	return _GROUP_MAKE_NAME<Group_Set...>(GROUP_GLOBAL, el, s);
 }
 
