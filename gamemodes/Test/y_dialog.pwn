@@ -1,11 +1,13 @@
-#define _DEBUG 1
+//#define _DEBUG 5
+
+#define RUN_TESTS
 
 #include <YSI\y_testing>
 #include <YSI\y_dialog>
 
 // y_dialog test file.
 
-#define DIALOG_CLEAN:%0; Clean:%0for(new i=0;i!=MAX_DIALOGS;++i)Dialog_Free(i);
+#define DIALOG_CLEAN:%0; TestClose:%0for(new i=0;i!=MAX_DIALOGS;++i)Dialog_Free(i);
 
 // =============================================================================
 
@@ -19,14 +21,14 @@ DIALOG_CLEAN:ObtainID4();
 
 // =============================================================================
 
-Init:TryObtainID0()
+TestInit:TryObtainID0()
 {
 	Dialog_ObtainID();
 }
 
-Test:TryObtainID0() ASSERT(Dialog_TryObtainID(0) == 0);
-Test:TryObtainID1() ASSERT(Dialog_TryObtainID(5) == 1);
-Test:TryObtainID2() ASSERT(Dialog_TryObtainID(5) == 0);
+Test:TryObtainID0() ASSERT(Dialog_TryObtainID(0) == -1);
+Test:TryObtainID1() ASSERT(Dialog_TryObtainID(5) == 5);
+Test:TryObtainID2() ASSERT(Dialog_TryObtainID(5) == -1);
 
 DIALOG_CLEAN:TryObtainID2();
 
@@ -99,6 +101,7 @@ Test:CB0()
 	gCheck = false;
 	inline Hi0(playerid, dialogid, response, listitem, string:inputtext[])
 	{
+		#pragma unused playerid, dialogid, response, listitem, inputtext
 		gCheck = true;
 	}
 	new id = Dialog_ShowCallback(42, using inline Hi0, 0, "", "", "");
@@ -111,6 +114,7 @@ forward Hi1(playerid, dialogid, response, listitem, string:inputtext[]);
 public Hi1(playerid, dialogid, response, listitem, string:inputtext[])
 {
 	gCheck = true;
+	return 1;
 }
 
 Test:CB1()
@@ -129,12 +133,12 @@ Test:CB2()
 	gCheck = true;
 }
 
-Clean:CB2()
+TestClose:CB2()
 {
 	ASSERT(gCheck);
 }
 
-Init:CB3()
+TestInit:CB3()
 {
 	Iter_Add(Player, 42);
 	for (new i = 0; i != MAX_DIALOGS; ++i)
@@ -152,7 +156,7 @@ Test:CB3()
 	ASSERT(Dialog_ObtainID() == id);
 }
 
-Init:CB4()
+TestInit:CB4()
 {
 	Iter_Add(Player, 42);
 	for (new i = 0; i != MAX_DIALOGS; ++i)
@@ -208,6 +212,8 @@ Test:Keep0()
 	ASSERT(Dialog_ObtainID() != id);
 }
 
+DIALOG_CLEAN:Keep0();
+
 Test:Keep1()
 {
 	new id = Dialog_ObtainID();
@@ -216,16 +222,20 @@ Test:Keep1()
 	ASSERT(Dialog_ObtainID() != id);
 }
 
+DIALOG_CLEAN:Keep1();
+
 Test:Keep2()
 {
 	new id = Dialog_ObtainID();
-	ASSERT(Dialog_TryObtainID(id) == 0);
+	ASSERT(Dialog_TryObtainID(id) == -1);
 }
+
+DIALOG_CLEAN:Keep2();
 
 Test:Keep3()
 {
 	new id = Dialog_ObtainID();
-	ASSERT(Dialog_TryObtainID(id + 1) == 1);
+	ASSERT(Dialog_TryObtainID(id + 1) == id + 1);
 }
 
 DIALOG_CLEAN:Keep3();

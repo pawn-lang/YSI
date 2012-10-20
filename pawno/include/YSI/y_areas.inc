@@ -24,6 +24,10 @@ Legal:
 Version:
 	0.1
 Changelog:
+	13/08/12:
+		Added overlapping areas support.
+	01/01/12:
+		Massive ground-up rewrite based on zones.
 	27/08/07:
 		Made master compatible.
 	03/08/07:
@@ -149,6 +153,14 @@ Operators:
 	#define AREAS_ZONE_BOUNDS 4000
 #endif
 
+// You can of course have more, but if you do have more the extras will be dealt
+// with separately.  I can see three happening sometimes, but not often.  More
+// than that will probably be very rare, and less will be more common, so we can
+// use the third slot usually to store the "NO_AREA" terminator.
+#if !defined AREAS_MAX_OVERLAPS
+	#define AREAS_MAX_OVERLAPS (3)
+#endif
+
 #define AREAS_ZONE_ARRAY (ceildiv(AREAS_ZONE_BOUNDS * 2, AREAS_ZONE_SIZE))
 
 #if !defined AREA_WORLDS
@@ -248,7 +260,7 @@ static stock
 	//YSI_g_sLastUnused = MAX_AREAS - 1,
 	YSI_g_sFreeCount = MAX_AREAS,
 	YSI_g_sAreas[MAX_AREAS][E_AREA],
-	YSI_g_sPlayerArea[MAX_PLAYERS] = {NO_AREA, ...},
+	YSI_g_sPlayerArea[MAX_PLAYERS][AREAS_MAX_OVERLAPS], // = {NO_AREA, ...},
 	YSI_g_sHasCallbacks,
 	YSI_g_sZones[AREAS_ZONE_ARRAY * AREAS_ZONE_ARRAY] = {AREA_NO_NEXT, ...},
 	// "Inner" zones.  -4000 <= x, y <= 4000; Z(x) != Z(y)
@@ -1053,7 +1065,7 @@ global Area_AddCube(Float:x0, Float:y0, Float:z0, Float:x1, Float:y1, Float:z1)
 	YSI_g_sAreas[next][E_AREA_POS][1] = y1;
 	YSI_g_sAreas[next][E_AREA_POS][2] = z1;
 	PA_FastInit(YSI_g_sAreas[slot][E_AREA_PLAYERS]);
-	NO_GROUPS()
+	NO_GROUPS(slot)
 	{
 		PA_Init(YSI_g_sAreas[slot][E_AREA_PLAYERS], true);
 	}
@@ -1105,7 +1117,7 @@ global Area_AddBox(Float:minx, Float:miny, Float:maxx, Float:maxy)
 	YSI_g_sAreas[slot][E_AREA_POS][2] = maxx;
 	YSI_g_sAreas[slot][E_AREA_POS][3] = maxy;
 	PA_FastInit(YSI_g_sAreas[slot][E_AREA_PLAYERS]);
-	NO_GROUPS()
+	NO_GROUPS(slot)
 	{
 		PA_Init(YSI_g_sAreas[slot][E_AREA_PLAYERS], true);
 	}
@@ -1151,7 +1163,7 @@ global _Area_AddCircle(Float:x, Float:y, Float:r, Float:h)
 	YSI_g_sAreas[slot][E_AREA_POS][2] = r * r;
 	YSI_g_sAreas[slot][E_AREA_POS][3] = h;
 	PA_FastInit(YSI_g_sAreas[slot][E_AREA_PLAYERS]);
-	NO_GROUPS()
+	NO_GROUPS(slot)
 	{
 		PA_Init(YSI_g_sAreas[slot][E_AREA_PLAYERS], true);
 	}
@@ -1189,7 +1201,7 @@ global Area_AddSphere(Float:x, Float:y, Float:z, Float:r)
 	YSI_g_sAreas[slot][E_AREA_POS][2] = z;
 	YSI_g_sAreas[slot][E_AREA_POS][3] = r * r;
 	PA_FastInit(YSI_g_sAreas[slot][E_AREA_PLAYERS]);
-	NO_GROUPS()
+	NO_GROUPS(slot)
 	{
 		PA_Init(YSI_g_sAreas[slot][E_AREA_PLAYERS], true);
 	}
@@ -1372,7 +1384,7 @@ Notes:
 		Float:maxy = FLOAT_NEGATIVE_INFINITY;
 	YSI_g_sAreas[real][E_AREA_FLAGS] = e_AREA_FLAGS_USED | e_AREA_FLAGS_POLY | e_AREA_FLAGS_ACTIVE | (e_AREA_FLAGS:(count << 14) & e_AREA_FLAGS_COUNT);
 	PA_FastInit(YSI_g_sAreas[real][E_AREA_PLAYERS]);
-	NO_GROUPS()
+	NO_GROUPS(real)
 	{
 		PA_Init(YSI_g_sAreas[real][E_AREA_PLAYERS], true);
 	}
@@ -1486,7 +1498,10 @@ Notes:
 
 mhook OnPlayerConnect(playerid)
 {
-	YSI_g_sPlayerArea[playerid] = NO_AREA;
+	for (new i = 0; i != AREAS_MAX_OVERLAPS; ++i)
+	{
+		YSI_g_sPlayerArea[playerid][i] = NO_AREA;
+	}
 	NO_GROUPS()
 	{
 		new
@@ -1513,6 +1528,9 @@ Notes:
 -*----------------------------------------------------------------------------*/
 
 #if defined AREAS_USE_TIMER
+	
+	#error AREAS_USE_TIMER is currently unsupported sorry.
+	
 	ptask Area_Loop[200](playerid)
 	{
 		new
@@ -1545,6 +1563,9 @@ Notes:
 	hook OnPlayerUpdate(playerid)
 	{
 		static
+			// Another hard-coded limit (max areas we can actually be in, more
+			// than the max that is globally stored, but still not infinate).
+			sAreas[16],
 			sZones[9],
 			Float:sX,
 			Float:sY,
@@ -1552,28 +1573,50 @@ Notes:
 			sCur,
 			sW;
 		new
+			in,
 			idx;
 		// Get all the zones for this player.
 		GetPlayerPos(playerid, sX, sY, sZ);
 		#if AREA_WORLDS > 0
 			sW = GetPlayerVirtualWorld(playerid);
 		#endif
-		if ((sCur = YSI_g_sPlayerArea[playerid]) != NO_AREA)
+		for ( ; ; )
 		{
-			if (Area_CheckArea(playerid, sW, sCur, sX, sY, sZ))
+			if ((sCur = _Area_GetPlayerAreas(playerid, idx)) == NO_AREA)
 			{
-				// Still in the old area, don't check for new ones.
-				return 1;
+				break;
 			}
 			else
 			{
-				// No longer in the area they used to be in.
-				YSI_g_sPlayerArea[playerid] = NO_AREA;
-				Area_DoLeave(playerid, sCur);
+				// In this zone too.
+				if (in == 16)
+				{
+					P:E("\"in\" expired in y_areas (one player is in too many areas at once).");
+				}
+				else
+				{
+					sAreas[in++] = sCur;
+				}
+				if (!Area_CheckArea(playerid, sW, sCur, sX, sY, sZ))
+				{
+					// No longer in the area they used to be in.  Need more
+					// advanced removal code, but we do have the slot that was
+					// removed.
+					//YSI_g_sPlayerArea[playerid] = NO_AREA;
+					// Here is that more advanced code.
+					//_Area_GetPlayerAreas(playerid, idx)
+					Area_DoLeave(playerid, sCur);
+					// Still in the old area, don't check for new ones.
+					//return 1;
+				}
+				//else
+				//{
+				//}
 			}
+			++idx;
 		}
 		sZones = Area_GetZones(sX, sY);
-		for ( ; ; )
+		for (idx = 0; ; )
 		{
 			switch (sZones[idx++])
 			{
@@ -1948,16 +1991,124 @@ Params:
 Return:
 	The area a player is in or -1.
 Notes:
-	-
+	Deprecated.
 -*----------------------------------------------------------------------------*/
 
-foreign Area_GetPlayerArea(playerid);
+//foreign Area_GetPlayerArea(playerid);
 
-global Area_GetPlayerArea(playerid)
+stock Area_GetPlayerArea(playerid)
 {
-	if (playerid >= 0 && playerid < MAX_PLAYERS)
+	if (0 <= playerid < MAX_PLAYERS)
 	{
-		return YSI_g_sPlayerArea[playerid];
+		return YSI_g_sPlayerArea[playerid][0];
+	}
+	return NO_AREA;
+}
+
+#pragma deprecate Area_GetPlayerArea
+
+/*----------------------------------------------------------------------------*-
+Function:
+	_Area_SetPlayerAreas
+Params:
+	playerid - Player to set areas of.
+	idx - Which slot to set.
+	area - The area to store in that slot.
+Return:
+	-
+Notes:
+	Sets a player as in a slot.
+-*----------------------------------------------------------------------------*/
+
+static stock
+	_Area_SetPlayerAreas(playerid, idx, area)
+{
+	if (0 <= idx <= 999)
+	{
+		if (idx < AREAS_MAX_OVERLAPS)
+		{
+			YSI_g_sPlayerArea[playerid][idx] = area;
+			return 1;
+		}
+		else
+		{
+			// Use PVars to store extended areas.
+			static
+				sProp[12] = "y_areas_";
+			valstr(sProp[8], idx);
+			if (area == NO_AREA)
+			{
+				DeletePVar(playerid, sProp);
+			}
+			else
+			{
+				SetPVarInt(playerid, sProp, area);
+			}
+			return 1;
+		}
+	}
+	return 0;
+}
+
+/*----------------------------------------------------------------------------*-
+Function:
+	_Area_GetPlayerAreas
+	Area_GetPlayerAreas
+Params:
+	playerid - Player to get areas of.
+	idx - Which area to get.
+Return:
+	The area a player is in or -1.
+Notes:
+	Replaces Area_GetPlayerArea for multiple areas.  Includes an internal
+	version for tighter loops within this code to use once it is known that a
+	player exists, and without using the global function system.
+-*----------------------------------------------------------------------------*/
+
+static stock
+	_Area_GetPlayerAreas(playerid, idx)
+{
+	if (0 <= idx <= 999)
+	{
+		/*if (idx == AREAS_MAX_OVERLAPS - 1)
+		{
+			// Special one for the last locally stored one.
+			if (YSI_g_sPlayerArea[playerid][AREAS_MAX_OVERLAPS - 1] == NO_AREA)
+			{
+				return NO_AREA;
+			}
+			else
+			{
+				return YSI_g_sPlayerArea[playerid][AREAS_MAX_OVERLAPS - 1] & cellmax;
+			}
+		}
+		else if (idx < AREAS_MAX_OVERLAPS - 1)*/
+		if (idx < AREAS_MAX_OVERLAPS)
+		{
+			return YSI_g_sPlayerArea[playerid][idx];
+		}
+		else
+		{
+			// Use PVars to store extended areas.
+			static
+				sProp[12] = "y_areas_";
+			valstr(sProp[8], idx);
+			if (GetPVarType(playerid, sProp) == PLAYER_VARTYPE_INT)
+			{
+				return GetPVarInt(playerid, sProp);
+			}
+		}
+	}
+	return NO_AREA;
+}
+
+foreign Area_GetPlayerAreas(playerid, idx);
+
+global Area_GetPlayerAreas(playerid, idx)
+{
+	if (0 <= playerid < MAX_PLAYERS)
+	{
+		return _Area_GetPlayerAreas(playerid, idx);
 	}
 	return NO_AREA;
 }
@@ -1991,12 +2142,12 @@ global Area_SetPlayer(area, playerid, bool:set)
 Function:
 	Area_GetPlayer
 Params:
-	area - Area to set for.
-	playerid - Player to set for.
+	area - Area to get for.
+	playerid - Player to get for.
 Return:
 	-
 Notes:
-	-
+	Can the player USE this area (not are they in it)?
 -*----------------------------------------------------------------------------*/
 
 foreign bool:Area_GetPlayer(area, playerid);
@@ -2112,18 +2263,32 @@ Params:
 Return:
 	Is the passed area valid and empty.
 Notes:
-	-
+	Currently very slow as it has to loop through multiple players!  I may add
+	an entry counter to zones to make this O(1) instead of O(nm).
 -*----------------------------------------------------------------------------*/
 
 foreign bool:Area_IsEmpty(area);
 
 global bool:Area_IsEmpty(area)
 {
+	new
+		z;
 	if (Area_IsActive(area))
 	{
 		foreach (new playerid : Player)
 		{
-			if (YSI_g_sPlayerArea[playerid] == area) return false;
+			for (new i = 0; ; ++i)
+			{
+				z = _Area_GetPlayerAreas(playerid, i);
+				if (z == NO_AREA)
+				{
+					break;
+				}
+				else if (z == area)
+				{
+					return false;
+				}
+			}
 		}
 	}
 	return true;
@@ -2200,4 +2365,4 @@ remotefunc Area_DoLeave(playerid, areaid)
 forward OnPlayerLeaveArea(playerid, areaid);
 
 //#define YSI_SET_LAST_GROUP 19
-#include "internal\y_grouprevert"
+#include <YSI\internal\y_grouprevert>

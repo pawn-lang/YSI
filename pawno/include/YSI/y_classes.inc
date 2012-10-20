@@ -401,11 +401,13 @@ hook OnScriptInit()
 				#if _YSIM_IS_CLOUD
 					// Set to uninitialised.
 					state _YCM:u;
+					_YCM = _YCM@u;
 				#endif
 				CallRemoteFunction(#_YCM, "");
 				#if _YSIM_IS_CLOUD
 					// Fully master.
 					state _YCM:y;
+					_YCM = _YCM@y;
 				#endif
 			#endif
 		}
@@ -539,11 +541,6 @@ public _Class_OtherRequestClass(playerid, classid)
 					}
 				}
 			}
-			new Group:oldgroup = YSI_g_sClasses[(YSI_g_sPlayerClass[playerid] & e_PLAYER_CLASS_SKIN)][E_CLASS_GROUP];
-			
-			if (oldgroup != GROUP_GLOBAL)
-				Group_SetPlayer(oldgroup, playerid, false);
-			
 			// Store which class they are now on.
 			//printf("%d %d %d %d", classid, YSI_g_sMiddle, YSI_g_sLeft, YSI_g_sRight);
 			if (classid == YSI_g_sMiddle)
@@ -695,7 +692,7 @@ public _Class_OtherRequestSpawn(playerid)
 
 //mhook OnPlayerRequestSpawn(playerid)
 
-#if !defined YSI_NO_MASTER && _YSIM_IS_CLIENT
+#if !defined YSI_NO_MASTER && (_YSIM_IS_CLIENT || _YSIM_IS_STUB)
 	public _Class_OnPlayerRequestSpawn(playerid)
 	{
 		return 1;
@@ -940,6 +937,16 @@ mhook OnPlayerConnect(playerid)
 	//printf("OnPlayerConnect %d", playerid);
 	YSI_g_sPlayerClass[playerid] = (e_PLAYER_CLASS_NONE);
 	YSI_g_sTimer[playerid] = SetTimerEx("_Class_NotSpawned", 500, 0, "i", playerid);
+	NO_GROUPS()
+	{
+		new
+			slot = Bit_Slot(playerid) + 1,
+			Bit:mask = Bit_Mask(playerid); //Bit:(1 << (playerid & (cellbits - 1)));
+		for (new i = 0; i != MAX_CLASSES; ++i)
+		{
+			YSI_g_sClasses[i][E_CLASS_PLAYERS][slot] |= mask;
+		}
+	}
 	return 1;
 }
 
@@ -1134,6 +1141,36 @@ global Class_AddClass(s,Float:x,Float:y,Float:z,Float:a,w[],c,Group:f,Group:g)
 	YSI_g_sClassCount++;
 	return i;
 }
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Class_HasGroup
+Params:
+	classid - The class to test.
+	Group:group - The group to test setting of.
+Return:
+	Does this class add players to the given group on spawn?
+Notes:
+	-
+\*----------------------------------------------------------------------------*/
+
+foreign Class_HasGroup(classid, Group:group);
+
+global Class_HasGroup(classid, Group:group)
+{
+	return YSI_g_sClasses[classid][E_CLASS_GROUP] == group;
+}
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Class_Enable
+Params:
+	-
+Return:
+	-
+Notes:
+	-
+\*----------------------------------------------------------------------------*/
 
 foreign Class_Enable(classid, bool:toggle);
 

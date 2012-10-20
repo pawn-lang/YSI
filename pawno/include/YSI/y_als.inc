@@ -144,15 +144,15 @@ Changelog:
 	
 	//#define ALS_DETECT_SHORT<On%0> if(funcidx(#ALS_PREFIX"_"#%0)!=-1)Bit_Let(gs_ALS,_:ALS_On%0);
 	
-	//#define ALS_CALL_INT<%0,%2>(%3) return Bit_GetBit(Bit:gs_ALS,_:ALS_On%0)?P@(#ALS_PREFIX"_On"#%0,#%2#x,%3):1;
+	//#define ALS_CALL_INT<%0,%2>(%3) return Bit_GetBit(Bit:gs_ALS,_:ALS_On%0)?P@(#ALS_PREFIX"_On"#%0,(x:#%2#),%3):1;
 	
 	// ALS Callback.
-	#define _ALS_C_INT<%0,%2>(%3) Bit_GetBit(Bit:gs_ALS,_:ALS_On%0)?P@(#ALS_PREFIX"_On"#%0,#%2#q,ALS_RS_%3):ALS_R_%0;
+	#define _ALS_C_INT<%0,%2>(%3) Bit_GetBit(Bit:gs_ALS,_:ALS_On%0)?P@(#ALS_PREFIX"_On"#%0,(q:#%2#),ALS_RS_%3):ALS_R_%0;
 	#define ALS_C_INT<%0,%2>(%3) return _ALS_C_INT<%0,%2>(%3)
 	// ALS Forward.
 	#define ALS_F_INT<%0,%8>(%1) forward On%0(ALS_KS_%1);
 	// ALS Go (ignore extra parameters).
-	#define ALS_G_INT<%0,%1>(%8)(%2) W@(#On#%0,#%1#x,%2)
+	#define ALS_G_INT<%0,%1>(%8)(%2) W@(#On#%0,(x:#%1#),%2)
 	
 	// Default return value definitions.
 	//#define ALS_R_AnyScriptInit             1

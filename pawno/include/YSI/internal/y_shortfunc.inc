@@ -201,8 +201,9 @@ stock G@(GLOBAL_TAG_TYPES:...)
 // else tries to define "x" however they may have a slight problem (they can't).
 //#define x,), x),
 // Changed as x,): was also needed (for ?:).
-#define x,) )
-#define q,ALS_RS_none:) )
+#define x:##),) #))
+//#define x,) )
+#define q:##),ALS_RS_none:) #))
 
 // This is for getting excess parameters on non-strings.
 #define _:%0,) %0)

@@ -105,10 +105,10 @@ ALS_DATA<>
 
 // These defines now use the much more generic ALS code so that the list of
 // callbacks is only done in one place.
-#define HOOK_R_INT<%0,%2>(%3) return Bit_GetBit(Bit:gs_ALS,_:ALS_On%0)?P@(#ALS_PREFIX"_On"#%0,#%2#q,ALS_RS_%3):ret;
+#define HOOK_R_INT<%0,%2>(%3) return Bit_GetBit(Bit:gs_ALS,_:ALS_On%0)?P@(#ALS_PREFIX"_On"#%0,(q:#%2#),ALS_RS_%3):ret;
 #define HOOK_RETURN<%0> ALS_DO:HOOK_R_INT<%0>
 
-#define HOOK_C_INT<%0,%2>(%3) if(Bit_GetBit(Bit:gs_ALS,_:ALS_On%0))return P@(#ALS_PREFIX"_On"#%0,#%2#q,ALS_RS_%3);hooks_do_hooks_call_no_als:return ret;
+#define HOOK_C_INT<%0,%2>(%3) if(Bit_GetBit(Bit:gs_ALS,_:ALS_On%0))return P@(#ALS_PREFIX"_On"#%0,(q:#%2#),ALS_RS_%3);hooks_do_hooks_call_no_als:return ret;
 #define HOOK_CALL<%0> ALS_DO:HOOK_C_INT<%0>
 
 
@@ -3787,7 +3787,7 @@ ALS_FORWARD<PlayerClickMap>
 
 public OnPlayerClickTextDraw(playerid, Text:clickedid)
 {
-	P:2("Hooks_OnPlayerClickTextDraw called: %d, %f, %f, %f", playerid, fX, fY, fZ);
+	P:2("Hooks_OnPlayerClickTextDraw called: %d, %d", playerid, _:clickedid);
 	new
 		end   = YSI_g_sCallbackData[ALS_OnPlayerClickTextDraw][E_FUNC_HOOK_DATA_END],
 		start = YSI_g_sCallbackData[ALS_OnPlayerClickTextDraw][E_FUNC_HOOK_DATA_START],
@@ -3852,7 +3852,7 @@ ALS_FORWARD<PlayerClickTextDraw>
 
 public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 {
-	P:2("Hooks_OnPlayerClickPlayerTextDraw called: %d, %f, %f, %f", playerid, fX, fY, fZ);
+	P:2("Hooks_OnPlayerClickPlayerTextDraw called: %d, %d", playerid, _:playertextid);
 	new
 		end   = YSI_g_sCallbackData[ALS_OnPlayerClickPlayerTextDraw][E_FUNC_HOOK_DATA_END],
 		start = YSI_g_sCallbackData[ALS_OnPlayerClickPlayerTextDraw][E_FUNC_HOOK_DATA_START],
@@ -3916,7 +3916,7 @@ ALS_FORWARD<PlayerClickPlayerTextDraw>
 
 public OnPlayerEditObject(playerid, playerobject, objectid, response, Float:fX, Float:fY, Float:fZ, Float:fRotX, Float:fRotY, Float:fRotZ)
 {
-	P:2("Hooks_OnPlayerEditObject called: %d, %f, %f, %f", playerid, fX, fY, fZ);
+	P:2("Hooks_OnPlayerEditObject called: %d, %d, %d, %d, %f, %f, %f, %f, %f, %f", playerid, playerobject, objectid, response, fX, fY, fZ, fRotX, fRotY, fRotZ);
 	new
 		end   = YSI_g_sCallbackData[ALS_OnPlayerEditObject][E_FUNC_HOOK_DATA_END],
 		start = YSI_g_sCallbackData[ALS_OnPlayerEditObject][E_FUNC_HOOK_DATA_START],
@@ -3997,7 +3997,7 @@ ALS_FORWARD<PlayerEditObject>
 
 public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Float:fOffsetX, Float:fOffsetY, Float:fOffsetZ, Float:fRotX, Float:fRotY, Float:fRotZ, Float:fScaleX, Float:fScaleY, Float:fScaleZ)
 {
-	P:2("Hooks_OnPlayerEditAttachedObject called: %d, %f, %f, %f", playerid, fX, fY, fZ);
+	P:2("Hooks_OnPlayerEditAttachedObject called: %d, %d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f", playerid, response, index, modelid, boneid, fOffsetX, fOffsetY, fOffsetZ, fRotX, fRotY, fRotZ, fScaleX, fScaleY, fScaleZ);
 	new
 		end   = YSI_g_sCallbackData[ALS_OnPlayerEditAttachedObject][E_FUNC_HOOK_DATA_END],
 		start = YSI_g_sCallbackData[ALS_OnPlayerEditAttachedObject][E_FUNC_HOOK_DATA_START],
@@ -4086,7 +4086,7 @@ ALS_FORWARD<PlayerEditAttachedObject>
 
 public OnPlayerSelectObject(playerid, type, objectid, modelid, Float:fX, Float:fY, Float:fZ)
 {
-	P:2("Hooks_OnPlayerSelectObject called: %d, %f, %f, %f", playerid, fX, fY, fZ);
+	P:2("Hooks_OnPlayerSelectObject called: %d, %d, %d, %d, %f, %f, %f", playerid, type, objectid, modelid, fX, fY, fZ);
 	new
 		end   = YSI_g_sCallbackData[ALS_OnPlayerSelectObject][E_FUNC_HOOK_DATA_END],
 		start = YSI_g_sCallbackData[ALS_OnPlayerSelectObject][E_FUNC_HOOK_DATA_START],

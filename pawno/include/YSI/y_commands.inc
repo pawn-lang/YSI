@@ -287,14 +287,6 @@ static stock
 	e_COMM_FLAG:YSI_g_sCommandFlags = e_COMM_FLAG:0xFF,
 	YSI_g_sCommandIndex,
 	YSI_g_sCommandCount;
-	//YSI_g_sCommandDialog[MAX_PLAYERS] = {-1, ...},
-	//YSI_g_sMaster23,
-
-/*Group:Command_InitialiseFromGroups(x)
-{
-	//Bit_SetAll(YSI_g_sCommands[x][E_COMMANDS_PLAYERS], true, bits<MAX_PLAYERS>);
-	PA_Init(YSI_g_sCommands[x][E_COMMANDS_PLAYERS], true, bits<MAX_PLAYERS>);
-}*/
 
 /*----------------------------------------------------------------------------*\
 Function:

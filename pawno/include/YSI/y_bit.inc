@@ -318,7 +318,7 @@ stock Bit_Display(BitArray:array<>, size = sizeof (array))
 	{
 		format(ret, sizeof (ret), "%s%016b%016b", ret, _:array[size] >>> 16, _:array[size] & 0xFFFF);
 	}
-	P:3("Bit_Display called: %s, %i", ret, size);
+	P:7("Bit_Display called: %s, %i", ret, size);
 	return ret;
 }
 
@@ -326,7 +326,7 @@ stock Bit_Display(BitArray:array<>, size = sizeof (array))
 
 stock Bits@YSII_Ag(BitArray:data<>, start, size = sizeof (data))
 {
-	P:3("YSI_gABITSFunc called: %s, %i", Bit_Display(data), start);
+	P:3("YSI_gABITSFunc called: %s, %i", Bit_Display(data, size), start);
 	static const
 		scDeBruijn[] =
 			{

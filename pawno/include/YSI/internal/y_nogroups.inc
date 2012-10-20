@@ -64,12 +64,6 @@ static stock _Groups_DefineStates_() <YSI_has_groups:y>
 {
 }
 
-/*stock _@Group_Sink(e)
-{
-	P:3("_@Group_Sink called: %i", e);
-	#pragma unused e
-}*/
-
 // Now you can use the default fallback to define functions:
 //  
 //  stock Class_InitialiseFromGroups() <YSI_has_groups:n>
@@ -83,18 +77,16 @@ static stock _Groups_DefineStates_() <YSI_has_groups:y>
 //  }
 //  
 
-#define _GROUP_LOCAL_NAME               e
+#define _GROUP_LOCAL_NAME               _GROUP_MAKE_TAG:e
 #define _GROUP_INITIALISE               _GROUP_MAKE_NAME<..._InitialiseFromGroups>
-//#define __GROUP_INITIALISE              _GROUP_MAKE_NAME<_..._InitialiseFromGroups>
-
-//#define Group:
 
 // Dummy values.
 #define _GROUP_MAKE_NAME<%0...%1>       %0_%1
 #define _GROUP_MAKE_LIMIT               0
 
-#define GROUP_GLOBAL                    (Group:-1)
+#define INVALID_GROUP (Group:-1)
 #define GROUP_MASK                      (Group:0x80000000)
+#define GROUP_GLOBAL                    (Group:_MAX_GROUPS | GROUP_MASK) //-1)
 #define GROUP_FIX(%0)                   ((%0)&=~GROUP_MASK)
 #define GROUP_TEMP_FIX(%0)              ((%0)&~GROUP_MASK)
 

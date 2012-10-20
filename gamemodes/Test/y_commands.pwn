@@ -4,7 +4,7 @@
 
 #include <a_samp>
 
-#define RUN_TESTS
+#define INCLUDE_TESTS
 //#define _DEBUG 2
 
 #include <YSI\y_testing>
@@ -35,18 +35,18 @@ R1()
 
 #define CMDFAIL(%1,%2) \
 	SendClientMessage(playerid, 0x0000FFAA, "Test:" #%2 ": A failure should follow..."); \
-	if (R0(),W@("OnPlayerCommandText", "is", playerid, "/" #%1),R1(),P@("OnPlayerCommandText", "is", playerid, "/" #%1)) ASSERT(FALSE); \
-	else SendClientMessage(playerid, 0xFF0000AA, "Test:" #%2 ": Fail!"), ASSERT(TRUE); \
+	if (R0(),W@("OnPlayerCommandText", "is", playerid, "/" #%1),R1(),P@("OnPlayerCommandText", "is", playerid, "/" #%1)) TEST_TRUE(FALSE); \
+	else SendClientMessage(playerid, 0xFF0000AA, "Test:" #%2 ": Fail!"), TEST_TRUE(TRUE); \
 	SendClientMessage(playerid, 0x0000FFAA, "Test:" #%2 ": No failure above means the test failed.")
 
 #define CMDPASS(%1,%2) \
 	SendClientMessage(playerid, 0x0000FFAA, "Test:" #%2 ": A message should follow..."); \
-	ASSERT((R0(),W@("OnPlayerCommandText", "is", playerid, "/" #%1),R1(),P@("OnPlayerCommandText", "is", playerid, "/" #%1)) != 0); \
+	TEST_NOT_NULL((R0(),W@("OnPlayerCommandText", "is", playerid, "/" #%1),R1(),P@("OnPlayerCommandText", "is", playerid, "/" #%1))); \
 	SendClientMessage(playerid, 0x0000FFAA, "Test:" #%2 ": No message above means the test failed.")
 
 #define CMDNONE(%1,%2) \
 	SendClientMessage(playerid, 0x0000FFAA, "Test:" #%2 ": No message should follow..."); \
-	ASSERT((R0(),W@("OnPlayerCommandText", "is", playerid, "/" #%1),R1(),P@("OnPlayerCommandText", "is", playerid, "/" #%1)) != 0); \
+	TEST_NOT_NULL((R0(),W@("OnPlayerCommandText", "is", playerid, "/" #%1),R1(),P@("OnPlayerCommandText", "is", playerid, "/" #%1))); \
 	SendClientMessage(playerid, 0x0000FFAA, "Test:" #%2 ": A message above means the test failed.")
 
 main()

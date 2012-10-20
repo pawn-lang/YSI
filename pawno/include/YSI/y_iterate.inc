@@ -55,6 +55,11 @@ Legal:
 Version:
 	0.4
 Changelog:
+	17/10/12:
+		Fixed a bug that was here but not in "foreach.inc".
+	04/10/12:
+		Added a tiny tweak to detect tag-returning iterator functions.
+		Added Iter_InternalSize.
 	13/01/12:
 		Fixed the count thanks to AndreT.
 	05/01/12:
@@ -178,7 +183,7 @@ Iterators:
 \*----------------------------------------------------------------------------*/
 
 // "y_iterate" is always higher than "foreach".
-#define _Y_ITERATE_LOCAL_VERSION        13
+#define _Y_ITERATE_LOCAL_VERSION        18
 
 // Foreach is testing us.
 #if defined _FOREACH_INC_TEST
@@ -211,6 +216,12 @@ Iterators:
 	#error "Please include a_samp or a_npc before foreach"
 #endif
 
+#if defined _YSI_SPECIAL_DEBUG
+	#define PS_IS_PLAYER_CONNECTED(%0) (%0 != INVALID_PLAYER_ID)
+#else
+	#define PS_IS_PLAYER_CONNECTED IsPlayerConnected
+#endif
+
 //#include "y_debug"
 //#include "y_hooks"
 
@@ -233,7 +244,7 @@ Iterators:
 
 #define _Y_ITER_C0:%0[%1]@YSII_%4g%3) %0@YSII_%4g[%1]%3)
 #define _Y_ITER_C1:_Y_ITER_C2:%0[%1]@YSII_Ag%3) %0@YSII_Ag[]%3)
-#define _Y_ITER_C2:sizeof%0(%1)@YSII_Ag-1;_:(%2=_Y_ITER_ARRAY:%3(%4)@YSII_Ag[%5])!=_Y_ITER_ARRAY_SIZE(%6);) -1;_:(%2=%3@YSII_Ag(%4,%5))!=-1;)
+#define _Y_ITER_C2:sizeof%0(%1)@YSII_Ag-1;_:(%2=_Y_ITER_ARRAY:%3(%4)@YSII_Ag[%5])!=%9_Y_ITER_ARRAY_SIZE(%6);) -1;_:(%2=%3@YSII_Ag(%4,%5))!=-1;)
 
 #define _Y_ITER_C3:%0[%1]@YSII_Cg,%2[%3]@YSII_Ag[%4]={%5} _Y_ITER_C3:%0@YSII_Cg[%4-1],%0@YSII_Ag[%1][%4]
 
@@ -291,7 +302,7 @@ native Iter_Init(IteratorArray:Name[]<>);
 
 #define Iter_Init Itter_Init
 #define Itter_Init(%1) \
-	Itter_InitInternal(%1@YSII_Ag,sizeof %1@YSII_Ag,sizeof %1@YSII_Ag[])
+	Itter_InitInternal(%1@YSII_Ag,sizeof %1@YSII_Ag,sizeof %1@YSII_Ag[]-1)
 
 /*----------------------------------------------------------------------------*\
 Function:
@@ -1107,7 +1118,7 @@ Notes:
 Function:
 	Iter_End
 Params:
-	iter - Name of the iterator to
+	iter - Name of the iterator to get the end of.
 Return:
 	-
 Notes:
@@ -1121,7 +1132,7 @@ Notes:
 Function:
 	Iter_First
 Params:
-	iter - Name of the iterator to
+	iter - Name of the iterator to get the first valid element in.
 Return:
 	-
 Notes:
@@ -1149,7 +1160,8 @@ Notes:
 Function:
 	Iter_Next
 Params:
-	iter - Name of the iterator to
+	iter - Name of the iterator to get the next element in.
+	cur - The current element.
 Return:
 	-
 Notes:
@@ -1163,7 +1175,8 @@ Notes:
 Function:
 	Iter_Prev
 Params:
-	iter - Name of the iterator to
+	iter - Name of the iterator to get the previous element in.
+	cur - The current element.
 Return:
 	-
 Notes:
@@ -1177,12 +1190,28 @@ Notes:
 Function:
 	Iter_InternalArray
 Params:
-	iter - Name of the iterator to
+	iter - Name of the iterator to get the true name of.
 Return:
 	-
 Notes:
-	Accesses the internal array of an iterator
+	Accesses the internal array of an iterator.
 \*----------------------------------------------------------------------------*/
 
 #define Iter_InternalArray(%1) (_Y_ITER_ARRAY:%1@YSII_Ag)
 #define Itter_InternalArray(%1) (_Y_ITER_ARRAY:%1@YSII_Ag)
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Iter_InternalSize
+Params:
+	iter - Name of the iterator to get the true size of.
+Return:
+	-
+Notes:
+	Accesses the internal size of an iterator.
+\*----------------------------------------------------------------------------*/
+
+#define _Y_ITER_INT_SIZE:%0(%2[%1]@YSII_Ag)) %0(%2@YSII_Ag[]))
+
+#define Iter_InternalSize(%1) (_:_Y_ITER_INT_SIZE:sizeof (%1@YSII_Ag))
+#define Itter_InternalSize(%1) (_:_Y_ITER_INT_SIZE:sizeof (%1@YSII_Ag))

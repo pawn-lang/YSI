@@ -282,6 +282,28 @@ Changelog:
 			#include "internal\y_groupsecond"
 		#endif
 	#endif
+	// Recursive group functions to make groups of groups.  Make this code pure
+	// client code so that 90% of it is not included ever.
+	/*#define _YSIM_OVERRIDE      24
+	//#define YSIM_C_ENABLE
+	#include <YSI\y_master>
+	#undef _GROUP_MAKE_NAME
+	#undef _GROUP_MAKE_LIMIT*/
+	/*#define _GROUP_MAKE_NAME        _GROUP_MAKE_NAME_GROUP
+	#define _GROUP_MAKE_LIMIT       _GROUP_MAKE_LIMIT_GROUP
+	#define _GROUP_MAKE_TAG         Group
+	//#include <YSI\internal\y_groupsecond>
+	#undef _YSI_GROUPS_FIRST_HALF
+	// Disable the OnPlayerConnect code.
+	#undef ghook
+	#define ghook%0On%1(%2) stock _GROUP_MAKE_NAME<On%2...>(%3)
+	#include <YSI\internal\y_groupsecond>
+	#undef ghook
+	#define ghook group_hook
+	#define _YSI_GROUPS_FIRST_HALF
+	#define _GROUP_MAKE_TAG         Group
+	#include <YSI\internal\y_groupsingle>*/
+	// These need VERY different defaults.
 #endif
 
 // Now include any user defined libraries.
@@ -298,6 +320,9 @@ Changelog:
 		#undef _GROUP_MAKE_LIMIT
 		#define _GROUP_MAKE_NAME        GROUP_LIBRARY_NAME
 		#define _GROUP_MAKE_LIMIT       GROUP_LIBRARY_SIZE
+		//#if defined GROUP_LIBRARY_TAG
+		//	#define _GROUP_MAKE_TAG       GROUP_LIBRARY_TAG
+		//#endif
 		#undef _YSI_GROUPS_FIRST_HALF
 		// Include the second half of the file for the methods.
 		#include "internal\y_groupsecond"

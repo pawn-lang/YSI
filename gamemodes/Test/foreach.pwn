@@ -7,8 +7,8 @@
 #define _FOREACH_NO_TEST
 #define FOREACH_NO_BOTS
 
-#include <foreach>
-//#include <YSI\y_iterate>
+//#include <foreach>
+#include <YSI\y_iterate>
 
 main()
 {

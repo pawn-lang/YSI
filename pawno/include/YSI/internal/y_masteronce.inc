@@ -306,6 +306,22 @@ forward Master_OnScriptClose(script);
 
 forward Master_Reassert();
 
+enum _E_YCM
+{
+	_E_YCM@y,
+	_E_YCM@n,
+	_E_YCM@m,
+	_E_YCM@p,
+	_E_YCM@u//,
+	//_YCM@
+}
+
+#define _YCM@y (_YCM@==_E_YCM@y)
+#define _YCM@n (_YCM@==_E_YCM@n)
+#define _YCM@m (_YCM@==_E_YCM@m)
+#define _YCM@p (_YCM@==_E_YCM@p)
+#define _YCM@u (_YCM@==_E_YCM@u)
+
 static
 	YSI_g_sMasterCount,
 	YSI_g_sMasterData[MAX_MASTERS];

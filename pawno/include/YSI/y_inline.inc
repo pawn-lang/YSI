@@ -55,6 +55,8 @@ Legal:
 Version:
 	1.0
 Changelog:
+	20/10/12:
+		Fixed a bug with "Callback_Release" with public functions.
 	15/11/11:
 		Changed the precedence of "using" types.
 	19/09/11:
@@ -136,9 +138,9 @@ Changelog:
 //  
 #define inline%0(%1) new %0__;static const%0[]=#%0":..."#_YI@CP;for(new%1,,;Inline_Loop(INLINE_LOOP_PATTERNS,%0__,%0);)
 
-#define callback:%0) const callback_tag:callback_check:%0ï¿½ï¿½ï¿½
-#define callback_tag:callback_check:%0,%1ï¿½ï¿½ï¿½ callback_tag:%0[],%1)
-#define callback_check:%0ï¿½ï¿½ï¿½ %0[])
+#define callback:%0) const callback_tag:callback_check:%0£££
+#define callback_tag:callback_check:%0,%1£££ callback_tag:%0[],%1)
+#define callback_check:%0£££ %0[])
 
 #define anonymous%0(%1) Q@=#_YI@CA;for(new%1,,;Inline_Loop(INLINE_LOOP_PATTERNS,%0__,":...:"#);)
 
@@ -739,7 +741,11 @@ stock Callback_Get(callback:name, result[E_CALLBACK_DATA], expect = -1)
 
 stock Callback_Release(const input[E_CALLBACK_DATA])
 {
-	free(input[E_CALLBACK_DATA_ALLOC]);
+	if (!(input[E_CALLBACK_DATA_FLAGS] & e_CALLBACK_FLAGS_PUBLIC))
+	{
+		// Publics don't have any stored data.
+		free(input[E_CALLBACK_DATA_ALLOC]);
+	}
 }
 
 stock Callback_Call(const result[E_CALLBACK_DATA], GLOBAL_TAG_TYPES:...)

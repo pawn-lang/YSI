@@ -64,7 +64,7 @@ stock Class_ResolveGroups(class, Group:forgroup, bool:cp) <YSI_has_groups:y>
 	}
 	else
 	{
-		//printf("ENABLE THIS CLASS: %d FOR: %d", class, _:forgroup);
+		P:7("Class_ResolveGroups<y>: Enable this class: %d For: %d", class, _:forgroup);
 		// Only enable this class for one group.
 		Group_UpdateAllClass(class, false);
 		Group_SetClass(forgroup, class, true);

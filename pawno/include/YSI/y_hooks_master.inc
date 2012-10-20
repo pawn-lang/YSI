@@ -115,10 +115,10 @@ ALS_DATA<>
 
 // These defines now use the much more generic ALS code so that the list of
 // callbacks is only done in one place.
-#define HOOK_R_INT<%0,%2>(%3) return Bit_GetBit(Bit:gs_ALS,_:ALS_On%0)?P@(#ALS_PREFIX"_On"#%0,#%2#q,ALS_RS_%3):ret;
+#define HOOK_R_INT<%0,%2>(%3) return Bit_GetBit(Bit:gs_ALS,_:ALS_On%0)?P@(#ALS_PREFIX"_On"#%0,(q:#%2#),ALS_RS_%3):ret;
 #define HOOK_RETURN<%0> ALS_DO:HOOK_R_INT<%0>
 
-#define HOOK_C_INT<%0,%2>(%3) if(Bit_GetBit(Bit:gs_ALS,_:ALS_On%0))return P@(#ALS_PREFIX"_On"#%0,#%2#q,ALS_RS_%3);hooks_do_hooks_call_no_als:return ret;
+#define HOOK_C_INT<%0,%2>(%3) if(Bit_GetBit(Bit:gs_ALS,_:ALS_On%0))return P@(#ALS_PREFIX"_On"#%0,(q:#%2#),ALS_RS_%3);hooks_do_hooks_call_no_als:return ret;
 #define HOOK_CALL<%0> ALS_DO:HOOK_C_INT<%0>
 
 
