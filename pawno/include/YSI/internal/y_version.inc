@@ -111,7 +111,7 @@ Natives:
 
 #define YSI_VERSION_MAJOR               1
 #define YSI_VERSION_MINOR               06
-#define YSI_VERSION_BUILD               0000
+#define YSI_VERSION_BUILD               0001
 
 #define YSI_VERSION                     #YSI_VERSION_MAJOR "." #YSI_VERSION_MINOR "." #YSI_VERSION_BUILD
 
