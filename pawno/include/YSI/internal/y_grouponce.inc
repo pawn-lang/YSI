@@ -277,6 +277,7 @@ new //stock
 
 static
 	// Function pointers for chaining.
+	YSI_g_sNextInitFunc,
 	YSI_g_sNextUpdFunc,
 	YSI_g_sNextAddFunc,
 	YSI_g_sGroupCount;
@@ -325,6 +326,42 @@ static stock
 //#define Group_IsActive(%0) 
 //	(YSI_gGroupData[_:GROUP_FIX(%0)][E_GROUP_DATA_FLAGS] & e_GROUP_FLAGS_ACTIVE)
 
+/*----------------------------------------------------------------------------*\
+Function:
+	GROUP_ADD
+Params:
+	Group:g - Group to add the following items to.
+Return:
+	-
+Notes:
+	This sets up a temporary environment, during which all items are ONLY added
+	to the specified group and no others, with no complex extra code required.
+\*----------------------------------------------------------------------------*/
+
+#define GROUP_ADD<%0> for(J@=_Group_AddInternal(1,(%0));J@;J@=_Group_AddInternal(0,(%0)))
+
+stock _Group_AddInternal(a, Group:g)
+{
+	broadcastfunc __Group_AddInternal(a, _:g);
+	return a;
+}
+
+static remotefunc __Group_AddInternal(a,g)
+{
+	GROUP_CHAIN?<YSI_g_sNextInitFunc>(-1, a, g);
+}
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Group_IsValid
+Params:
+	Group:g - Group to check.
+Return:
+	bool: - Is the group active and valid?
+Notes:
+	-
+\*----------------------------------------------------------------------------*/
+
 foreign bool:Group_IsValid(Group:g);
 
 global bool:Group_IsValid(Group:g)
@@ -359,13 +396,12 @@ hook OnScriptInit()
 	Bit_Let(YSI_g_sChildGroups[_MAX_GROUPS], _:_MAX_GROUPS);
 	// Call the other group init functions.
 	new
-		init,
-		ni = AMX_GetPublicPointerPrefix(0, init, _A<_yGI>),
+		ni = AMX_GetPublicPointerPrefix(0, YSI_g_sNextInitFunc, _A<_yGI>),
 		na = AMX_GetPublicPointerPrefix(0, YSI_g_sNextAddFunc, _A<_yGA>),
 		nu = AMX_GetPublicPointerPrefix(0, YSI_g_sNextUpdFunc, _A<_yGU>);
 	printf("Group_OnScriptInit: %d, %d, %d", ni, na, nu);
 	P:5("Group_OnScriptInit: %d, %d, %d", ni, na, nu);
-	GROUP_CHAIN?<init>(ni, na, nu);
+	GROUP_CHAIN?<YSI_g_sNextInitFunc>(ni, na, nu);
 }
 
 /*----------------------------------------------------------------------------*\

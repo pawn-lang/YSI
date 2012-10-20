@@ -202,25 +202,49 @@ Notes:
 	"_gchain" macro works means that the fact that "ni" etc are references is
 	irrelevant; however, it does make the code LOOK much nicer and like
 	assigning to the variables does have some wider meaning.
+	
+	If this is called with "ni = -1", it is special code to temporarilly set or
+	restore the defaults for use with the "GROUP_ADD" macro.
 \*----------------------------------------------------------------------------*/
 
 _gchain _yGI(&ni, &na, &nu)
 {
-	P:4(#_GROUP_MAKE_NAME<_yGI...> " called: %i, %i, %i", ni, na, nu);
-	// Enable the default group.  If I'm right, this way is actually better than
-	// using variables as in most cases because "_MAX_GROUPS" is a constant so
-	// all the other maths will be constant.
-	Bit_Let(_GROUP_DEFAULTS, _MAX_GROUPS);
-	// Don't need this loop anymore, it is done for every element individually.
-	//for (new i = 0; i != _GROUP_MAKE_LIMIT; ++i)
-	//{
-	//	// Basically, enable everything in the default group.
-	//	Bit_Let(_GROUP_GROUP_NAME[i], _MAX_GROUPS);
-	//}
-	// Set up the function chaining.
-	ni = AMX_GetPublicPointerPrefix(ni, _yGI, _A<_yGI>);
-	na = AMX_GetPublicPointerPrefix(na, _yGA, _A<_yGA>);
-	nu = AMX_GetPublicPointerPrefix(nu, _yGU, _A<_yGU>);
+	if (ni == -1)
+	{
+		static
+			BitArray:sStack<_MAX_GROUPS_G>,
+			BitArray:sBlank<_MAX_GROUPS_G>;
+		if (na)
+		{
+			// Called to "push" the default settings.
+			sStack = _GROUP_DEFAULTS;
+			_GROUP_DEFAULTS = sBlank;
+			Bit_Let(_GROUP_DEFAULTS, nu);
+		}
+		else
+		{
+			// Called to "pop" the default settings.
+			_GROUP_DEFAULTS = sStack;
+		}
+	}
+	else
+	{
+		P:4(#_GROUP_MAKE_NAME<_yGI...> " called: %i, %i, %i", ni, na, nu);
+		// Enable the default group.  If I'm right, this way is actually better than
+		// using variables as in most cases because "_MAX_GROUPS" is a constant so
+		// all the other maths will be constant.
+		Bit_Let(_GROUP_DEFAULTS, _MAX_GROUPS);
+		// Don't need this loop anymore, it is done for every element individually.
+		//for (new i = 0; i != _GROUP_MAKE_LIMIT; ++i)
+		//{
+		//	// Basically, enable everything in the default group.
+		//	Bit_Let(_GROUP_GROUP_NAME[i], _MAX_GROUPS);
+		//}
+		// Set up the function chaining.
+		ni = AMX_GetPublicPointerPrefix(ni, _yGI, _A<_yGI>);
+		na = AMX_GetPublicPointerPrefix(na, _yGA, _A<_yGA>);
+		nu = AMX_GetPublicPointerPrefix(nu, _yGU, _A<_yGU>);
+	}
 }
 
 /*----------------------------------------------------------------------------*\
@@ -369,6 +393,7 @@ gglobal Group_Set...Default(Group:g,bool:s)
 			BitArray:sNext<_MAX_GROUPS_G>;
 		if (s)
 		{
+			Bit_Let(_GROUP_DEFAULTS, _:g);
 			for (new el = 0; el != _GROUP_MAKE_LIMIT; ++el)
 			{
 				sNext = _GROUP_GROUP_NAME[el];
@@ -387,6 +412,7 @@ gglobal Group_Set...Default(Group:g,bool:s)
 		}
 		else
 		{
+			Bit_Vet(_GROUP_DEFAULTS, _:g);
 			for (new el = 0; el != _GROUP_MAKE_LIMIT; ++el)
 			{
 				sNext = _GROUP_GROUP_NAME[el];
@@ -427,6 +453,52 @@ gglobal Group_SetGlobal...Default(bool:s)
 {
 	P:2(#_GROUP_MAKE_NAME<Group_SetGlobal...Default> " called: %i", s);
 	return _GROUP_MAKE_NAME<Group_Set...Default>(GROUP_GLOBAL, s);
+}
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Group_Set...New
+Params:
+	Group:g - Group to set for.
+	bool:s - Set or unset?
+Return:
+	-
+Notes:
+	Similar to "Group_Set...Default", but doesn't reset all existing elements,
+	just sets the permissions for any future items.
+\*----------------------------------------------------------------------------*/
+
+gforeign Group_Set...New(Group:g,bool:s);
+
+gglobal Group_Set...New(Group:g,bool:s)
+{
+	P:2(#_GROUP_MAKE_NAME<Group_Set...New> " called: %i, %i", _:g, s);
+	if (GROUP_MASK <= g <= GROUP_GLOBAL)
+	{
+		// There is now NO validity check for reasons of distruibution.
+		Bit_Set(_GROUP_DEFAULTS, _:GROUP_TEMP_FIX(g), s);
+		return 1;
+	}
+	return 0;
+}
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Group_SetGlobal...New
+Params:
+	bool:s - Set or unset?
+Return:
+	-
+Notes:
+	All elements created FROM THIS POINT ON will have this default setting.
+\*----------------------------------------------------------------------------*/
+
+gforeign Group_SetGlobal...New(bool:s);
+
+gglobal Group_SetGlobal...New(bool:s)
+{
+	P:2(#_GROUP_MAKE_NAME<Group_SetGlobal...New> " called: %i", s);
+	return _GROUP_MAKE_NAME<Group_Set...New>(GROUP_GLOBAL, s);
 }
 
 /*----------------------------------------------------------------------------*\
