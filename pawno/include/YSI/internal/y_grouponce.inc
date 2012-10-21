@@ -888,8 +888,16 @@ global Group_SetName(Group:g,string:n[])
 	if (_Group_IsValid(g))
 	{
 		GROUP_FIX(g);
-		strpack(YSI_gGroupData[_:g][E_GROUP_DATA_NAME], n, MAX_GROUP_NAME char);
-		YSI_gGroupData[_:g][E_GROUP_DATA_HASH] = YHash(n);
+		if (isnull(n))
+		{
+			YSI_gGroupData[_:g][E_GROUP_DATA_NAME][0] = 0;
+			YSI_gGroupData[_:g][E_GROUP_DATA_HASH] = 0;
+		}
+		else
+		{
+			strpack(YSI_gGroupData[_:g][E_GROUP_DATA_NAME], n, MAX_GROUP_NAME char);
+			YSI_gGroupData[_:g][E_GROUP_DATA_HASH] = YHash(n);
+		}
 	}
 	return 1;
 }
@@ -1107,6 +1115,13 @@ global Group:_Group_Create(string:name[])
 	P:2("Group_Create called in %d", _@);
 	new
 		i;
+	if (!isnull(name))
+	{
+		// Get a group of the same name if it already exists.
+		i = _:Group_GetID(name);
+		if (i != _:INVALID_GROUP) return Group:i;
+	}
+	i = 0;
 	while (i != _MAX_GROUPS && _Group_IsActive(i))
 	{
 		++i;
@@ -1116,11 +1131,16 @@ global Group:_Group_Create(string:name[])
 	{
 		YSI_gGroupData[i][E_GROUP_DATA_NAME][0] = 0;
 		YSI_gGroupData[i][E_GROUP_DATA_FLAGS] = e_GROUP_FLAGS_TEMP | e_GROUP_FLAGS_ACTIVE;
+		YSI_gGroupData[i][E_GROUP_DATA_HASH] = 0;
 	}
 	else
 	{
 		strpack(YSI_gGroupData[i][E_GROUP_DATA_NAME], name, MAX_GROUP_NAME char);
 		YSI_gGroupData[i][E_GROUP_DATA_FLAGS] = e_GROUP_FLAGS_ACTIVE;
+		if (!(YSI_gGroupData[i][E_GROUP_DATA_HASH] = YHash(name)))
+		{
+			P:E("Group %d has hash 0.", name);
+		}
 	}
 	++YSI_g_sGroupCount;
 	// Reset the group members iterator.
@@ -1132,7 +1152,6 @@ global Group:_Group_Create(string:name[])
 	YSI_g_sChildGroups[i] = YSI_g_cEmptyGroups;
 	Bit_Let(YSI_g_sChildGroups[i], i);
 	//PA_Init(YSI_gGroupPlayers[i]);
-	YSI_gGroupData[i][E_GROUP_DATA_HASH] = YHash(name);
 	// Add this group to other groups.
 	// TODO: CHAIN.  Done
 	// TODO: Spread data over all other scripts.  NO.
