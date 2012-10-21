@@ -1461,7 +1461,7 @@ foreign Group_GetGlobalGroup(Group:el);
 global Group_GetGlobalGroup(Group:el)
 {
 	P:2(#Group_GetGlobalGroup " called: %i", _:el);
-	return _GROUP_MAKE_NAME<Group_Get...>(GROUP_GLOBAL, el);
+	return Group_GetGroup(GROUP_GLOBAL, el);
 }
 
 #define _YSIM_RESET_USER
