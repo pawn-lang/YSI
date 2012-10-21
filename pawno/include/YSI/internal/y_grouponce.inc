@@ -1425,5 +1425,44 @@ global Group_SetGlobalGroup(Group:el,bool:s)
 	return Group_SetGroup(GROUP_GLOBAL, el, s);
 }
 
+/*----------------------------------------------------------------------------*\
+Function:
+	Group_Get...
+Params:
+	Group:g - Group to get from.
+	Group:el - Element to get.
+Return:
+	bool: Does the group have the element?
+Notes:
+	-
+\*----------------------------------------------------------------------------*/
+
+foreign bool:Group_GetGroup(Group:g,Group:el);
+
+global bool:Group_GetGroup(Group:g,Group:el)
+{
+	P:2(#Group_GetGroup " called: %i, %i", _:g, _:el);
+	return (GROUP_MASK <= el <= GROUP_GLOBAL && GROUP_MASK <= g <= GROUP_GLOBAL && Bit_Get(YSI_g_sChildGroups[_:GROUP_TEMP_FIX(g)], _:GROUP_TEMP_FIX(el)));
+}
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Group_GetGlobal...
+Params:
+	Group:el - Element to get.
+Return:
+	bool: Does the global group have the element?
+Notes:
+	-
+\*----------------------------------------------------------------------------*/
+
+foreign Group_GetGlobalGroup(Group:el);
+
+global Group_GetGlobalGroup(Group:el)
+{
+	P:2(#Group_GetGlobalGroup " called: %i", _:el);
+	return _GROUP_MAKE_NAME<Group_Get...>(GROUP_GLOBAL, el);
+}
+
 #define _YSIM_RESET_USER
 #include <YSI\y_master>

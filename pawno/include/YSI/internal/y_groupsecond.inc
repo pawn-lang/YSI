@@ -50,19 +50,21 @@ Legal:
 Version:
 	2.0
 Changelog:
+	21/10/12:
+		Added Group_Get... functions.
 	20/10/12:
 		Pretty much a ground-up API-compatible rewrite.  Shorter and reliabler.
 	29/11/10:
 		First version
 \*----------------------------------------------------------------------------*/
-	
+
 #undef _inc_y_groupsecond
 
 // This code, having been updated to use the later version of y_hooks,
 // unfortunately no longer has one function spread between two files, which was
 // a very unique (required) code feature.  However this version should be better
 // overall (at least slightly).
-#include "..\y_hooks"
+//#include "..\y_hooks"
 
 // This file contains generic code for setting all the stats to do with a single
 // element type.  Groups can be defined for any element (classes, objects etc)
@@ -594,6 +596,45 @@ gglobal Group_SetGlobal...(_GROUP_MAKE_TAG:el,bool:s)
 {
 	P:2(#_GROUP_MAKE_NAME<Group_SetGlobal...> " called: %i, %i", _:el, s);
 	return _GROUP_MAKE_NAME<Group_Set...>(GROUP_GLOBAL, el, s);
+}
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Group_Get...
+Params:
+	Group:g - Group to get from.
+	el - Element to get.
+Return:
+	bool: Does the group have the element?
+Notes:
+	-
+\*----------------------------------------------------------------------------*/
+
+gforeign bool:Group_Get...(Group:g,_GROUP_MAKE_TAG:el);
+
+gglobal bool:Group_Get...(Group:g,_GROUP_MAKE_TAG:el)
+{
+	P:2(#_GROUP_MAKE_NAME<Group_Get...> " called: %i, %i", _:g, _:el);
+	return (0 <= _:el < _GROUP_MAKE_LIMIT && GROUP_MASK <= g <= GROUP_GLOBAL && Bit_Get(_GROUP_GROUP_NAME[_:el], _:GROUP_TEMP_FIX(g)));
+}
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Group_GetGlobal...
+Params:
+	el - Element to get.
+Return:
+	bool: Does the global group have the element?
+Notes:
+	-
+\*----------------------------------------------------------------------------*/
+
+gforeign Group_GetGlobal...(_GROUP_MAKE_TAG:el);
+
+gglobal Group_GetGlobal...(_GROUP_MAKE_TAG:el)
+{
+	P:2(#_GROUP_MAKE_NAME<Group_GetGlobal...> " called: %i", _:el);
+	return _GROUP_MAKE_NAME<Group_Get...>(GROUP_GLOBAL, el);
 }
 
 #undef _GROUP_MAKE_TAG
