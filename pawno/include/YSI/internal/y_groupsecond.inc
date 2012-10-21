@@ -84,6 +84,7 @@ Changelog:
 static stock
 	BitArray:_GROUP_GROUP_NAME[_GROUP_MAKE_LIMIT]<_:_MAX_GROUPS_G>,
 	BitArray:_GROUP_DEFAULTS<_:_MAX_GROUPS_G>,
+	BitArray:YSI_g_sEmpty<_:_MAX_GROUPS_G>,
 	_yGI,
 	_yGU,
 	_yGA;
@@ -212,19 +213,24 @@ _gchain _yGI(&ni, &na, &nu)
 	if (ni == -1)
 	{
 		static
-			BitArray:sStack<_MAX_GROUPS_G>,
-			BitArray:sBlank<_MAX_GROUPS_G>;
+			BitArray:sStack<_MAX_GROUPS_G>;//,
+			//BitArray:sBlank<_MAX_GROUPS_G>;
 		if (na)
 		{
 			// Called to "push" the default settings.
 			sStack = _GROUP_DEFAULTS;
-			_GROUP_DEFAULTS = sBlank;
+			_GROUP_DEFAULTS = YSI_g_cEmptyGroups;
 			Bit_Let(_GROUP_DEFAULTS, nu);
+			for (new i = 0; i != bits<_MAX_GROUPS_G>; ++i)
+			{
+				YSI_g_sEmpty[i] = ~_GROUP_DEFAULTS[i];
+			}
 		}
 		else
 		{
 			// Called to "pop" the default settings.
 			_GROUP_DEFAULTS = sStack;
+			YSI_g_sEmpty = YSI_g_cEmptyGroups;
 		}
 	}
 	else
@@ -339,12 +345,15 @@ stock bool:_GROUP_INITIALISE(_GROUP_MAKE_TAG:x = _GROUP_MAKE_TAG:_GROUP_MAKE_LIM
 	// the default settings for a group.
 	if (x != _GROUP_MAKE_TAG:_GROUP_MAKE_LIMIT)
 	{
-		static
-			BitArray:sEmpty<_MAX_GROUPS_G>;
+		//static
+		//	BitArray:sEmpty<_MAX_GROUPS_G>;
 		_GROUP_GROUP_NAME[_:x] = _GROUP_DEFAULTS;
 		foreach (new playerid : Player)
 		{
-			Group_FU(playerid, _:x, sEmpty, _GROUP_DEFAULTS, YSI_gGroupPlayers[playerid]);
+			// Uses "YSI_g_sEmpty" instead of a truly blank variable so that we
+			// can ensure that NO other groups have this element when we use the
+			// "GROUP_ADD" macro.
+			Group_FU(playerid, _:x, YSI_g_sEmpty, _GROUP_DEFAULTS, YSI_gGroupPlayers[playerid]);
 		}
 	}
 	return true;
@@ -528,28 +537,28 @@ gglobal Group_Set...(Group:g,_GROUP_MAKE_TAG:el,bool:s)
 		new
 			slot = Bit_Slot(g),
 			Bit:mask = Bit_Mask(g);
-		static
-			BitArray:sNext<_MAX_GROUPS_G>;
+		//static
+		//	BitArray:sNext<_MAX_GROUPS_G>;
 		if (s)
 		{
-			sNext = _GROUP_GROUP_NAME[_:el];
-			if (sNext[slot] & mask)
+			YSI_gTempGroups = _GROUP_GROUP_NAME[_:el];
+			if (YSI_gTempGroups[slot] & mask)
 			{
 				// No point adding an element to a group that it is already in.
 				return 1;
 			}
 			// Is this element NOT in the current group?
-			Bit_Let(sNext, _:g);
+			Bit_Let(YSI_gTempGroups, _:g);
 		}
 		else
 		{
-			sNext = _GROUP_GROUP_NAME[_:el];
-			if (!(sNext[slot] & mask))
+			YSI_gTempGroups = _GROUP_GROUP_NAME[_:el];
+			if (!(YSI_gTempGroups[slot] & mask))
 			{
 				return 1;
 			}
 			// Is this element in the current group?
-			Bit_Vet(sNext, _:g);
+			Bit_Vet(YSI_gTempGroups, _:g);
 		}
 		foreach (new playerid : Player)
 		{
@@ -557,10 +566,10 @@ gglobal Group_Set...(Group:g,_GROUP_MAKE_TAG:el,bool:s)
 			{
 				// The player is in the group in question, so they need a full
 				// update.
-				Group_FU(playerid, _:el, _GROUP_GROUP_NAME[_:el], sNext, YSI_gGroupPlayers[playerid]);
+				Group_FU(playerid, _:el, _GROUP_GROUP_NAME[_:el], YSI_gTempGroups, YSI_gGroupPlayers[playerid]);
 			}
 		}
-		_GROUP_GROUP_NAME[_:el] = sNext;
+		_GROUP_GROUP_NAME[_:el] = YSI_gTempGroups;
 		return 1;
 	}
 	return 0;

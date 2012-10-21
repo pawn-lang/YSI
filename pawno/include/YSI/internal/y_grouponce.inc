@@ -266,12 +266,16 @@ enum E_GROUP_DATA
 
 // I have "new", "stock", "static", "static stock" and "static stock const" - 
 // that is pretty much every meaningful combination possible!  The only other
-// vaguely useful one would be "stock const".
+// vaguely useful one would be "stock const".  In fact I now have that too!
 new //stock
 	//PlayerArray:YSI_gGroupPlayers[_MAX_GROUPS]<MAX_PLAYERS>,
 	BitArray:YSI_gGroupPlayers[MAX_PLAYERS]<_MAX_GROUPS_G>;
 
-//stock
+stock
+	BitArray:YSI_gTempGroups<_MAX_GROUPS_G>;
+
+stock const
+	BitArray:YSI_g_cEmptyGroups<_MAX_GROUPS_G>;
 
 //#define GROUPS_MAX_LIBRARIES            4
 
@@ -440,10 +444,10 @@ hook OnPlayerDisconnect(playerid, reason)
 			}
 	#endif
 	// Remove them from everything ever.
-	static const
-		BitArray:scEmpty<_MAX_GROUPS_G>;
+	//static const
+	//	BitArray:scEmpty<_MAX_GROUPS_G>;
 	//GROUP_CHAIN?<YSI_g_sNextUpdFunc>(playerid, YSI_gGroupPlayers[p], scEmpty);
-	YSI_gGroupPlayers[playerid] = scEmpty;
+	YSI_gGroupPlayers[playerid] = YSI_g_cEmptyGroups;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -542,13 +546,13 @@ static stock Bit:_Group_SetSome(playerid, group)
 	// code also neatly ignores recursion by only doing any one group if the
 	// player doesn't already have it.
 	static
-		sStack[128][2],
-		BitArray:n<_MAX_GROUPS_G>;
+		sStack[128][2];//,
+		//BitArray:n<_MAX_GROUPS_G>;
 	new
 		g = -1,
 		s = 0;
-	n = YSI_gGroupPlayers[playerid];
-	Bit_Let(n, group);
+	YSI_gTempGroups = YSI_gGroupPlayers[playerid];
+	Bit_Let(YSI_gTempGroups, group);
 	for ( ; ; )
 	{
 		g = Bits@YSII_Ag(YSI_g_sChildGroups[group], g, bits<_MAX_GROUPS_G>);
@@ -562,10 +566,10 @@ static stock Bit:_Group_SetSome(playerid, group)
 			}
 			else break;
 		}
-		else if (!Bit_Get(n, g)) //_Group_HasPlayer(g, playerid))
+		else if (!Bit_Get(YSI_gTempGroups, g)) //_Group_HasPlayer(g, playerid))
 		{
 			// This player isn't in this group, add them.
-			Bit_Let(n, g);
+			Bit_Let(YSI_gTempGroups, g);
 			sStack[s][0] = g;
 			sStack[s][1] = group;
 			++s;
@@ -573,7 +577,7 @@ static stock Bit:_Group_SetSome(playerid, group)
 			g = -1;
 		}
 	}
-	return n;
+	return YSI_gTempGroups;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -600,8 +604,8 @@ global Group_SetPlayer(Group:g,p,bool:s)
 	if (_Group_IsValid(g) && 0 <= p < MAX_PLAYERS)
 	{
 		GROUP_FIX(g);
-		static
-			BitArray:n<_MAX_GROUPS_G>;
+		//static
+		//	BitArray:n<_MAX_GROUPS_G>;
 		if (s)
 		{
 			if (!_Group_HasPlayer(g, p))
@@ -609,7 +613,7 @@ global Group_SetPlayer(Group:g,p,bool:s)
 				// Added to a group they don't already have.  Make a new list of
 				// groups they're in, taking in to account the new groups
 				// hierarchy and pass that new array about.
-				broadcastfunc _Group_SetPlayer(p, _Group_SetSome(p, _:g), sizeof (n));
+				broadcastfunc _Group_SetPlayer(p, _Group_SetSome(p, _:g), sizeof (YSI_gTempGroups));
 				return 1;
 			}
 		}
@@ -617,9 +621,9 @@ global Group_SetPlayer(Group:g,p,bool:s)
 		{
 			if (_Group_HasPlayer(g, p))
 			{
-				n = YSI_gGroupPlayers[p];
-				Bit_Vet(n, _:g);
-				broadcastfunc _Group_SetPlayer(p, n, sizeof (n));
+				YSI_gTempGroups = YSI_gGroupPlayers[p];
+				Bit_Vet(YSI_gTempGroups, _:g);
+				broadcastfunc _Group_SetPlayer(p, YSI_gTempGroups, sizeof (YSI_gTempGroups));
 				return 1;
 			}
 		}
@@ -1123,9 +1127,9 @@ global Group:_Group_Create(string:name[])
 	//Iter_Clear(GroupPlayers[i]);
 	// Set the child groups to only this group - this is in theory recursive,
 	// but actually isn't.
-	static const
-		BitArray:scEmpty<_MAX_GROUPS_G>;
-	YSI_g_sChildGroups[i] = scEmpty;
+	//static const
+	//	BitArray:scEmpty<_MAX_GROUPS_G>;
+	YSI_g_sChildGroups[i] = YSI_g_cEmptyGroups;
 	Bit_Let(YSI_g_sChildGroups[i], i);
 	//PA_Init(YSI_gGroupPlayers[i]);
 	YSI_gGroupData[i][E_GROUP_DATA_HASH] = YHash(name);
@@ -1191,8 +1195,8 @@ static remotefunc _Group_Destroy(g, gp@YSII_Ag[MAX_PLAYERS + 1], s)
 	new
 		ps = Bit_Slot(g),
 		Bit:pm = ~Bit_Mask(g);
-	static
-		BitArray:sOld<_MAX_GROUPS_G>;
+	//static
+	//	BitArray:sOld<_MAX_GROUPS_G>;
 	if (YSI_g_sNextUpdFunc)
 	{
 		// Update all players who were in this group as they may have lost
@@ -1205,11 +1209,11 @@ static remotefunc _Group_Destroy(g, gp@YSII_Ag[MAX_PLAYERS + 1], s)
 		foreach (new p : gp)
 		{
 			// TODO: SOMETHING!
-			sOld = YSI_gGroupPlayers[p];
+			YSI_gTempGroups = YSI_gGroupPlayers[p];
 			// If these parameters were the other way round I could do this:
 			//GROUP_CHAIN<YSI_g_sNextUpdFunc>(p, (YSI_gGroupPlayers[p], YSI_gGroupPlayers[p][ps] &= pm), YSI_gGroupPlayers[p]);
 			// But they're currently not so I can't.
-			GROUP_CHAIN<YSI_g_sNextUpdFunc>(p, sOld, YSI_gGroupPlayers[p]);
+			GROUP_CHAIN<YSI_g_sNextUpdFunc>(p, YSI_gTempGroups, YSI_gGroupPlayers[p]);
 			YSI_gGroupPlayers[p][ps] &= pm;
 		}
 	}

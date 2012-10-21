@@ -210,11 +210,12 @@ Compile options:
 #define _YCMD_0:_YCMD_1:_YCMD_2:%0(%1[]%2) RC:%0(%1[]%2)
 #define _YCMD_1:_YCMD_2:%0, Command_GetID(#%0),
 #define _YCMD_2:%0)  Command_GetID(#%0))
+#define @YCMD:%0;  Command_TouchNamed(#%0);
 
 #define YCMD: _YCMD_0:_YCMD_1:_YCMD_2:
 
 // ZCMD compatibility.
-#define CMD:%0(%1) RC:%0(%1,_h_e_l_p_)if(_h_e_l_p_)return 0;else
+#define CMD:%0(%1) RC:%0(%1,__help)if(__help)return 0;else
 #define COMMAND CMD
 
 // This is opposite AMX_FastString as that's in C, not packed, order.
@@ -1113,6 +1114,62 @@ Notes:
 	#define OnScriptClose Command_OnScriptClose
 	forward Command_OnScriptClose(script);
 #endif
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Command_TouchNamed
+Params:
+	string:command[] - Command to "touch".
+Return:
+	-
+Notes:
+	Used within "GROUP_ADD" to quickly assign a load of commands to just one
+	group.
+\*----------------------------------------------------------------------------*/
+
+foreign Command_TouchNamed(string:command[]);
+
+global Command_TouchNamed(string:command[])
+{
+	new
+		id = Command_Find(command);
+	if (id == COMMAND_NOT_FOUND)
+	{
+		return 0;
+	}
+	NO_GROUPS(id)
+	{
+		return 0;
+	}
+	return 1;
+}
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Command_Touch
+Params:
+	string:command[] - Command to "touch".
+Return:
+	-
+Notes:
+	Used within "GROUP_ADD" to quickly assign a load of commands to just one
+	group.
+\*----------------------------------------------------------------------------*/
+
+foreign Command_Touch(command);
+
+global Command_Touch(command)
+{
+	if (Command_IsValid(command))
+	{
+		NO_GROUPS(command)
+		{
+			return 0;
+		}
+		return 1;
+	}
+	return 0;
+}
 
 /*----------------------------------------------------------------------------*\
 Function:
