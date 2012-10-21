@@ -2365,4 +2365,4 @@ remotefunc Area_DoLeave(playerid, areaid)
 forward OnPlayerLeaveArea(playerid, areaid);
 
 //#define YSI_SET_LAST_GROUP 19
-#include <YSI\internal\y_grouprevert>
+#include "internal\y_grouprevert"

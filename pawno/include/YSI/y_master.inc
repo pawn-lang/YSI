@@ -11,7 +11,7 @@ Description:
 	want and include the script:
 	
 	  #define MASTER 14
-	  #include <YSI\Master>
+	  #include "Master"
 	
 	That will make the current script attempt to make itself the main master -
 	you don't need ANY other code for initialisation anywhere (which took a

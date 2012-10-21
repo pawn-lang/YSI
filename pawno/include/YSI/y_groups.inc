@@ -62,6 +62,7 @@ Changelog:
 #undef _inc_y_groups
 
 #include "internal\y_nogroups"
+#include "internal\y_plugins"
 
 /*#if defined YSI_GROUPS_LAST
 	#if YSI_GROUPS_LAST == 25
@@ -259,7 +260,7 @@ Changelog:
 		// Include the second half of the file for the methods.
 		#include "internal\y_groupsecond"
 	#endif
-	#if defined _inc_streamer
+	#if defined _YSI_PLUGINS_STREAMER
 		#if defined _YCM_q@
 			#define _YSIM_OVERRIDE          16
 		#endif
@@ -301,23 +302,23 @@ Changelog:
 	// client code so that 90% of it is not included ever.
 	/*#define _YSIM_OVERRIDE      24
 	//#define YSIM_C_ENABLE
-	#include <YSI\y_master>
+	#include "y_master"
 	#undef _GROUP_MAKE_NAME
 	#undef _GROUP_MAKE_LIMIT*/
 	/*#define _GROUP_MAKE_NAME        _GROUP_MAKE_NAME_GROUP
 	#define _GROUP_MAKE_LIMIT       _GROUP_MAKE_LIMIT_GROUP
 	#define _GROUP_MAKE_TAG         Group
-	//#include <YSI\internal\y_groupsecond>
+	//#include "internal\y_groupsecond"
 	#undef _YSI_GROUPS_FIRST_HALF
 	// Disable the OnPlayerConnect code.
 	#undef ghook
 	#define ghook%0On%1(%2) stock _GROUP_MAKE_NAME<On%2...>(%3)
-	#include <YSI\internal\y_groupsecond>
+	#include "internal\y_groupsecond"
 	#undef ghook
 	#define ghook group_hook
 	#define _YSI_GROUPS_FIRST_HALF
 	#define _GROUP_MAKE_TAG         Group
-	#include <YSI\internal\y_groupsingle>*/
+	#include "internal\y_groupsingle"*/
 	// These need VERY different defaults.
 #endif
 

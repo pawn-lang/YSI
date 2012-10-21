@@ -88,35 +88,7 @@ Operators:
 	-
 \*----------------------------------------------------------------------------*/
 
-#if !defined IPS_MAX_OBJECTS
-	#define IPS_MAX_OBJECTS (20000)
-#endif
-
-#if !defined IPS_MAX_PICKUPS
-	#define IPS_MAX_PICKUPS (5000)
-#endif
-
-#if !defined IPS_MAX_CPS
-	#define IPS_MAX_CPS (1000)
-#endif
-
-#if !defined IPS_MAX_RACE_CPS
-	#define IPS_MAX_RACE_CPS (1000)
-#endif
-
-#if !defined IPS_MAX_MAP_ICONS
-	#define IPS_MAX_MAP_ICONS (2000)
-#endif
-
-#if !defined IPS_MAX_3D_TEXT_LABELS
-	#define IPS_MAX_3D_TEXT_LABELS (1000)
-#endif
-
-#if !defined IPS_MAX_AREAS
-	#define IPS_MAX_AREAS (1000)
-#endif
-
-//#include "..\y_hooks"
+#include "y_plugins"
 
 static stock const
 	YSI_gscEmpty[2] = {-1, -1};

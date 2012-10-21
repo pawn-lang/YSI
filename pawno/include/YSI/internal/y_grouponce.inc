@@ -71,7 +71,7 @@ Changelog:
 
 //#include "..\y_hooks"
 #include "..\y_amx"
-//#include <YSI\y_cell>
+//#include "..\y_cell"
 
 #include "..\y_iterate"
 
@@ -1468,4 +1468,4 @@ global Group_GetGlobalGroup(Group:el)
 }
 
 #define _YSIM_RESET_USER
-#include <YSI\y_master>
+#include "..\y_master"

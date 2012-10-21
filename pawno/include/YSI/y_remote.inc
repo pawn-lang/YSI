@@ -101,7 +101,7 @@ Natives:
 #include "y_utils"
 
 /*#if !defined YSIM_HAS_MASTER
-	#include <YSI\internal\y_masterresolve>
+	#include "internal\y_masterresolve"
 	
 	#define _Y_REMOTE_MASTER_CLEANUP
 #endif*/

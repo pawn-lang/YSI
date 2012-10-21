@@ -401,13 +401,15 @@ hook OnScriptInit()
 				#if _YSIM_IS_CLOUD
 					// Set to uninitialised.
 					state _YCM:u;
-					_YCM = _YCM@u;
+					//_YCM = _YCM@u;
+					_YCM@ = _E_YCM@u;
 				#endif
 				CallRemoteFunction(#_YCM, "");
 				#if _YSIM_IS_CLOUD
 					// Fully master.
 					state _YCM:y;
-					_YCM = _YCM@y;
+					//_YCM = _YCM@y;
+					_YCM@ = _E_YCM@y;
 				#endif
 			#endif
 		}

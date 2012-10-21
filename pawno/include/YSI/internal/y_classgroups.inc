@@ -66,7 +66,17 @@ stock Class_ResolveGroups(class, Group:forgroup, bool:cp) <YSI_has_groups:y>
 	{
 		P:7("Class_ResolveGroups<y>: Enable this class: %d For: %d", class, _:forgroup);
 		// Only enable this class for one group.
-		Group_UpdateAllClass(class, false);
-		Group_SetClass(forgroup, class, true);
+		//Group_UpdateAllClass(class, false);
+		//Group_SetClass(forgroup, class, true);
+		/*#if !(YSIM_HAS_MASTER && (_YSIM_IS_CLIENT || _YSIM_IS_STUB))
+			_yGIClass(-1, 2, _:forgroup);
+			Class_InitialiseFromGroups(el);
+			_yGIClass(-1, 3, _:forgroup);
+		#endif
+		GROUP_ADD<forgroup>
+		{
+			// el.
+		}*/
+		Group_ExclusiveClass(forgroup, class);
 	}
 }

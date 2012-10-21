@@ -133,6 +133,18 @@ Changelog:
 		Bit:ALS_OnPlayerClickPlayerTextDraw,
 		Bit:ALS_OnPlayerEditObject,
 		Bit:ALS_OnPlayerEditAttachedObject,
+		#if defined _YSI_PLUGINS_STREAMER
+			Bit:ALS_OnDynamicObjectMoved,
+			Bit:ALS_OnPlayerEditDynamicObject,
+			Bit:ALS_OnPlayerSelectDynamicObject,
+			Bit:ALS_OnPlayerPickUpDynamicPickup,
+			Bit:ALS_OnPlayerEnterDynamicCP,
+			Bit:ALS_OnPlayerLeaveDynamicCP,
+			Bit:ALS_OnPlayerEnterDynamicRaceCP,
+			Bit:ALS_OnPlayerLeaveDynamicRaceCP,
+			Bit:ALS_OnPlayerEnterDynamicArea,
+			Bit:ALS_OnPlayerLeaveDynamicArea,
+		#endif
 		Bit:ALS_OnPlayerSelectObject
 	}
 	
@@ -215,6 +227,17 @@ Changelog:
 	#define ALS_R_PlayerEditObject 1
 	#define ALS_R_PlayerEditAttachedObject 1
 	#define ALS_R_PlayerSelectObject 1
+	// Streamer plugins.
+	#define ALS_R_DynamicObjectMoved 1
+	#define ALS_R_PlayerEditDynamicObject 1
+	#define ALS_R_PlayerSelectDynamicObject 1
+	#define ALS_R_PlayerPickUpDynamicPickup 1
+	#define ALS_R_PlayerEnterDynamicCP 1
+	#define ALS_R_PlayerLeaveDynamicCP 1
+	#define ALS_R_PlayerEnterDynamicRaceCP 1
+	#define ALS_R_PlayerLeaveDynamicRaceCP 1
+	#define ALS_R_PlayerEnterDynamicArea 1
+	#define ALS_R_PlayerLeaveDynamicArea 1
 	
 	// Chain call declarations.
 	#define ALS_DO_ScriptInit<%0>                %0<ScriptInit               ,>(none:)
@@ -275,6 +298,18 @@ Changelog:
 	#define ALS_DO_PlayerEditObject<%0>    %0<PlayerEditObject,iiiiffffff>(more:playerid,more:playerobject,more:objectid,more:response,tag:Float:fX,tag:Float:fY,tag:Float:fZ,tag:Float:fRotX,tag:Float:fRotY,end_tag:Float:fRotZ)
 	#define ALS_DO_PlayerEditAttachedObject<%0>    %0<PlayerEditAttachedObject,iiiiifffffffff>(more:playerid,more:response,more:index,more:modelid,more:boneid,tag:Float:fOffsetX,tag:Float:fOffsetY,tag:Float:fOffsetZ,tag:Float:fRotX,tag:Float:fRotY,tag:Float:fRotZ,tag:Float:fScaleX,tag:Float:fScaleY,end_tag:Float:fScaleZ)
 	#define ALS_DO_PlayerSelectObject<%0>    %0<PlayerSelectObject,iiiifff>(more:playerid,more:type,more:objectid,more:modelid,tag:Float:fX,tag:Float:fY,end_tag:Float:fZ)
+	// Streamer plugin.
+	#define ALS_DO_DynamicObjectMoved<%0>    %0<DynamicObjectMoved,i>(end:objectid)
+	#define ALS_DO_PlayerEditDynamicObject<%0>    %0<PlayerEditDynamicObject,iiiiiiiii>(more:playerid,more:objectid,more:response,tag:Float:x,tag:Float:y,tag:Float:z,tag:Float:rx,tag:Float:ry,end_tag:Float:rz)
+	#define ALS_DO_PlayerSelectDynamicObject<%0>    %0<PlayerSelectDynamicObject,iiiiii>(more:playerid,more:objectid,more:modelid,tag:Float:x,tag:Float:y,end_tag:Float:z)
+	//#define ALS_DO_PlayerSelectDynamicObjecp<%0>    %0<PlayerSelectDynamicObject,iiiiii>(more:playerid,more:objectid,more:modelid,tag:Float:x,tag:Float:y,end_tag:Float:z)
+	#define ALS_DO_PlayerPickUpDynamicPickup<%0>    %0<PlayerPickUpDynamicPickup,ii>(more:playerid,end:pickupid)
+	#define ALS_DO_PlayerEnterDynamicCP<%0>    %0<PlayerEnterDynamicCP,ii>(more:playerid,end:checkpointid)
+	#define ALS_DO_PlayerLeaveDynamicCP<%0>    %0<PlayerLeaveDynamicCP,ii>(more:playerid,end:checkpointid)
+	#define ALS_DO_PlayerEnterDynamicRaceCP<%0>    %0<PlayerEnterDynamicRaceCP,ii>(more:playerid,end:checkpointid)
+	#define ALS_DO_PlayerLeaveDynamicRaceCP<%0>    %0<PlayerLeaveDynamicRaceCP,ii>(more:playerid,end:checkpointid)
+	#define ALS_DO_PlayerEnterDynamicArea<%0>    %0<PlayerEnterDynamicArea,ii>(more:playerid,end:areaid)
+	#define ALS_DO_PlayerLeaveDynamicArea<%0>    %0<PlayerLeaveDynamicArea,ii>(more:playerid,end:areaid)
 	//#define ALS_CALL<%0> ALS_C_%0
 	//#define ALS_FORWARD<%0> ALS_F_%0
 	

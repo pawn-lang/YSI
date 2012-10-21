@@ -215,8 +215,7 @@ _gchain _yGI(&ni, &na, &nu)
 	if (ni == -1)
 	{
 		static
-			BitArray:sStack<_MAX_GROUPS_G>;//,
-			//BitArray:sBlank<_MAX_GROUPS_G>;
+			BitArray:sStack<_MAX_GROUPS_G>;
 		if (na)
 		{
 			//printf("PUSH %d", nu);
@@ -259,6 +258,36 @@ _gchain _yGI(&ni, &na, &nu)
 		na = AMX_GetPublicPointerPrefix(na, _yGA, _A<_yGA>);
 		nu = AMX_GetPublicPointerPrefix(nu, _yGU, _A<_yGU>);
 	}
+}
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Group_Exclusive...
+Params:
+	Group:g - Group to add this to.
+	_GROUP_MAKE_TAG:el - Element to add.
+Return:
+	-
+Notes:
+	Add this element to ONLY this group and remove it from any others it might
+	already be in.  This is basically a simplified version of "GROUP_ADD".
+\*----------------------------------------------------------------------------*/
+
+gforeign Group_Exclusive...(Group:g,_GROUP_MAKE_TAG:el);
+
+gglobal Group_Exclusive...(Group:g,_GROUP_MAKE_TAG:el)
+{
+	YSI_gTempGroups = _GROUP_DEFAULTS;
+	_GROUP_DEFAULTS = YSI_g_cEmptyGroups;
+	Bit_Let(_GROUP_DEFAULTS, nu);
+	for (new i = 0; i != bits<_MAX_GROUPS_G>; ++i)
+	{
+		YSI_g_sEmpty[i] = ~_GROUP_DEFAULTS[i];
+	}
+	_GROUP_INITIALISE(el);
+	_GROUP_DEFAULTS = YSI_gTempGroups;
+	YSI_g_sEmpty = YSI_g_cEmptyGroups;
+	return 0;
 }
 
 /*----------------------------------------------------------------------------*\

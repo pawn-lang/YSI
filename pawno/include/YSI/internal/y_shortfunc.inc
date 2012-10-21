@@ -94,11 +94,11 @@ Natives:
 	P@ - Renaming of __CallLocalFunction for size reasons.
 \*----------------------------------------------------------------------------*/
 
-#include <YSI\y_utils>
-#include <YSI\internal\y_globaltags>
-#include <YSI\y_debug>
+#include "..\y_utils"
+#include "y_globaltags"
+#include "..\y_debug"
 
-#include <YSI\internal\y_renative>
+#include "y_renative"
 
 // Public variable.
 public stock
@@ -209,7 +209,7 @@ stock G@(GLOBAL_TAG_TYPES:...)
 #define _:%0,) %0)
 
 #if defined YSI_LOCK_MODE
-	#include <YSI\y_hooks>
+	#include "..\y_hooks"
 	hook OnScriptInit()
 	{
 		new
