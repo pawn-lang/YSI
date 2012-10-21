@@ -346,7 +346,10 @@ Notes:
 
 stock _Group_AddInternal(a, Group:g)
 {
-	broadcastfunc __Group_AddInternal(a, _:g);
+	if (_Group_IsValid(g))
+	{
+		broadcastfunc __Group_AddInternal(a, _:GROUP_TEMP_FIX(g));
+	}
 	return a;
 }
 
@@ -403,7 +406,7 @@ hook OnScriptInit()
 		ni = AMX_GetPublicPointerPrefix(0, YSI_g_sNextInitFunc, _A<_yGI>),
 		na = AMX_GetPublicPointerPrefix(0, YSI_g_sNextAddFunc, _A<_yGA>),
 		nu = AMX_GetPublicPointerPrefix(0, YSI_g_sNextUpdFunc, _A<_yGU>);
-	printf("Group_OnScriptInit: %d, %d, %d", ni, na, nu);
+	//printf("Group_OnScriptInit: %d, %d, %d", ni, na, nu);
 	P:5("Group_OnScriptInit: %d, %d, %d", ni, na, nu);
 	GROUP_CHAIN?<YSI_g_sNextInitFunc>(ni, na, nu);
 }
@@ -1366,7 +1369,7 @@ foreign Group_SetGroup(Group:g,Group:el,bool:s);
 
 global Group_SetGroup(Group:g,Group:el,bool:s)
 {
-	P:2(#Group_SetGroup " called: %i, %i, %i", _:g, el, s);
+	P:2(#Group_SetGroup " called: %i, %i, %i", _:g, _:el, s);
 	// Set wether a group can use this item.
 	if (g != el && _Group_IsValid(g) && _Group_IsValid(el))
 	{
@@ -1421,7 +1424,7 @@ foreign Group_SetGlobalGroup(Group:el,bool:s);
 
 global Group_SetGlobalGroup(Group:el,bool:s)
 {
-	P:2(#Group_SetGlobalGroup " called: %i, %i", el, s);
+	P:2(#Group_SetGlobalGroup " called: %i, %i", _:el, s);
 	return Group_SetGroup(GROUP_GLOBAL, el, s);
 }
 

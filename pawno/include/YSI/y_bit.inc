@@ -55,6 +55,8 @@ Legal:
 Version:
 	0.2
 Changelog:
+	21/10/12:
+		Changed "Bit_Display" to print in the correct order.
 	22/02/12:
 		Added the "BITS" iterator.
 	01/12/08:
@@ -110,6 +112,7 @@ Compile options:
 #include "internal\y_version"
 #include "y_debug"
 #include "y_utils"
+#include "y_cell"
 
 // This is redefined below, don't worry.  It's like this so the function
 // prototypes can use a familiar syntax.
@@ -313,10 +316,12 @@ stock Bit_GetCount(BitArray:array<>, size = sizeof (array))
 stock Bit_Display(BitArray:array<>, size = sizeof (array))
 {
 	new
-		ret[YSI_MAX_STRING];
+		ret[YSI_MAX_STRING],
+		val;
 	while (size--)
 	{
-		format(ret, sizeof (ret), "%s%016b%016b", ret, _:array[size] >>> 16, _:array[size] & 0xFFFF);
+		val = Cell_ReverseBits(array[size]);
+		format(ret, sizeof (ret), "%016b%016b%s", val >>> 16, val & 0xFFFF, ret);
 	}
 	P:7("Bit_Display called: %s, %i", ret, size);
 	return ret;

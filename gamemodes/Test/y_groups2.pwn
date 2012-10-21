@@ -12,7 +12,7 @@
 #define GROUP_LIBRARY_SIZE 100
 
 #include <YSI\y_groups>
-//#include <YSI\y_commands>
+#include <YSI\y_commands>
 
 new
 	gPl,

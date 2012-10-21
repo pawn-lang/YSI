@@ -219,17 +219,23 @@ _gchain _yGI(&ni, &na, &nu)
 			//BitArray:sBlank<_MAX_GROUPS_G>;
 		if (na)
 		{
+			//printf("PUSH %d", nu);
 			// Called to "push" the default settings.
 			sStack = _GROUP_DEFAULTS;
+			//printf("ONE %d", nu);
 			_GROUP_DEFAULTS = YSI_g_cEmptyGroups;
+			//printf("TWO %d", nu);
 			Bit_Let(_GROUP_DEFAULTS, nu);
+			//printf("THREE %d", nu);
 			for (new i = 0; i != bits<_MAX_GROUPS_G>; ++i)
 			{
 				YSI_g_sEmpty[i] = ~_GROUP_DEFAULTS[i];
 			}
+			//printf("DONE %d", nu);
 		}
 		else
 		{
+			//printf("POP");
 			// Called to "pop" the default settings.
 			_GROUP_DEFAULTS = sStack;
 			YSI_g_sEmpty = YSI_g_cEmptyGroups;
@@ -349,6 +355,7 @@ stock bool:_GROUP_INITIALISE(_GROUP_MAKE_TAG:x = _GROUP_MAKE_TAG:_GROUP_MAKE_LIM
 	{
 		//static
 		//	BitArray:sEmpty<_MAX_GROUPS_G>;
+		//printf("%d %s %s", _:x, Bit_Display(_GROUP_DEFAULTS), Bit_Display(YSI_g_sEmpty));
 		_GROUP_GROUP_NAME[_:x] = _GROUP_DEFAULTS;
 		foreach (new playerid : Player)
 		{
