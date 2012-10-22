@@ -279,7 +279,7 @@ gglobal Group_Exclusive...(Group:g,_GROUP_MAKE_TAG:el)
 {
 	YSI_gTempGroups = _GROUP_DEFAULTS;
 	_GROUP_DEFAULTS = YSI_g_cEmptyGroups;
-	Bit_Let(_GROUP_DEFAULTS, nu);
+	Bit_Let(_GROUP_DEFAULTS, _:g);
 	for (new i = 0; i != bits<_MAX_GROUPS_G>; ++i)
 	{
 		YSI_g_sEmpty[i] = ~_GROUP_DEFAULTS[i];

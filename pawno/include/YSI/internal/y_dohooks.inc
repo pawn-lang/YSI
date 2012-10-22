@@ -4176,676 +4176,680 @@ public OnPlayerSelectObject(playerid, type, objectid, modelid, Float:fX, Float:f
 ALS_FORWARD<PlayerSelectObject>
 
 // Allow hooking of streamer plugin callbacks.
-#if defined _YSI_PLUGINS_STREAMER
-	public OnDynamicObjectMoved(objectid)
-	{
-		P:2("Hooks_OnDynamicObjectMoved called: %d", objectid);
-		new
-			end   = YSI_g_sCallbackData[ALS_OnDynamicObjectMoved][E_FUNC_HOOK_DATA_END],
-			start = YSI_g_sCallbackData[ALS_OnDynamicObjectMoved][E_FUNC_HOOK_DATA_START],
-			ret = ALS_R_DynamicObjectMoved;
-		if (start == end)
-		{
-			P:2("Hooks_OnDynamicObjectMoved end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnDynamicObjectMoved));
-			HOOK_CALL<DynamicObjectMoved>
-		}
-		new
-			idx,
-			pointer,
-			re = end;
-		if (end > sizeof (YSI_g_sCallbackAddresses))
-		{
-			re = sizeof (YSI_g_sCallbackAddresses);
-			if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
-		}
-		// Do the initial fast elements.
-		while (start != re)
-		{
-			pointer = YSI_g_sCallbackAddresses[start++];
-			#emit PUSH.S objectid
-			#emit PUSH.C     4
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Get any remaining pointers the old way.
-		while (start++ != end)
-		{
-			idx = AMX_GetPublicPointer(idx, pointer, "@yH_DynamicObjectMoved");
-			#emit PUSH.S objectid
-			#emit PUSH.C     4
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Do ALS just in case (YSI no longer uses this though now).
-		P:2("Hooks_OnDynamicObjectMoved end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnDynamicObjectMoved));
-		HOOK_RETURN<DynamicObjectMoved>
-	}
-	#if defined _ALS_OnDynamicObjectMoved
-		#undef OnDynamicObjectMoved
-	#else
-		#define _ALS_OnDynamicObjectMoved
-	#endif
-	#define OnDynamicObjectMoved S@@_OnDynamicObjectMoved
-	ALS_FORWARD<DynamicObjectMoved>
+#if !defined _YSI_PLUGINS_STREAMER
+	#undef ALS_PREFIX
 	
-	public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz)
-	{
-		P:2("Hooks_OnPlayerEditDynamicObject called: %d, %d, %d, %f, %f, %f, %f, %f, %f", playerid, objectid, response, x, y, z, rx, ry, rz);
-		new
-			end   = YSI_g_sCallbackData[ALS_OnPlayerEditDynamicObject][E_FUNC_HOOK_DATA_END],
-			start = YSI_g_sCallbackData[ALS_OnPlayerEditDynamicObject][E_FUNC_HOOK_DATA_START],
-			ret = ALS_R_PlayerEditDynamicObject;
-		if (start == end)
-		{
-			P:2("Hooks_OnPlayerEditDynamicObject end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEditDynamicObject));
-			HOOK_CALL<PlayerEditDynamicObject>
-		}
-		new
-			idx,
-			pointer,
-			re = end;
-		if (end > sizeof (YSI_g_sCallbackAddresses))
-		{
-			re = sizeof (YSI_g_sCallbackAddresses);
-			if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
-		}
-		// Do the initial fast elements.
-		while (start != re)
-		{
-			pointer = YSI_g_sCallbackAddresses[start++];
-			#emit PUSH.S rz
-			#emit PUSH.S ry
-			#emit PUSH.S rx
-			#emit PUSH.S z
-			#emit PUSH.S y
-			#emit PUSH.S x
-			#emit PUSH.S response
-			#emit PUSH.S objectid
-			#emit PUSH.S playerid
-			#emit PUSH.C     36
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Get any remaining pointers the old way.
-		while (start++ != end)
-		{
-			idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerEditDynamicObject");
-			#emit PUSH.S rz
-			#emit PUSH.S ry
-			#emit PUSH.S rx
-			#emit PUSH.S z
-			#emit PUSH.S y
-			#emit PUSH.S x
-			#emit PUSH.S response
-			#emit PUSH.S objectid
-			#emit PUSH.S playerid
-			#emit PUSH.C     36
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Do ALS just in case (YSI no longer uses this though now).
-		P:2("Hooks_OnPlayerEditDynamicObject end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEditDynamicObject));
-		HOOK_RETURN<PlayerEditDynamicObject>
-	}
-	#if defined _ALS_OnPlayerEditDynamicObject
-		#undef OnPlayerEditDynamicObject
-	#else
-		#define _ALS_OnPlayerEditDynamicObject
-	#endif
-	#define OnPlayerEditDynamicObject S@@_OnPlayerEditDynamicObject
-	ALS_FORWARD<PlayerEditDynamicObject>
-	
-	public OnPlayerSelectDynamicObject(playerid, objectid, modelid, Float:x, Float:y, Float:z)
-	{
-		P:2("Hooks_OnPlayerSelectDynamicObject called: %d, %d, %d, %f, %f, %f", playerid, objectid, modelid, x, y, z);
-		new
-			end   = YSI_g_sCallbackData[ALS_OnPlayerSelectDynamicObject][E_FUNC_HOOK_DATA_END],
-			start = YSI_g_sCallbackData[ALS_OnPlayerSelectDynamicObject][E_FUNC_HOOK_DATA_START],
-			ret = ALS_R_PlayerSelectDynamicObject;
-		if (start == end)
-		{
-			P:2("Hooks_OnPlayerSelectDynamicObject end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerSelectDynamicObject));
-			HOOK_CALL<PlayerSelectDynamicObject>
-		}
-		new
-			idx,
-			pointer,
-			re = end;
-		if (end > sizeof (YSI_g_sCallbackAddresses))
-		{
-			re = sizeof (YSI_g_sCallbackAddresses);
-			if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
-		}
-		// Do the initial fast elements.
-		while (start != re)
-		{
-			pointer = YSI_g_sCallbackAddresses[start++];
-			#emit PUSH.S z
-			#emit PUSH.S y
-			#emit PUSH.S x
-			#emit PUSH.S modelid
-			#emit PUSH.S objectid
-			#emit PUSH.S playerid
-			#emit PUSH.C     24
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Get any remaining pointers the old way.
-		while (start++ != end)
-		{
-			idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerSelectDynamicObject");
-			#emit PUSH.S z
-			#emit PUSH.S y
-			#emit PUSH.S x
-			#emit PUSH.S modelid
-			#emit PUSH.S objectid
-			#emit PUSH.S playerid
-			#emit PUSH.C     24
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Do ALS just in case (YSI no longer uses this though now).
-		P:2("Hooks_OnPlayerSelectDynamicObject end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerSelectDynamicObject));
-		HOOK_RETURN<PlayerSelectDynamicObject>
-	}
-	#if defined _ALS_OnPlayerSelectDynamicObj
-		#undef OnPlayerSelectDynamicObject
-	#else
-		#define _ALS_OnPlayerSelectDynamicObj
-	#endif
-	#define OnPlayerSelectDynamicObject S@@_OnPlayerSelectDynamicObject
-	ALS_FORWARD<PlayerSelectDynamicObject>
-	
-	public OnPlayerPickUpDynamicPickup(playerid, pickupid)
-	{
-		P:2("Hooks_OnPlayerPickUpDynamicPickup called: %d, %d", playerid, pickupid);
-		new
-			end   = YSI_g_sCallbackData[ALS_OnPlayerPickUpDynamicPickup][E_FUNC_HOOK_DATA_END],
-			start = YSI_g_sCallbackData[ALS_OnPlayerPickUpDynamicPickup][E_FUNC_HOOK_DATA_START],
-			ret = ALS_R_PlayerPickUpDynamicPickup;
-		if (start == end)
-		{
-			P:2("Hooks_OnPlayerPickUpDynamicPickup end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerPickUpDynamicPickup));
-			HOOK_CALL<PlayerPickUpDynamicPickup>
-		}
-		new
-			idx,
-			pointer,
-			re = end;
-		if (end > sizeof (YSI_g_sCallbackAddresses))
-		{
-			re = sizeof (YSI_g_sCallbackAddresses);
-			if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
-		}
-		// Do the initial fast elements.
-		while (start != re)
-		{
-			pointer = YSI_g_sCallbackAddresses[start++];
-			#emit PUSH.S pickupid
-			#emit PUSH.S playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Get any remaining pointers the old way.
-		while (start++ != end)
-		{
-			idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerPickUpDynamicPickup");
-			#emit PUSH.S pickupid
-			#emit PUSH.S playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Do ALS just in case (YSI no longer uses this though now).
-		P:2("Hooks_OnPlayerPickUpDynamicPickup end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerPickUpDynamicPickup));
-		HOOK_RETURN<PlayerPickUpDynamicPickup>
-	}
-	#if defined _ALS_OnPlayerPickUpDynamicPUp
-		#undef OnPlayerPickUpDynamicPickup
-	#else
-		#define _ALS_OnPlayerPickUpDynamicPUp
-	#endif
-	#define OnPlayerPickUpDynamicPickup S@@_OnPlayerPickUpDynamicPickup
-	ALS_FORWARD<PlayerPickUpDynamicPickup>
-	
-	public OnPlayerEnterDynamicCP(playerid, checkpointid)
-	{
-		P:2("Hooks_OnPlayerEnterDynamicCP called: %d, %d", playerid, checkpointid);
-		new
-			end   = YSI_g_sCallbackData[ALS_OnPlayerEnterDynamicCP][E_FUNC_HOOK_DATA_END],
-			start = YSI_g_sCallbackData[ALS_OnPlayerEnterDynamicCP][E_FUNC_HOOK_DATA_START],
-			ret = ALS_R_PlayerEnterDynamicCP;
-		if (start == end)
-		{
-			P:2("Hooks_OnPlayerEnterDynamicCP end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEnterDynamicCP));
-			HOOK_CALL<PlayerEnterDynamicCP>
-		}
-		new
-			idx,
-			pointer,
-			re = end;
-		if (end > sizeof (YSI_g_sCallbackAddresses))
-		{
-			re = sizeof (YSI_g_sCallbackAddresses);
-			if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
-		}
-		// Do the initial fast elements.
-		while (start != re)
-		{
-			pointer = YSI_g_sCallbackAddresses[start++];
-			#emit PUSH.S checkpointid
-			#emit PUSH.S playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Get any remaining pointers the old way.
-		while (start++ != end)
-		{
-			idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerEnterDynamicCP");
-			#emit PUSH.S checkpointid
-			#emit PUSH.S playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Do ALS just in case (YSI no longer uses this though now).
-		P:2("Hooks_OnPlayerEnterDynamicCP end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEnterDynamicCP));
-		HOOK_RETURN<PlayerEnterDynamicCP>
-	}
-	#if defined _ALS_OnPlayerEnterDynamicCP
-		#undef OnPlayerEnterDynamicCP
-	#else
-		#define _ALS_OnPlayerEnterDynamicCP
-	#endif
-	#define OnPlayerEnterDynamicCP S@@_OnPlayerEnterDynamicCP
-	ALS_FORWARD<PlayerEnterDynamicCP>
-	
-	public OnPlayerLeaveDynamicCP(playerid, checkpointid)
-	{
-		P:2("Hooks_OnPlayerLeaveDynamicCP called: %d, %d", playerid, checkpointid);
-		new
-			end   = YSI_g_sCallbackData[ALS_OnPlayerLeaveDynamicCP][E_FUNC_HOOK_DATA_END],
-			start = YSI_g_sCallbackData[ALS_OnPlayerLeaveDynamicCP][E_FUNC_HOOK_DATA_START],
-			ret = ALS_R_PlayerLeaveDynamicCP;
-		if (start == end)
-		{
-			P:2("Hooks_OnPlayerLeaveDynamicCP end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerLeaveDynamicCP));
-			HOOK_CALL<PlayerLeaveDynamicCP>
-		}
-		new
-			idx,
-			pointer,
-			re = end;
-		if (end > sizeof (YSI_g_sCallbackAddresses))
-		{
-			re = sizeof (YSI_g_sCallbackAddresses);
-			if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
-		}
-		// Do the initial fast elements.
-		while (start != re)
-		{
-			pointer = YSI_g_sCallbackAddresses[start++];
-			#emit PUSH.S checkpointid
-			#emit PUSH.S playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Get any remaining pointers the old way.
-		while (start++ != end)
-		{
-			idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerLeaveDynamicCP");
-			#emit PUSH.S checkpointid
-			#emit PUSH.S playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Do ALS just in case (YSI no longer uses this though now).
-		P:2("Hooks_OnPlayerLeaveDynamicCP end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerLeaveDynamicCP));
-		HOOK_RETURN<PlayerLeaveDynamicCP>
-	}
-	#if defined _ALS_OnPlayerLeaveDynamicCP
-		#undef OnPlayerLeaveDynamicCP
-	#else
-		#define _ALS_OnPlayerLeaveDynamicCP
-	#endif
-	#define OnPlayerLeaveDynamicCP S@@_OnPlayerLeaveDynamicCP
-	ALS_FORWARD<PlayerLeaveDynamicCP>
-	
-	public OnPlayerEnterDynamicRaceCP(playerid, checkpointid)
-	{
-		P:2("Hooks_OnPlayerEnterDynamicRaceCP called: %d, %d", playerid, checkpointid);
-		new
-			end   = YSI_g_sCallbackData[ALS_OnPlayerEnterDynamicRaceCP][E_FUNC_HOOK_DATA_END],
-			start = YSI_g_sCallbackData[ALS_OnPlayerEnterDynamicRaceCP][E_FUNC_HOOK_DATA_START],
-			ret = ALS_R_PlayerEnterDynamicRaceCP;
-		if (start == end)
-		{
-			P:2("Hooks_OnPlayerEnterDynamicRaceCP end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEnterDynamicRaceCP));
-			HOOK_CALL<PlayerEnterDynamicRaceCP>
-		}
-		new
-			idx,
-			pointer,
-			re = end;
-		if (end > sizeof (YSI_g_sCallbackAddresses))
-		{
-			re = sizeof (YSI_g_sCallbackAddresses);
-			if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
-		}
-		// Do the initial fast elements.
-		while (start != re)
-		{
-			pointer = YSI_g_sCallbackAddresses[start++];
-			#emit PUSH.S checkpointid
-			#emit PUSH.S playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Get any remaining pointers the old way.
-		while (start++ != end)
-		{
-			idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerEnterDynamicRaceCP");
-			#emit PUSH.S checkpointid
-			#emit PUSH.S playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Do ALS just in case (YSI no longer uses this though now).
-		P:2("Hooks_OnPlayerEnterDynamicRaceCP end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEnterDynamicRaceCP));
-		HOOK_RETURN<PlayerEnterDynamicRaceCP>
-	}
-	#if defined _ALS_OnPlayerEnterDynamicRaceCP
-		#undef OnPlayerEnterDynamicRaceCP
-	#else
-		#define _ALS_OnPlayerEnterDynamicRaceCP
-	#endif
-	#define OnPlayerEnterDynamicRaceCP S@@_OnPlayerEnterDynamicRaceCP
-	ALS_FORWARD<PlayerEnterDynamicRaceCP>
-	
-	public OnPlayerLeaveDynamicRaceCP(playerid, checkpointid)
-	{
-		P:2("Hooks_OnPlayerLeaveDynamicRaceCP called: %d, %d", playerid, checkpointid);
-		new
-			end   = YSI_g_sCallbackData[ALS_OnPlayerLeaveDynamicRaceCP][E_FUNC_HOOK_DATA_END],
-			start = YSI_g_sCallbackData[ALS_OnPlayerLeaveDynamicRaceCP][E_FUNC_HOOK_DATA_START],
-			ret = ALS_R_PlayerLeaveDynamicRaceCP;
-		if (start == end)
-		{
-			P:2("Hooks_OnPlayerLeaveDynamicRaceCP end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerLeaveDynamicRaceCP));
-			HOOK_CALL<PlayerLeaveDynamicRaceCP>
-		}
-		new
-			idx,
-			pointer,
-			re = end;
-		if (end > sizeof (YSI_g_sCallbackAddresses))
-		{
-			re = sizeof (YSI_g_sCallbackAddresses);
-			if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
-		}
-		// Do the initial fast elements.
-		while (start != re)
-		{
-			pointer = YSI_g_sCallbackAddresses[start++];
-			#emit PUSH.S checkpointid
-			#emit PUSH.S playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Get any remaining pointers the old way.
-		while (start++ != end)
-		{
-			idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerLeaveDynamicRaceCP");
-			#emit PUSH.S checkpointid
-			#emit PUSH.S playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Do ALS just in case (YSI no longer uses this though now).
-		P:2("Hooks_OnPlayerLeaveDynamicRaceCP end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerLeaveDynamicRaceCP));
-		HOOK_RETURN<PlayerLeaveDynamicRaceCP>
-	}
-	#if defined _ALS_OnPlayerLeaveDynamicRaceCP
-		#undef OnPlayerLeaveDynamicRaceCP
-	#else
-		#define _ALS_OnPlayerLeaveDynamicRaceCP
-	#endif
-	#define OnPlayerLeaveDynamicRaceCP S@@_OnPlayerLeaveDynamicRaceCP
-	ALS_FORWARD<PlayerLeaveDynamicRaceCP>
-	
-	public OnPlayerEnterDynamicArea(playerid, areaid)
-	{
-		P:2("Hooks_OnPlayerEnterDynamicArea called: %d, %d", playerid, areaid);
-		new
-			end   = YSI_g_sCallbackData[ALS_OnPlayerEnterDynamicArea][E_FUNC_HOOK_DATA_END],
-			start = YSI_g_sCallbackData[ALS_OnPlayerEnterDynamicArea][E_FUNC_HOOK_DATA_START],
-			ret = ALS_R_PlayerEnterDynamicArea;
-		if (start == end)
-		{
-			P:2("Hooks_OnPlayerEnterDynamicArea end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEnterDynamicArea));
-			HOOK_CALL<PlayerEnterDynamicArea>
-		}
-		new
-			idx,
-			pointer,
-			re = end;
-		if (end > sizeof (YSI_g_sCallbackAddresses))
-		{
-			re = sizeof (YSI_g_sCallbackAddresses);
-			if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
-		}
-		// Do the initial fast elements.
-		while (start != re)
-		{
-			pointer = YSI_g_sCallbackAddresses[start++];
-			#emit PUSH.S areaid
-			#emit PUSH.S playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Get any remaining pointers the old way.
-		while (start++ != end)
-		{
-			idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerEnterDynamicArea");
-			#emit PUSH.S areaid
-			#emit PUSH.S playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Do ALS just in case (YSI no longer uses this though now).
-		P:2("Hooks_OnPlayerEnterDynamicArea end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEnterDynamicArea));
-		HOOK_RETURN<PlayerEnterDynamicArea>
-	}
-	#if defined _ALS_OnPlayerEnterDynamicArea
-		#undef OnPlayerEnterDynamicArea
-	#else
-		#define _ALS_OnPlayerEnterDynamicArea
-	#endif
-	#define OnPlayerEnterDynamicArea S@@_OnPlayerEnterDynamicArea
-	ALS_FORWARD<PlayerEnterDynamicArea>
-	
-	public OnPlayerLeaveDynamicArea(playerid, areaid)
-	{
-		P:2("Hooks_OnPlayerLeaveDynamicArea called: %d, %d", playerid, areaid);
-		new
-			end   = YSI_g_sCallbackData[ALS_OnPlayerLeaveDynamicArea][E_FUNC_HOOK_DATA_END],
-			start = YSI_g_sCallbackData[ALS_OnPlayerLeaveDynamicArea][E_FUNC_HOOK_DATA_START],
-			ret = ALS_R_PlayerLeaveDynamicArea;
-		if (start == end)
-		{
-			P:2("Hooks_OnPlayerLeaveDynamicArea end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerLeaveDynamicArea));
-			HOOK_CALL<PlayerLeaveDynamicArea>
-		}
-		new
-			idx,
-			pointer,
-			re = end;
-		if (end > sizeof (YSI_g_sCallbackAddresses))
-		{
-			re = sizeof (YSI_g_sCallbackAddresses);
-			if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
-		}
-		// Do the initial fast elements.
-		while (start != re)
-		{
-			pointer = YSI_g_sCallbackAddresses[start++];
-			#emit PUSH.S areaid
-			#emit PUSH.S playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Get any remaining pointers the old way.
-		while (start++ != end)
-		{
-			idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerLeaveDynamicArea");
-			#emit PUSH.S areaid
-			#emit PUSH.S playerid
-			#emit PUSH.C     8
-			#emit LCTRL      6
-			#emit ADD.C      28
-			#emit PUSH.pri
-			#emit LOAD.S.pri pointer
-			#emit SCTRL      6
-			#emit CONST.alt  0xFFFFFFFF
-			#emit STOR.S.pri ret
-			#emit JEQ        hooks_do_hooks_call_no_als
-		}
-		// Do ALS just in case (YSI no longer uses this though now).
-		P:2("Hooks_OnPlayerLeaveDynamicArea end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerLeaveDynamicArea));
-		HOOK_RETURN<PlayerLeaveDynamicArea>
-	}
-	#if defined _ALS_OnPlayerLeaveDynamicArea
-		#undef OnPlayerLeaveDynamicArea
-	#else
-		#define _ALS_OnPlayerLeaveDynamicArea
-	#endif
-	#define OnPlayerLeaveDynamicArea S@@_OnPlayerLeaveDynamicArea
-	ALS_FORWARD<PlayerLeaveDynamicArea>
+	#endinput
 #endif
+
+public OnDynamicObjectMoved(objectid)
+{
+	P:2("Hooks_OnDynamicObjectMoved called: %d", objectid);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnDynamicObjectMoved][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnDynamicObjectMoved][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_DynamicObjectMoved;
+	if (start == end)
+	{
+		P:2("Hooks_OnDynamicObjectMoved end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnDynamicObjectMoved));
+		HOOK_CALL<DynamicObjectMoved>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S objectid
+		#emit PUSH.C     4
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_DynamicObjectMoved");
+		#emit PUSH.S objectid
+		#emit PUSH.C     4
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnDynamicObjectMoved end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnDynamicObjectMoved));
+	HOOK_RETURN<DynamicObjectMoved>
+}
+#if defined _ALS_OnDynamicObjectMoved
+	#undef OnDynamicObjectMoved
+#else
+	#define _ALS_OnDynamicObjectMoved
+#endif
+#define OnDynamicObjectMoved S@@_OnDynamicObjectMoved
+ALS_FORWARD<DynamicObjectMoved>
+
+public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz)
+{
+	P:2("Hooks_OnPlayerEditDynamicObject called: %d, %d, %d, %f, %f, %f, %f, %f, %f", playerid, objectid, response, x, y, z, rx, ry, rz);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnPlayerEditDynamicObject][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnPlayerEditDynamicObject][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_PlayerEditDynamicObject;
+	if (start == end)
+	{
+		P:2("Hooks_OnPlayerEditDynamicObject end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEditDynamicObject));
+		HOOK_CALL<PlayerEditDynamicObject>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S rz
+		#emit PUSH.S ry
+		#emit PUSH.S rx
+		#emit PUSH.S z
+		#emit PUSH.S y
+		#emit PUSH.S x
+		#emit PUSH.S response
+		#emit PUSH.S objectid
+		#emit PUSH.S playerid
+		#emit PUSH.C     36
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerEditDynamicObject");
+		#emit PUSH.S rz
+		#emit PUSH.S ry
+		#emit PUSH.S rx
+		#emit PUSH.S z
+		#emit PUSH.S y
+		#emit PUSH.S x
+		#emit PUSH.S response
+		#emit PUSH.S objectid
+		#emit PUSH.S playerid
+		#emit PUSH.C     36
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnPlayerEditDynamicObject end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEditDynamicObject));
+	HOOK_RETURN<PlayerEditDynamicObject>
+}
+#if defined _ALS_OnPlayerEditDynamicObject
+	#undef OnPlayerEditDynamicObject
+#else
+	#define _ALS_OnPlayerEditDynamicObject
+#endif
+#define OnPlayerEditDynamicObject S@@_OnPlayerEditDynamicObject
+ALS_FORWARD<PlayerEditDynamicObject>
+
+public OnPlayerSelectDynamicObject(playerid, objectid, modelid, Float:x, Float:y, Float:z)
+{
+	P:2("Hooks_OnPlayerSelectDynamicObject called: %d, %d, %d, %f, %f, %f", playerid, objectid, modelid, x, y, z);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnPlayerSelectDynamicObject][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnPlayerSelectDynamicObject][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_PlayerSelectDynamicObject;
+	if (start == end)
+	{
+		P:2("Hooks_OnPlayerSelectDynamicObject end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerSelectDynamicObject));
+		HOOK_CALL<PlayerSelectDynamicObject>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S z
+		#emit PUSH.S y
+		#emit PUSH.S x
+		#emit PUSH.S modelid
+		#emit PUSH.S objectid
+		#emit PUSH.S playerid
+		#emit PUSH.C     24
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerSelectDynamicObject");
+		#emit PUSH.S z
+		#emit PUSH.S y
+		#emit PUSH.S x
+		#emit PUSH.S modelid
+		#emit PUSH.S objectid
+		#emit PUSH.S playerid
+		#emit PUSH.C     24
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnPlayerSelectDynamicObject end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerSelectDynamicObject));
+	HOOK_RETURN<PlayerSelectDynamicObject>
+}
+#if defined _ALS_OnPlayerSelectDynamicObj
+	#undef OnPlayerSelectDynamicObject
+#else
+	#define _ALS_OnPlayerSelectDynamicObj
+#endif
+#define OnPlayerSelectDynamicObject S@@_OnPlayerSelectDynamicObject
+ALS_FORWARD<PlayerSelectDynamicObject>
+
+public OnPlayerPickUpDynamicPickup(playerid, pickupid)
+{
+	P:2("Hooks_OnPlayerPickUpDynamicPickup called: %d, %d", playerid, pickupid);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnPlayerPickUpDynamicPickup][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnPlayerPickUpDynamicPickup][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_PlayerPickUpDynamicPickup;
+	if (start == end)
+	{
+		P:2("Hooks_OnPlayerPickUpDynamicPickup end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerPickUpDynamicPickup));
+		HOOK_CALL<PlayerPickUpDynamicPickup>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S pickupid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerPickUpDynamicPickup");
+		#emit PUSH.S pickupid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnPlayerPickUpDynamicPickup end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerPickUpDynamicPickup));
+	HOOK_RETURN<PlayerPickUpDynamicPickup>
+}
+#if defined _ALS_OnPlayerPickUpDynamicPUp
+	#undef OnPlayerPickUpDynamicPickup
+#else
+	#define _ALS_OnPlayerPickUpDynamicPUp
+#endif
+#define OnPlayerPickUpDynamicPickup S@@_OnPlayerPickUpDynamicPickup
+ALS_FORWARD<PlayerPickUpDynamicPickup>
+
+public OnPlayerEnterDynamicCP(playerid, checkpointid)
+{
+	P:2("Hooks_OnPlayerEnterDynamicCP called: %d, %d", playerid, checkpointid);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnPlayerEnterDynamicCP][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnPlayerEnterDynamicCP][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_PlayerEnterDynamicCP;
+	if (start == end)
+	{
+		P:2("Hooks_OnPlayerEnterDynamicCP end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEnterDynamicCP));
+		HOOK_CALL<PlayerEnterDynamicCP>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S checkpointid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerEnterDynamicCP");
+		#emit PUSH.S checkpointid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnPlayerEnterDynamicCP end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEnterDynamicCP));
+	HOOK_RETURN<PlayerEnterDynamicCP>
+}
+#if defined _ALS_OnPlayerEnterDynamicCP
+	#undef OnPlayerEnterDynamicCP
+#else
+	#define _ALS_OnPlayerEnterDynamicCP
+#endif
+#define OnPlayerEnterDynamicCP S@@_OnPlayerEnterDynamicCP
+ALS_FORWARD<PlayerEnterDynamicCP>
+
+public OnPlayerLeaveDynamicCP(playerid, checkpointid)
+{
+	P:2("Hooks_OnPlayerLeaveDynamicCP called: %d, %d", playerid, checkpointid);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnPlayerLeaveDynamicCP][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnPlayerLeaveDynamicCP][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_PlayerLeaveDynamicCP;
+	if (start == end)
+	{
+		P:2("Hooks_OnPlayerLeaveDynamicCP end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerLeaveDynamicCP));
+		HOOK_CALL<PlayerLeaveDynamicCP>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S checkpointid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerLeaveDynamicCP");
+		#emit PUSH.S checkpointid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnPlayerLeaveDynamicCP end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerLeaveDynamicCP));
+	HOOK_RETURN<PlayerLeaveDynamicCP>
+}
+#if defined _ALS_OnPlayerLeaveDynamicCP
+	#undef OnPlayerLeaveDynamicCP
+#else
+	#define _ALS_OnPlayerLeaveDynamicCP
+#endif
+#define OnPlayerLeaveDynamicCP S@@_OnPlayerLeaveDynamicCP
+ALS_FORWARD<PlayerLeaveDynamicCP>
+
+public OnPlayerEnterDynamicRaceCP(playerid, checkpointid)
+{
+	P:2("Hooks_OnPlayerEnterDynamicRaceCP called: %d, %d", playerid, checkpointid);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnPlayerEnterDynamicRaceCP][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnPlayerEnterDynamicRaceCP][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_PlayerEnterDynamicRaceCP;
+	if (start == end)
+	{
+		P:2("Hooks_OnPlayerEnterDynamicRaceCP end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEnterDynamicRaceCP));
+		HOOK_CALL<PlayerEnterDynamicRaceCP>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S checkpointid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerEnterDynamicRaceCP");
+		#emit PUSH.S checkpointid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnPlayerEnterDynamicRaceCP end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEnterDynamicRaceCP));
+	HOOK_RETURN<PlayerEnterDynamicRaceCP>
+}
+#if defined _ALS_OnPlayerEnterDynamicRaceCP
+	#undef OnPlayerEnterDynamicRaceCP
+#else
+	#define _ALS_OnPlayerEnterDynamicRaceCP
+#endif
+#define OnPlayerEnterDynamicRaceCP S@@_OnPlayerEnterDynamicRaceCP
+ALS_FORWARD<PlayerEnterDynamicRaceCP>
+
+public OnPlayerLeaveDynamicRaceCP(playerid, checkpointid)
+{
+	P:2("Hooks_OnPlayerLeaveDynamicRaceCP called: %d, %d", playerid, checkpointid);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnPlayerLeaveDynamicRaceCP][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnPlayerLeaveDynamicRaceCP][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_PlayerLeaveDynamicRaceCP;
+	if (start == end)
+	{
+		P:2("Hooks_OnPlayerLeaveDynamicRaceCP end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerLeaveDynamicRaceCP));
+		HOOK_CALL<PlayerLeaveDynamicRaceCP>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S checkpointid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerLeaveDynamicRaceCP");
+		#emit PUSH.S checkpointid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnPlayerLeaveDynamicRaceCP end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerLeaveDynamicRaceCP));
+	HOOK_RETURN<PlayerLeaveDynamicRaceCP>
+}
+#if defined _ALS_OnPlayerLeaveDynamicRaceCP
+	#undef OnPlayerLeaveDynamicRaceCP
+#else
+	#define _ALS_OnPlayerLeaveDynamicRaceCP
+#endif
+#define OnPlayerLeaveDynamicRaceCP S@@_OnPlayerLeaveDynamicRaceCP
+ALS_FORWARD<PlayerLeaveDynamicRaceCP>
+
+public OnPlayerEnterDynamicArea(playerid, areaid)
+{
+	P:2("Hooks_OnPlayerEnterDynamicArea called: %d, %d", playerid, areaid);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnPlayerEnterDynamicArea][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnPlayerEnterDynamicArea][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_PlayerEnterDynamicArea;
+	if (start == end)
+	{
+		P:2("Hooks_OnPlayerEnterDynamicArea end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEnterDynamicArea));
+		HOOK_CALL<PlayerEnterDynamicArea>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S areaid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerEnterDynamicArea");
+		#emit PUSH.S areaid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnPlayerEnterDynamicArea end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerEnterDynamicArea));
+	HOOK_RETURN<PlayerEnterDynamicArea>
+}
+#if defined _ALS_OnPlayerEnterDynamicArea
+	#undef OnPlayerEnterDynamicArea
+#else
+	#define _ALS_OnPlayerEnterDynamicArea
+#endif
+#define OnPlayerEnterDynamicArea S@@_OnPlayerEnterDynamicArea
+ALS_FORWARD<PlayerEnterDynamicArea>
+
+public OnPlayerLeaveDynamicArea(playerid, areaid)
+{
+	P:2("Hooks_OnPlayerLeaveDynamicArea called: %d, %d", playerid, areaid);
+	new
+		end   = YSI_g_sCallbackData[ALS_OnPlayerLeaveDynamicArea][E_FUNC_HOOK_DATA_END],
+		start = YSI_g_sCallbackData[ALS_OnPlayerLeaveDynamicArea][E_FUNC_HOOK_DATA_START],
+		ret = ALS_R_PlayerLeaveDynamicArea;
+	if (start == end)
+	{
+		P:2("Hooks_OnPlayerLeaveDynamicArea end 1: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerLeaveDynamicArea));
+		HOOK_CALL<PlayerLeaveDynamicArea>
+	}
+	new
+		idx,
+		pointer,
+		re = end;
+	if (end > sizeof (YSI_g_sCallbackAddresses))
+	{
+		re = sizeof (YSI_g_sCallbackAddresses);
+		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
+	}
+	// Do the initial fast elements.
+	while (start != re)
+	{
+		pointer = YSI_g_sCallbackAddresses[start++];
+		#emit PUSH.S areaid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Get any remaining pointers the old way.
+	while (start++ != end)
+	{
+		idx = AMX_GetPublicPointer(idx, pointer, "@yH_PlayerLeaveDynamicArea");
+		#emit PUSH.S areaid
+		#emit PUSH.S playerid
+		#emit PUSH.C     8
+		#emit LCTRL      6
+		#emit ADD.C      28
+		#emit PUSH.pri
+		#emit LOAD.S.pri pointer
+		#emit SCTRL      6
+		#emit CONST.alt  0xFFFFFFFF
+		#emit STOR.S.pri ret
+		#emit JEQ        hooks_do_hooks_call_no_als
+	}
+	// Do ALS just in case (YSI no longer uses this though now).
+	P:2("Hooks_OnPlayerLeaveDynamicArea end 2: %d %d", ret, _:Bit_GetBit(Bit:gs_ALS, _:ALS_OnPlayerLeaveDynamicArea));
+	HOOK_RETURN<PlayerLeaveDynamicArea>
+}
+#if defined _ALS_OnPlayerLeaveDynamicArea
+	#undef OnPlayerLeaveDynamicArea
+#else
+	#define _ALS_OnPlayerLeaveDynamicArea
+#endif
+#define OnPlayerLeaveDynamicArea S@@_OnPlayerLeaveDynamicArea
+ALS_FORWARD<PlayerLeaveDynamicArea>
 
 #undef ALS_PREFIX
