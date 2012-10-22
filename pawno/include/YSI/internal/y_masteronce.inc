@@ -121,6 +121,13 @@ Natives:
 
 #define _YSIM_COMPARE -1
 
+#define MASTER_DATA<%0> static stock Bit:YSI_g_sMasterData[_:(%0)];
+#define MASTER_RESET<%0> YSI_g_sMasterData[_:(%0)] = Bit:0;
+#define MASTER_SET<%0> YSI_g_sMasterData[_:(%0)] = Bit:(1 << Master_Caller());
+#define MASTER_ADD<%0> YSI_g_sMasterData[_:(%0)] |= Bit:(1 << Master_Caller());
+#define MASTER_REMOVE<%0> YSI_g_sMasterData[_:(%0)] &= Bit:(~(1 << Master_Caller()));
+#define MASTER_EMPTY<%0> if(!YSI_g_sMasterData[_:(%0)])
+
 #if defined YSI_IS_CLIENT
 	#if NO_VALUE(YSI_IS_CLIENT)
 		#undef YSI_IS_CLIENT

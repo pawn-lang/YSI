@@ -59,8 +59,10 @@ Changelog:
 \*----------------------------------------------------------------------------*/
 
 #include <a_samp>
-//#include "..\y_scriptinit"
 
+#include "..\y_scriptinit"
+
+//#include "..\y_master"
 #define YSIM_U_DISABLE
 #include "..\y_master"
 #include "..\y_playerarray"
@@ -296,6 +298,8 @@ static stock
 	//BitArray:YSI_g_sChildDefaults<_MAX_GROUPS_G>,
 	Iterator:GroupPlayers[_MAX_GROUPS_G]<MAX_PLAYERS>;
 
+MASTER_DATA<_MAX_GROUPS_G>
+
 //#define GROUP_BITS<%0> BitArray:%0<_MAX_GROUPS_G>,
 
 #define _Group_HasPlayer(%0,%1) \
@@ -392,15 +396,22 @@ Notes:
 	_yGU - An update function called when a player's groups change.
 \*----------------------------------------------------------------------------*/
 
-hook OnScriptInit()
+public _YSI_SpecialInit()
 {
 	state YSI_has_groups:y;
 	// Set up the global groups.
-	Iter_Init(GroupPlayers);
-	strpack(YSI_gGroupData[_MAX_GROUPS][E_GROUP_DATA_NAME], YSI_g_scGlobalName, MAX_GROUP_NAME char);
-	YSI_gGroupData[_MAX_GROUPS][E_GROUP_DATA_FLAGS] = e_GROUP_FLAGS_ACTIVE | e_GROUP_FLAGS_GLOBAL;
-	YSI_gGroupData[_MAX_GROUPS][E_GROUP_DATA_HASH] = YHash(YSI_g_scGlobalName);
-	Bit_Let(YSI_g_sChildGroups[_MAX_GROUPS], _:_MAX_GROUPS);
+	#if !(YSIM_HAS_MASTER && (_YSIM_IS_STUB || _YSIM_IS_CLIENT))
+		#if _YSIM_IS_CLOUD
+			if (_YCM@y)
+		#endif
+			{
+				Iter_Init(GroupPlayers);
+				strpack(YSI_gGroupData[_MAX_GROUPS][E_GROUP_DATA_NAME], YSI_g_scGlobalName, MAX_GROUP_NAME char);
+				YSI_gGroupData[_MAX_GROUPS][E_GROUP_DATA_FLAGS] = e_GROUP_FLAGS_ACTIVE | e_GROUP_FLAGS_GLOBAL;
+				YSI_gGroupData[_MAX_GROUPS][E_GROUP_DATA_HASH] = YHash(YSI_g_scGlobalName);
+				Bit_Let(YSI_g_sChildGroups[_MAX_GROUPS], _:_MAX_GROUPS);
+			}
+	#endif
 	// Call the other group init functions.
 	new
 		ni = AMX_GetPublicPointerPrefix(0, YSI_g_sNextInitFunc, _A<_yGI>),
@@ -409,6 +420,62 @@ hook OnScriptInit()
 	//printf("Group_OnScriptInit: %d, %d, %d", ni, na, nu);
 	P:5("Group_OnScriptInit: %d, %d, %d", ni, na, nu);
 	GROUP_CHAIN?<YSI_g_sNextInitFunc>(ni, na, nu);
+	CallLocalFunction("_Group_SpecialInit", "");
+}
+
+#undef _YSI_SpecialInit
+#define _YSI_SpecialInit _Group_SpecialInit
+forward _YSI_SpecialInit();
+
+/*----------------------------------------------------------------------------*\
+Function:
+	OnScriptExit
+Params:
+	-
+Return:
+	-
+Notes:
+	Destroy all this script's groups.  This is an instance of "_YSI_SpecialExit"
+	which can't be y_hooked and is called after (almost) every other callback,
+	at least after every one controlled via y_scriptinit.
+\*----------------------------------------------------------------------------*/
+
+public _YSI_SpecialExit()
+{
+	_Group_TryRemove();
+	CallLocalFunction("_Group_SpecialExit", "");
+}
+
+#undef _YSI_SpecialExit
+#define _YSI_SpecialExit _Group_SpecialExit
+forward _YSI_SpecialExit();
+
+/*----------------------------------------------------------------------------*\
+Function:
+	_Group_TryRemove
+Params:
+	-
+Return:
+	-
+Notes:
+	Removes all groups purely owned by the calling script.
+\*----------------------------------------------------------------------------*/
+
+foreign _Group_TryRemove();
+
+global _Group_TryRemove()
+{
+	for (new i = 0; i != _MAX_GROUPS; ++i)
+	{
+		MASTER_REMOVE<i>
+		MASTER_EMPTY<i>
+		{
+			broadcastfunc _Group_Destroy(i, Iter_InternalArray(GroupPlayers[i]), Iter_InternalSize(GroupPlayers[i]));
+			YSI_gGroupData[i][E_GROUP_DATA_FLAGS] = e_GROUP_FLAGS:0;
+			YSI_gGroupData[i][E_GROUP_DATA_HASH] = 0;
+			Iter_Clear(GroupPlayers[i]);
+		}
+	}
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1122,7 +1189,11 @@ global Group:_Group_Create(string:name[])
 	{
 		// Get a group of the same name if it already exists.
 		i = _:Group_GetID(name);
-		if (i != _:INVALID_GROUP) return Group:i;
+		if (i != _:INVALID_GROUP)
+		{
+			MASTER_ADD<i>
+			return Group:i;
+		}
 	}
 	i = 0;
 	while (i != _MAX_GROUPS && _Group_IsActive(i))
@@ -1145,6 +1216,7 @@ global Group:_Group_Create(string:name[])
 			P:E("Group %d has hash 0.", name);
 		}
 	}
+	MASTER_SET<i>
 	++YSI_g_sGroupCount;
 	// Reset the group members iterator.
 	//Iter_Clear(GroupPlayers[i]);

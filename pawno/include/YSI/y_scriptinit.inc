@@ -73,6 +73,7 @@ forward _ScriptInit_FixState();
 	public OnFilterScriptInit()
 	{
 		state _script_init_fix_state : true;
+		CallLocalFunction("__YSI_SpecialInit", "");
 		CallLocalFunction("ScriptInit_OnScriptInit", "");
 		#if defined YSI_LOCK_MODE
 			if (strlen(YSI_gLockData[5]) !=
@@ -112,6 +113,7 @@ forward _ScriptInit_FixState();
 		state _script_init_fix_state : true;
 		//printf("OFSI");
 		YSI_FILTERSCRIPT = true;
+		CallLocalFunction("__YSI_SpecialInit", "");
 		YSI_g_sScriptInitGM = funcidx("ScriptInit_OnGameModeInit") != -1;
 		YSI_g_sScriptExitGM = funcidx("ScriptInit_OnGameModeExit") != -1;
 		CallLocalFunction("ScriptInit_OnScriptInit", "");
@@ -128,7 +130,6 @@ forward _ScriptInit_FixState();
 		//CallRemoteFunction("ScriptInit_OnAnyScriptInit", "");
 		CallLocalFunction("ScriptInit_OnFilterScriptInit", "");
 		//CallLocalFunction("ScriptInit_OnScriptInitLate", "");
-		//CallLocalFunction("Text_SpecialInit", "");
 	}
 	
 	public OnGameModeInit()
@@ -144,6 +145,7 @@ forward _ScriptInit_FixState();
 		else
 		{
 			state _script_init_fix_state : false;
+			CallLocalFunction("__YSI_SpecialInit", "");
 			CallLocalFunction("ScriptInit_OnScriptInit", "");
 			#if defined YSI_LOCK_MODE
 				if (YSI_gLockData[
@@ -192,6 +194,7 @@ forward _ScriptInit_FixState();
 		//CallRemoteFunction("ScriptInit_OnAnyScriptExit", "");
 		CallLocalFunction("ScriptInit_OnFilterScriptExit", "");
 		//CallLocalFunction("ScriptInit_OnScriptExitLate", "");
+		CallLocalFunction("__YSI_SpecialExit", "");
 	}
 	
 	#if defined _ALS_OnFilterScriptExit
@@ -211,9 +214,10 @@ forward _ScriptInit_FixState();
 			//CallRemoteFunction("ScriptInit_OnAnyScriptExit", "");
 			CallLocalFunction("ScriptInit_OnFilterScriptExit", "");
 			//CallLocalFunction("ScriptInit_OnScriptExitLate", "");
+			CallLocalFunction("__YSI_SpecialExit", "");
 		}
 	}
-
+	
 	public OnGameModeExit()
 	{
 		//printf("ScriptInit_OnGameModeExit");
@@ -233,6 +237,7 @@ forward _ScriptInit_FixState();
 			CallLocalFunction("ScriptInit_OnGameModeExit", "");
 			//printf("NF 2");
 			//CallLocalFunction("ScriptInit_OnScriptExitLate", "");
+			CallLocalFunction("__YSI_SpecialExit", "");
 		}
 	}
 	
@@ -255,10 +260,20 @@ forward _ScriptInit_FixState();
 #endif
 
 #define OnScriptInit ScriptInit_OnScriptInit
+#define _ALS_OnScriptInit
 forward OnScriptInit();
 
 #define OnScriptExit ScriptInit_OnScriptExit
+#define _ALS_OnScriptExit
 forward OnScriptExit();
+
+#define _YSI_SpecialInit __YSI_SpecialInit
+#define _ALS__YSI_SpecialInit
+forward _YSI_SpecialInit();
+
+#define _YSI_SpecialExit __YSI_SpecialExit
+#define _ALS__YSI_SpecialExit
+forward _YSI_SpecialExit();
 
 /*#define OnScriptInitLate ScriptInit_OnScriptInitLate
 forward OnScriptInitLate();

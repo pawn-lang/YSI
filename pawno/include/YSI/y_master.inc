@@ -1459,7 +1459,7 @@ Natives:
 				//#define RP@v:%1[%2](%3) forward @%1(%3);@%1(%3)<>{}@%1(%3)<_YCM:y>%1(%3);static %1(%3)<>U@(8,YSIM_CALLER,_@),W@(#@%1,(x:#%2#),%3),U@(8,YSIM_CALLER,-1);static %1(%3)<_YCM:y>
 				
 				#define Master_Caller() \
-					((V@(8,YSIM_CALLER)==-1)?(_@):(V@(8,YSIM_CALLER)))
+					(((I@=V@(8,YSIM_CALLER))==-1)?(_@):(I@))
 				
 				// Remote local - only calls the local version if we're master,
 				// doesn't call the remote version.
