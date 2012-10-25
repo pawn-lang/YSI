@@ -255,15 +255,20 @@ static Hooks_OnScriptInit()
 	//HOOKS_DO_ONE_CALLBACK<GameModeExit>
 	//HOOKS_DO_ONE_CALLBACK<FilterScriptInit>
 	//HOOKS_DO_ONE_CALLBACK<FilterScriptExit>
+	//printf(" ");
 	ALS_DETECT<ScriptInit>
 	ALS_DETECT<ScriptExit>
 	ALS_DETECT<GameModeInit>
 	ALS_DETECT<GameModeExit>
 	ALS_DETECT<FilterScriptInit>
 	ALS_DETECT<FilterScriptExit>
+	printf(" ");
+	for (new i = 0; i != 1000000; ++i) {}
+	printf(" ");
 	Hooks_FindAll(#ScriptInit, cidx, YSI_g_sCallbackData[ALS_OnScriptInit]);
 	if (YSI_FILTERSCRIPT)
 	{
+		//printf(" ");
 		if (!(Hooks_FindAll(#FilterScriptExit, cidx, YSI_g_sCallbackData[ALS_OnFilterScriptExit]) + Hooks_FindAll(#ScriptExit, cidx, YSI_g_sCallbackData[ALS_OnScriptExit])))
 		{
 			Hooks_RedirectPublic(#OnFilterScriptExit, #S@@_OnFilterScriptExit);
@@ -273,9 +278,11 @@ static Hooks_OnScriptInit()
 		HOOKS_DO_ONE_CALLBACK<GameModeInit>
 		HOOKS_DO_ONE_CALLBACK<GameModeExit>
 		//Hooks_FindAll(#FilterScriptExit, cidx, YSI_g_sCallbackData[ALS_OnFilterScriptExit], count);
+		//printf("d");
 	}
 	else
 	{
+		printf(" ");
 		if (!(Hooks_FindAll(#GameModeExit, cidx, YSI_g_sCallbackData[ALS_OnGameModeExit]) + Hooks_FindAll(#ScriptExit, cidx, YSI_g_sCallbackData[ALS_OnScriptExit])))
 		{
 			Hooks_RedirectPublic(#OnGameModeExit, #S@@_OnGameModeExit);
@@ -333,6 +340,7 @@ static Hooks_OnScriptInit()
 	HOOKS_DO_ONE_CALLBACK<PlayerEditObject>
 	HOOKS_DO_ONE_CALLBACK<PlayerEditAttachedObject>
 	HOOKS_DO_ONE_CALLBACK<PlayerSelectObject>
+	//printf("e");
 	// Streamer plugin.
 	#if defined _YSI_PLUGINS_STREAMER
 		HOOKS_DO_ONE_CALLBACK<DynamicObjectMoved>
@@ -390,6 +398,7 @@ hooks_do_hooks_call_no_als:
 		re = sizeof (YSI_g_sCallbackAddresses);
 		if (start != sizeof (YSI_g_sCallbackAddresses)) idx = YSI_g_sLastFoundIndex;
 	}
+	//printf("f");
 	// Do the initial fast elements.
 	while (start != re)
 	{
@@ -759,7 +768,7 @@ public OnFilterScriptInit()
 		}*/
 	#endif
 	//Hooks_OnAnyScriptInit();
-	YSI_FILTERSCRIPT = true;
+	//YSI_FILTERSCRIPT = true;
 	new
 		end   = YSI_g_sCallbackData[ALS_OnFilterScriptInit][E_FUNC_HOOK_DATA_END],
 		start = YSI_g_sCallbackData[ALS_OnFilterScriptInit][E_FUNC_HOOK_DATA_START],

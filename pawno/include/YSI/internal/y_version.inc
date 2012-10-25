@@ -157,6 +157,8 @@ Natives:
 				YSI_gLockData[1] = (YSI_gLockData[2] - YSI_gLockData[3]) / 2 + YSI_gLockData[3];
 			#endif
 			print(" ");
+			print(" ");
+			print(" ");
 			print(" ======================================= ");
 			print(" |                                     | ");
 			print(" |        YSI version " YSI_VERSION "        | ");
@@ -195,6 +197,8 @@ Natives:
 			YSI_gLockData[0] -= 1;
 			YSI_gLockData[1] = YSI_gLockData[0] + 7;
 		#endif
+		print(" ");
+		print(" ");
 		print(" ");
 		print(" ======================================= ");
 		print(" |                                     | ");
