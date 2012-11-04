@@ -345,6 +345,30 @@ stock Debug_Print0(str[], {Float,_}:...) <>
 	#pragma unused str
 }
 
+stock Debug_PrintArray(arr[], size)
+{
+	new
+		str[96];
+	switch (size)
+	{
+		case 0:
+			str = "<>";
+		case 1:
+			format(str, sizeof (str), "<%d>", arr[0]);
+		case 2:
+			format(str, sizeof (str), "<%d, %d>", arr[0], arr[1]);
+		case 3:
+			format(str, sizeof (str), "<%d, %d, %d>", arr[0], arr[1], arr[2]);
+		case 4:
+			format(str, sizeof (str), "<%d, %d, %d, %d>", arr[0], arr[1], arr[2], arr[3]);
+		case 5:
+			format(str, sizeof (str), "<%d, %d, %d, %d, %d>", arr[0], arr[1], arr[2], arr[3], arr[4]);
+		default:
+			format(str, sizeof (str), "<%d, %d, %d, %d, %d, ... (+ %d)>", arr[0], arr[1], arr[2], arr[3], arr[4], size - 5);
+	}
+	return str;
+}
+
 /*#if _DEBUG > 0
 	#define Debug_Print0(%1); \
 		printf(%1);

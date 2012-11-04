@@ -77,6 +77,7 @@ stock Class_ResolveGroups(class, Group:forgroup, bool:cp) <YSI_has_groups:y>
 		{
 			// el.
 		}*/
-		Group_ExclusiveClass(forgroup, class);
+		if (forgroup == Group:-1) Group_ExclusiveClass(GROUP_GLOBAL, class);
+		else Group_ExclusiveClass(forgroup, class);
 	}
 }

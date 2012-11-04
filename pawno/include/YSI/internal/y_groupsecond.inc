@@ -277,16 +277,21 @@ gforeign Group_Exclusive...(Group:g,_GROUP_MAKE_TAG:el);
 
 gglobal Group_Exclusive...(Group:g,_GROUP_MAKE_TAG:el)
 {
-	YSI_gTempGroups = _GROUP_DEFAULTS;
-	_GROUP_DEFAULTS = YSI_g_cEmptyGroups;
-	Bit_Let(_GROUP_DEFAULTS, _:g);
-	for (new i = 0; i != bits<_MAX_GROUPS_G>; ++i)
+	if (GROUP_MASK <= g <= GROUP_GLOBAL)
 	{
-		YSI_g_sEmpty[i] = ~_GROUP_DEFAULTS[i];
+		GROUP_FIX(g);
+		YSI_gTempGroups = _GROUP_DEFAULTS;
+		_GROUP_DEFAULTS = YSI_g_cEmptyGroups;
+		Bit_Let(_GROUP_DEFAULTS, _:g);
+		for (new i = 0; i != bits<_MAX_GROUPS_G>; ++i)
+		{
+			YSI_g_sEmpty[i] = ~_GROUP_DEFAULTS[i];
+		}
+		_GROUP_INITIALISE(el);
+		_GROUP_DEFAULTS = YSI_gTempGroups;
+		YSI_g_sEmpty = YSI_g_cEmptyGroups;
+		return 1;
 	}
-	_GROUP_INITIALISE(el);
-	_GROUP_DEFAULTS = YSI_gTempGroups;
-	YSI_g_sEmpty = YSI_g_cEmptyGroups;
 	return 0;
 }
 
