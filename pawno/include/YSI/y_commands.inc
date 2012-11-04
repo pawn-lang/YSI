@@ -2295,6 +2295,7 @@ Notes:
 	mhook OnPlayerCommandText(playerid, cmdtext[])
 	{
 		P:1("Commands_OnPlayerCommandText");
+		if (isnull(cmdtext)) return Command_UnknownReturn();
 		if (YSI_g_sCommandFlags & e_COMM_FLAG_OPCR)
 		{
 			switch (CallRemoteFunction("OnPlayerCommandReceived", "is", playerid, cmdtext))
