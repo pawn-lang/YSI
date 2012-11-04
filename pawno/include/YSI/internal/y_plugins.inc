@@ -54,6 +54,7 @@ Changelog:
 		First version
 \*----------------------------------------------------------------------------*/
 
+// All the code in here relies on detecting FEATURES, not FILENAMES.
 #if defined Streamer_IncludeFileVersion
 	#define _YSI_PLUGINS_STREAMER
 	
@@ -89,3 +90,21 @@ Changelog:
 #if defined WP_Hash
 	#define _YSI_PLUGINS_WHIRLPOOL
 #endif
+
+/*
+#if defined mysql_function_query
+	// BlueG R7 MySQL
+	#define _YSI_PLUGINS_MYSQL 7
+#elseif defined mysql_init
+	// StrickenKid MySQL
+	#define _YSI_PLUGINS_MYSQL 1
+#elseif defined mysql_debug
+	// BlueG R5/R6 MySQL
+	#define _YSI_PLUGINS_MYSQL 6
+#else
+	// No MySQL
+*/
+	#define _YSI_PLUGINS_MYSQL 0
+/*
+#endif
+*/
