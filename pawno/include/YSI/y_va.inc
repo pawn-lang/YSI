@@ -399,9 +399,10 @@ stock va_format(out[], size, const fmat[], va_:STATIC_ARGS)
 
 stock va_return(const fmat[], va_:STATIC_ARGS)
 {
+	static
+		out[YSI_MAX_STRING * 8],
+		size = YSI_MAX_STRING;
 	new
-		out[YSI_MAX_STRING],
-		size = YSI_MAX_STRING,
 		num_args,
 		arg_start,
 		arg_end;
@@ -433,8 +434,8 @@ stock va_return(const fmat[], va_:STATIC_ARGS)
 	}
 	// Push the additional parameters.
 	#emit PUSH.S       fmat
-	#emit PUSH.S       size
-	#emit PUSH.ADR     out
+	#emit PUSH         size
+	#emit PUSH.C       out
 	// Push the argument count.
 	#emit LOAD.S.pri   num_args
 	#emit ADD.C        12
