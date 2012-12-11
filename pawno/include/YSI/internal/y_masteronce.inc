@@ -369,7 +369,7 @@ Notes:
 	the master system is disabled - doing otherwise is just too complicated.
 \*----------------------------------------------------------------------------*/
 
-hook OnScriptInit()
+public OnScriptInit()
 {
 	P:1("Master_OGM");
 	if (!existproperty(8, YSIM_MASTER))
@@ -400,8 +400,12 @@ hook OnScriptInit()
 	// all the ones which use the master system.
 	CallLocalFunction("YSIM_OnMasterSystemInit", "");
 	// Just use one name...
-	return 1;
+	CallLocalFunction("Master_OnScriptInit", "");
 }
+
+#undef OnScriptInit
+#define OnScriptInit Master_OnScriptInit
+forward OnScriptInit();
 
 #define OnMasterSystemInit YSIM_OnMasterSystemInit
 forward OnMasterSystemInit();

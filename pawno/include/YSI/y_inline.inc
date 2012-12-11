@@ -142,7 +142,7 @@ Changelog:
 #define callback_tag:callback_check:%0,%1£££ callback_tag:%0[],%1)
 #define callback_check:%0£££ %0[])
 
-#define anonymous%0(%1) Q@=#_YI@CA;for(new%1,,;Inline_Loop(INLINE_LOOP_PATTERNS,%0__,":...:"#);)
+#define anonymous%0(%1) new __anonVar;Q@=#_YI@CA;for(new%1,,;Inline_Loop(INLINE_LOOP_PATTERNS,__anonVar,":...:"#);)
 
 #define _YI@CP;for(new%0,%1; @Ia#@Ib#@Ic#@Id#:;for(new @Iz|||%0|||%1;
 

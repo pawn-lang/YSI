@@ -242,6 +242,10 @@ public OnScriptInit()
 	CallLocalFunction("AMX_OnScriptInit", "");
 }
 
+#undef OnScriptInit
+#define OnScriptInit AMX_OnScriptInit
+forward OnScriptInit();
+
 stock AMX_GetGlobalAddress(...)
 {
 	new
@@ -302,10 +306,6 @@ static AMX_GetGlobal()
 	// Find base address, not cod address (both operands relative to DAT.
 	return 0;
 }
-
-#undef OnScriptInit
-#define OnScriptInit AMX_OnScriptInit
-forward OnScriptInit();
 
 stock AMX_TraceCode(pattern[], &addrRet, &dataRet, size = sizeof (pattern))
 {

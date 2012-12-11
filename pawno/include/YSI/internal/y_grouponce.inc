@@ -396,7 +396,7 @@ Notes:
 	_yGU - An update function called when a player's groups change.
 \*----------------------------------------------------------------------------*/
 
-public _YSI_SpecialInit()
+public OnScriptInit()
 {
 	state YSI_has_groups:y;
 	// Set up the global groups.
@@ -405,6 +405,7 @@ public _YSI_SpecialInit()
 			if (_YCM@y)
 		#endif
 			{
+				P:5("Group_OnScriptInit: Master");
 				Iter_Init(GroupPlayers);
 				strpack(YSI_gGroupData[_MAX_GROUPS][E_GROUP_DATA_NAME], YSI_g_scGlobalName, MAX_GROUP_NAME char);
 				YSI_gGroupData[_MAX_GROUPS][E_GROUP_DATA_FLAGS] = e_GROUP_FLAGS_ACTIVE | e_GROUP_FLAGS_GLOBAL;
@@ -423,9 +424,9 @@ public _YSI_SpecialInit()
 	CallLocalFunction("_Group_SpecialInit", "");
 }
 
-#undef _YSI_SpecialInit
-#define _YSI_SpecialInit _Group_SpecialInit
-forward _YSI_SpecialInit();
+#undef OnScriptInit
+#define OnScriptInit _Group_SpecialInit
+forward OnScriptInit();
 
 /*----------------------------------------------------------------------------*\
 Function:
