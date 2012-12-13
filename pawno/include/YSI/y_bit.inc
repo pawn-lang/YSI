@@ -347,7 +347,7 @@ stock Bits@YSII_Ag(BitArray:data<>, start, size = sizeof (data))
 		return -1;
 	}
 	// Blank out the lowest bits to get the lowest bit not yet used.
-	if ((cur = (_:data[i] & ~(1 << (start & cellbits) - 1))))
+	if ((cur = (_:data[i] & ~(1 << (start & (cellbits - 1)) - 1))))
 	{
 		// Bits left in the current cell.
 		return (i * cellbits) + scDeBruijn[((cur & -cur) * 0x077CB531) >>> 27];
@@ -381,7 +381,7 @@ stock Blanks@YSII_Ag(BitArray:data<>, start, size = sizeof (data))
 	{
 		return -1;
 	}
-	if ((cur = ~(_:(data[i] & ~(1 << (start & cellbits) - 1)))))
+	if ((cur = ~(_:(data[i] & ~(1 << (start & (cellbits - 1)) - 1)))))
 	{
 		// Bits left in the current cell.
 		return (i * cellbits) + scDeBruijn[((cur & -cur) * 0x077CB531) >>> 27];

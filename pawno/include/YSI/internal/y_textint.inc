@@ -1222,6 +1222,8 @@ static stock Text_AddEntry(set, name[], value[], hash)
 	//strcpy(YSI_g_sTextEntries[entry][e_TEXT_ENTRY_NAME], name, MAX_INI_ENTRY_NAME * 4);
 	YSI_g_sTextEntries[entry][e_TEXT_ENTRY_HASH] = hash;
 	YSI_g_sTextEntries[entry][e_TEXT_ENTRY_POINTERS][YSI_g_sLangIndex] = slot;
+	// Set the default style.
+	_Style_Init(entry);
 	// Insert the identifier.
 	new
 		idx = YSI_g_sTextSets[set][e_TEXT_SETS_INDEX],

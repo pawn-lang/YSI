@@ -350,11 +350,16 @@ Notes:
 
 stock _Group_AddInternal(a, Group:g)
 {
+	//printf("_Group_AddInternal %d %d", a, _:g);
 	if (_Group_IsValid(g))
 	{
 		broadcastfunc __Group_AddInternal(a, _:GROUP_TEMP_FIX(g));
+		return a;
 	}
-	return a;
+	else
+	{
+		return 0;
+	}
 }
 
 static remotefunc __Group_AddInternal(a,g)
@@ -398,6 +403,7 @@ Notes:
 
 public OnScriptInit()
 {
+	P:1("Group_OnScriptInit called");
 	state YSI_has_groups:y;
 	// Set up the global groups.
 	#if !(YSIM_HAS_MASTER && (_YSIM_IS_STUB || _YSIM_IS_CLIENT))
