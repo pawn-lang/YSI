@@ -1193,7 +1193,7 @@ global Group:_Group_Create(string:name[])
 		i = _:Group_GetID(name);
 		if (i != _:INVALID_GROUP)
 		{
-			MASTER_ADD<i>
+			MASTER_ADD<_:GROUP_TEMP_FIX(Group:i)>
 			return Group:i;
 		}
 	}
