@@ -112,6 +112,8 @@ enum E_AMX_TABLE
 #define AMX_PUSH_C                      039
 #define AMX_CALL                        049
 #define AMX_STACK                       044
+#define AMX_PUSH_PRI                    036
+#define AMX_CONST_PRI                   011
 
 forward _@_y_amx_inc_@_();
 public _@_y_amx_inc_@_()

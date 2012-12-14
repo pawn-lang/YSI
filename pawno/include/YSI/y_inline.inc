@@ -219,6 +219,7 @@ static stock Inline_DoFormat(data[])
 		//len = 0, //strlen(data),
 		//bit = 1,
 		total = 1;
+	//printf("%s", data);
 	//P:C(if (len - pos - 1 > 30) P:E("Inline functions only support up to 30 parameters"););
 	if (pos != -1)
 	{
@@ -237,7 +238,7 @@ static stock Inline_DoFormat(data[])
 				}
 				default:
 				{
-					total = total << 1 | 1;
+					total = (total << 1) | 1;
 				}
 			}
 		}
@@ -245,6 +246,7 @@ static stock Inline_DoFormat(data[])
 	// Store the compressed format, also instantly end the string.
 	data[0] = ~total;
 	data[1] = '\0';
+	//printf("%x", data[0]);
 	return 1;
 }
 
@@ -284,7 +286,7 @@ static stock Inline_FindFunction(const data[], const name[], address)
 				{
 					ret = value;
 					candidate = tmp;
-					printf("candidate: %x", ret);
+					//printf("candidate: %x", ret);
 				}
 			}
 			value = data[len + 1];
@@ -306,9 +308,11 @@ static stock Inline_FindAnonymous(const data[], address)
 	#emit LOAD.S.pri data
 	#emit STOR.S.pri value
 	// Check the "pointer" is valid.
+	//printf("Inline_FindAnonymous %s %d %d", data, address, value);
 	while (value != -1)
 	{
 		// Check if this is anonymous.
+		//printf("%d %s %d %d %d", value, data, address, ret, candidate);
 		if (data[0] == ':')
 		{
 			// Found a candidate.
@@ -322,11 +326,13 @@ static stock Inline_FindAnonymous(const data[], address)
 				candidate = tmp;
 			}
 		}
-		value = data[strlen(data) - 3];
+		//printf("%d %d %d,%d,%d,%d,%d", strlen(data), strlen(data) - 4, data[0], data[1], data[2], data[3], data[4]);
+		value = data[strlen(data) - 4];
 		// Move on to the next "pointer".
 		#emit LOAD.S.pri value
 		#emit STOR.S.pri data
 	}
+	//printf("Found anon: %d", ret);
 	return ret;
 }
 
@@ -345,7 +351,8 @@ public _Inline_FixCompiler@@()
 hook OnScriptInit()
 {
 	static
-		sSearch[] =
+		// Default settings.
+		sSearch1[] =
 			{
 				AMX_PUSH_C, INLINE_LOOP_PATTERN_3,
 				AMX_PUSH_C, INLINE_LOOP_PATTERN_2,
@@ -353,19 +360,63 @@ hook OnScriptInit()
 				AMX_PUSH_C, INLINE_LOOP_PATTERN_0,
 				AMX_PUSH_C, 0x18,
 				AMX_CALL
+			},
+		// Debug settings.
+		sSearch2[] =
+			{
+				AMX_CONST_PRI, INLINE_LOOP_PATTERN_3,
+				AMX_PUSH_PRI,
+				AMX_CONST_PRI, INLINE_LOOP_PATTERN_2,
+				AMX_PUSH_PRI,
+				AMX_CONST_PRI, INLINE_LOOP_PATTERN_1,
+				AMX_PUSH_PRI,
+				AMX_CONST_PRI, INLINE_LOOP_PATTERN_0,
+				AMX_PUSH_PRI,
+				AMX_PUSH_C, 0x18,
+				AMX_CALL
 			};
+	// Different optimisation levels produce different sensibilities of code.
+	if (Inline_DoSearch(sSearch1, 3) == -1)
+	{
+		// Pass the number of extra instructions before this code block.
+		Inline_DoSearch(sSearch2, 5);
+	}
+	/*new
+		p0 = Inline_DoSearch(sSearch1),
+		// I could actually detect compilation flags in this way!
+		p1 = Inline_DoSearch(sSearch2);
+	if (p0 == -1 && p1 != -1)
+	{
+		// Compiled with "-d3".  That's interesting but ultimately pointless.
+		// And I can't detect this if they have no inline functions.
+	}*/
+}
+
+//pp(d, str[])
+//{
+//	#emit LOAD.S.pri        d
+//	#emit STOR.S.pri        str
+//	printf("data = %08x, %x,%x,%x,%x,%x,%x", d, str[0], str[1], str[2], str[3], str[4], str[5]);
+//}
+
+static stock Inline_DoSearch(sSearch[], neg, size = sizeof (sSearch))
+{
 	new
+		//str[32],
 		addr,
 		data,
-		func,
+		func;
+	static
 		last = -1;
-	while (AMX_TraceCode(sSearch, addr, func))
+	//printf("FIND FUNC: %s", sSearch);
+	while (AMX_TraceCode(sSearch, addr, func, size))
 	{
 		// Get the function return address (make sure "pri" is always non-zero).
-		func = addr + (12 * 4);
+		func = addr + ((size + 1) * 4);
 		//printf("stored function at %x", func);
 		// Get the address of the last parameter.
-		addr += (AMX_HEADER_COD - 12);
+		addr += (AMX_HEADER_COD - (neg * 4));
+		//printf("FOUND FUNC: %d", addr);
 		// Get the value of the last parameter.
 		#emit LREF.S.pri        addr
 		#emit STOR.S.pri        data
@@ -373,7 +424,6 @@ hook OnScriptInit()
 		// both the address and contents of the loaded string!  Amazingly it
 		// worked for anonymous functions too...
 		//#emit PUSH.S            data
-		//printf("data = %08x, %s", data);
 		//#emit POP.pri
 		// Anyway, now we need to see if this is a named or anonymous function
 		// and plan accordingly.  We don't need all the complex code of the
@@ -398,6 +448,7 @@ hook OnScriptInit()
 		#emit SYSREQ.C       strfind
 		#emit STOR.S.pri     pos
 		#emit STACK          20
+		//printf("pos = %d, %d", pos, last);
 		if (pos != -1)
 		{
 			if (last == -1)
@@ -407,7 +458,7 @@ hook OnScriptInit()
 			else
 			{
 				#emit LOAD.S.pri data
-				#emit SREF.S.pri last
+				#emit SREF.pri   last
 			}
 			// Equivalent to: "data[pos + 1] = -1;" (1 cell = 4 bytes).
 			data += pos * 4 + 4;
@@ -416,6 +467,7 @@ hook OnScriptInit()
 			// Equivalent to: "data[pos + 2] = func;"
 			last = data;
 			data += 4;
+			//printf("pos = %d, %d", data, func);
 			#emit LOAD.S.pri   func
 			#emit SREF.S.pri   data
 			// Now find and compress the format specifier (backwards).
@@ -430,10 +482,13 @@ hook OnScriptInit()
 			#emit PUSH.pri
 			#emit CONST.pri      Inline_DoFormat
 			#emit SCTRL          6
+			//pp(data - 8, str);
 		}
-		// Move on to find the next value.
-		addr -= (AMX_HEADER_COD - 16);
+		// Move on to find the next value.  24 is larger than both 12 and 20,
+		// but is still a little hard-coded to the known code types.
+		addr -= (AMX_HEADER_COD - 24);
 	}
+	return last;
 }
 
 stock Inline_Loop(p0, p1, p2, p3, &__yil, volatile const format[])
@@ -524,7 +579,7 @@ stock Callback_Get(callback:name, result[E_CALLBACK_DATA], expect = -1)
 		#emit LOAD.I
 		// Call the function.
 		#emit PUSH.pri
-		#emit PUSH.S     name
+		//#emit PUSH.S     name
 		#emit PUSH       YSI_g_sFirstFunc
 		#emit PUSH.C     8
 		#emit LCTRL      6
@@ -543,14 +598,15 @@ stock Callback_Get(callback:name, result[E_CALLBACK_DATA], expect = -1)
 		#emit STOR.S.pri pos
 		result[E_CALLBACK_DATA_POINTER] = pos;
 		// Save the function parameters.
-		++func;
+		func += 4;
 		#emit LREF.S.pri func
 		#emit STOR.S.pri pos
-		result[E_CALLBACK_DATA_FLAGS]  = e_CALLBACK_FLAGS:pos;
-		++func;
+		result[E_CALLBACK_DATA_FLAGS] = e_CALLBACK_FLAGS:pos;
+		func += 4;
 		#emit LREF.S.pri func
 		#emit STOR.S.pri pos
-		result[E_CALLBACK_DATA_FORMAT]  = pos;
+		result[E_CALLBACK_DATA_FORMAT] = pos;
+		//printf("%x %x", expect, pos);
 		if (expect != -1 && pos != expect)
 		{
 			P:E("Format specifier didn't match on anonymous function");
@@ -627,24 +683,24 @@ stock Callback_Get(callback:name, result[E_CALLBACK_DATA], expect = -1)
 				func += strlen(name) * 4 + 2 * 4;
 				P:5("Callback_Get: inline/public found: %08x", func);
 				//#emit LREF.S.pri func
-				pos = 444;
+				//pos = 444;
 				#emit LOAD.S.pri func
 				#emit LOAD.I
 				#emit STOR.S.pri pos
-				printf("%d", pos);
+				//printf("%d", pos);
 				result[E_CALLBACK_DATA_POINTER] = pos;
 				// Save the function parameters.
-				++func;
+				func += 4;
 				#emit LREF.S.pri func
 				#emit STOR.S.pri pos
-				printf("%d", pos);
+				//printf("%d", pos);
 				result[E_CALLBACK_DATA_FLAGS]  = e_CALLBACK_FLAGS:pos;
 				// Save the function format.
-				++func;
-				--pos;
+				func += 4;
+				//--pos;
 				#emit LREF.S.pri func
 				#emit STOR.S.pri pos
-				printf("%d", pos);
+				//printf("%d", pos);
 				result[E_CALLBACK_DATA_FORMAT]  = pos;
 				if (expect != -1 && pos != expect)
 				{
