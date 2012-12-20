@@ -1009,7 +1009,7 @@ stock Callback_Call(const result[E_CALLBACK_DATA], GLOBAL_TAG_TYPES:...)
 #define @Rx:@Ry:@Rw:@Rv:@Ru:(%0s,%1) @Rx:@Ry:@Rw:@Rv:@Ru:(%0,%1+1)
 #define @Ry:@Rw:@Rv:@Ru:(,%1) ~(1<<%1)*/
 
-// This is very similar to Callback_Call, but takes an array of parameters
+// This is very similar to Callback_Call, but takes an array of ADDRESSES
 // instead of normal parameters.  This is designed to help support some
 // experimental OO code I was working on...
 stock Callback_Array(const result[E_CALLBACK_DATA], const params[])
@@ -1149,6 +1149,216 @@ stock Callback_Array(const result[E_CALLBACK_DATA], const params[])
 		#emit STOR.S.pri tmp
 		num *= 4;
 		addr += num;
+		// "addr" now contains the params stack address, "stack" contains the
+		// starting stack address.  This code technically pushes an incorrect
+		// destination size (it's 4x too big), but as the bytes to copy is
+		// smaller this is not important.
+		// Set the frame pointer.
+		size = _:result[E_CALLBACK_DATA_FLAGS];
+		#emit LOAD.S.pri size
+		#emit SHR.C.pri  8
+		#emit SHL.C.pri  2 // NOT SHR 6
+		#emit LOAD.S.alt addr
+		#emit ADD
+		#emit STOR.S.pri tmp
+		// Copy the data.
+		size = ((size & 0xFF) + (size >>> 8) + 3) * 4;
+		num = _:result[E_CALLBACK_DATA_ALLOC];
+		#emit LOAD.S.pri size
+		#emit PUSH.pri
+		#emit PUSH.pri
+		#emit PUSH.C     0
+		#emit CONST.alt  YSI_gMallocMemory
+		#emit LOAD.S.pri num
+		#emit IDXADDR
+		#emit PUSH.pri
+		#emit PUSH.S     addr
+		#emit PUSH.C     20
+		#emit SYSREQ.C   memcpy
+		#emit STACK      24
+		// Store the return frame.
+		#emit LOAD.S.alt tmp
+		#emit LCTRL      5
+		#emit STOR.I
+		#emit MOVE.pri
+		#emit ADD.C      4
+		#emit MOVE.alt
+		// Get the return address and call the function.
+		#emit LCTRL      6
+		#emit ADD.C      48              // 8
+		#emit STOR.I                     // 12
+		#emit LOAD.alt   YSI_g_sInInline // 20
+		#emit LOAD.S.pri tmp             // 28
+		#emit SCTRL      5               // 36
+		#emit MOVE.pri                   // 40
+		#emit SCTRL      6               // 48
+		// Restore the stack.
+		//printf("one");
+		#emit LOAD.S.pri stack
+		#emit SCTRL      4
+		//printf("two");
+		//YSI_g_sInInline = ininline;
+	}
+}
+
+// This is very similar to Callback_Call, but takes an allocated block of stack.
+stock Callback_Block(const result[E_CALLBACK_DATA], const params[], num)
+{
+	#pragma unused params
+	// Call the function with the given data.  We need some serious stack
+	// manipulation skills in here to make it all work.
+	if (result[E_CALLBACK_DATA_FLAGS] & e_CALLBACK_FLAGS_PUBLIC)
+	{
+		// I think I've got an even better way.  NOPE!  None of this code will
+		// work because all the parameters are passed by reference, not by
+		// value!  This is VERY VERY bad!  D'oh!  Good thing I kept a copy of
+		// the old code!  Shame, this would have been very elegant.  Sweet, it
+		// seemed to work as well!  Maybe I could just do some similar in-line
+		// variable modifications.
+		new
+			par,
+			pointer = result[E_CALLBACK_DATA_POINTER],
+			mask = result[E_CALLBACK_DATA_FORMAT];
+		// Destroy one parameter.
+		//#emit PUSH.S          8
+		#emit LOAD.S.alt      8
+		#emit PUSH.alt
+		//#emit ADD.C      0xFFFFFFFC
+		//#emit PUSH.pri
+		// Move the return address.
+		#emit LOAD.S.pri      4
+		#emit STOR.S.pri      8
+		// Move the frame.
+		#emit LOAD.S.pri      0
+		#emit STOR.S.pri      4
+		// Fix the parameters.
+		#emit LCTRL           5
+		#emit ADD
+		#emit ADD.C           12
+		#emit STOR.S.pri      par
+		// Get the jump address.
+		//while (mask != ~1)
+		// If no format has been provided, just guess and pass every parameter
+		// by reference (as they are passed to here).
+		while (mask != -1)
+		{
+			par -= 4;
+			if (!(mask & 1))
+			{
+				#emit LREF.S.pri      par
+				#emit LOAD.I
+				#emit SREF.S.pri      par
+			}
+			mask >>= 1;
+		}
+		//#emit LOAD.S.pri      8
+		#emit POP.pri
+		#emit ADD.C           0xFFFFFFFC
+		#emit STOR.S.pri      12
+		//#emit ADD.C      4
+		//#emit ADD.C      4
+		//#emit MOVE.alt
+		#emit LOAD.S.alt      pointer
+		// Mangle the stack (no variables from here).
+		#emit LCTRL           5
+		#emit ADD.C           4
+		#emit SCTRL           4
+		#emit SCTRL           5
+		// Jump to new code (after "PROC").
+		#emit MOVE.pri
+		#emit ADD.C           4
+		#emit SCTRL           6
+		// Will never be called.
+		//#emit RETN
+	}
+	else
+	{
+		new
+			size = _:result[E_CALLBACK_DATA_FLAGS],
+			//num  = 0,
+			stack,
+			//mask = 0x80000000,
+			addr,
+			tmp;
+			//YSI_g_sInInline = result[E_CALLBACK_DATA_POINTER];
+		//	ininline = YSI_g_sInInline;
+		YSI_g_sInInline = result[E_CALLBACK_DATA_POINTER];
+		size = ((size & 0xFF) + (size >>> 8) + 3) * 4;
+		#emit LCTRL      4
+		#emit STOR.S.pri stack
+		#emit LOAD.S.alt size
+		#emit SUB
+		#emit STOR.S.pri addr
+		// Add more data for additional parameters.
+		#emit SCTRL      4
+		//#emit LCTRL      4
+		size = result[E_CALLBACK_DATA_FORMAT];
+		//#emit LCTRL      5
+		//#emit ADD.C      16
+		//#emit LOAD.I
+		//#emit STOR.S.pri tmp
+		// OK, now the fun bit!
+		//num = Malloc_SlotSize(params) - 2;
+		addr -= num * 4;
+		// Increase the stack size.
+		#emit LOAD.S.pri addr
+		#emit SCTRL      4
+		// Copy the data.
+		#emit LOAD.S.pri num
+		// Destination size.
+		#emit PUSH.pri
+		#emit SMUL.C     4
+		// Number of bytes.
+		#emit PUSH.pri
+		// 0.
+		#emit PUSH.C     0
+		#emit PUSH.S     params
+		#emit PUSH.S     addr
+		#emit PUSH.C     20
+		#emit SYSREQ.C   memcpy
+		#emit STACK      24
+		//tmp = 
+		/*while (size & mask)
+		{
+			mask >>>= 1;
+		}
+		mask >>>= 1;
+		while (mask)
+		{
+			if (size & mask)
+			{
+				num += YSI_MAX_STRING;
+				addr -= YSI_MAX_STRING * 4;
+				//printf("copying string");
+				#emit LOAD.S.pri addr
+				#emit SCTRL      4
+				// Copy the data.
+				#emit PUSH.C     130
+				#emit PUSH.C     520
+				#emit PUSH.C     0
+				#emit LREF.S.pri tmp
+				#emit PUSH.pri
+				#emit PUSH.S     addr
+				#emit PUSH.C     20
+				#emit SYSREQ.C   memcpy
+				#emit STACK      24
+				//printf("finished");
+			}
+			else
+			{
+				num += 1;
+				addr -= 1 * 4;
+				#emit LREF.S.pri tmp
+				#emit LOAD.I
+				#emit PUSH.pri
+			}
+			mask >>>= 1;
+			tmp += 4;
+		}*/
+		#emit LCTRL      5
+		#emit STOR.S.pri tmp
+		//num *= 4;
+		addr += num * 4;
 		// "addr" now contains the params stack address, "stack" contains the
 		// starting stack address.  This code technically pushes an incorrect
 		// destination size (it's 4x too big), but as the bytes to copy is
