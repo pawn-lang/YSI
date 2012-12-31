@@ -1,5 +1,5 @@
 <?php
-
+/*
 $ini = new YSI_ini;
 
 $ini->Open('..\Games\San Andreas (Original)\GTA San Andreas\samp\YSI\scriptfiles\woo.txt');
@@ -12,7 +12,7 @@ $ini->Write('fjweoifj', 're');
 $ini->SetTag('yeah');
 $ini->Write('yeah', '');
 $ini->Close();
-
+*/
 class YSI_ini
 {
 	private $writefile;
