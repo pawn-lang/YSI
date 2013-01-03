@@ -152,17 +152,17 @@ global Dialog_Get(playerid)
 	return YSI_g_sPlayerDialog[playerid];
 }
 
-foreign Dialog_Garbage(dialogid);
+foreign void:Dialog_Garbage(dialogid);
 
-global Dialog_Garbage(dialogid)
+global void:Dialog_Garbage(dialogid)
 {
 	Bit_Let(YSI_g_sFree, dialogid);
-	return 1;
+	//return 1;
 }
 
-foreign Dialog_Free(dialogid);
+foreign void:Dialog_Free(dialogid);
 
-global Dialog_Free(dialogid)
+global void:Dialog_Free(dialogid)
 {
 	Bit_Vet(YSI_g_sFree, dialogid);
 	Bit_Let(YSI_g_sIDs, dialogid);
@@ -178,7 +178,7 @@ global Dialog_Free(dialogid)
 			}
 		}
 	}
-	return 1;
+	//return 1;
 }
 
 foreign Dialog_Set(playerid, dialogid);

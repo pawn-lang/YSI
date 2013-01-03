@@ -546,9 +546,9 @@ Notes:
 	Removes all groups purely owned by the calling script.
 \*----------------------------------------------------------------------------*/
 
-@foreign _Group_TryRemove();
+@foreign void:_Group_TryRemove();
 
-@global _Group_TryRemove()
+@global void:_Group_TryRemove()
 {
 	for (new i = 0; i != _MAX_GROUPS; ++i)
 	{
@@ -561,7 +561,7 @@ Notes:
 			Iter_Clear(GroupPlayers[i]);
 		}
 	}
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -668,9 +668,9 @@ Notes:
 	Request all a player's groups from the master system.
 \*----------------------------------------------------------------------------*/
 
-foreign _Group_InitPlayer(p, master);
+foreign void:_Group_InitPlayer(p, master);
 
-global _Group_InitPlayer(p, master)
+global void:_Group_InitPlayer(p, master)
 {
 	targetfunc _Group_FakePlayer<master>(p, YSI_gGroupPlayers[p], bits<_MAX_GROUPS_G>);
 	//Set their groups to the global group.
@@ -679,7 +679,7 @@ global _Group_InitPlayer(p, master)
 	//	Iter_Add(GroupPlayers[i], playerid);
 	//}
 	//YSI_gGroupPlayers[playerid] = YSI_gGroupData[_MAX_GROUPS];
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -753,9 +753,9 @@ Notes:
 	update any of their other settings.  As a result it has less checks in it.
 \*----------------------------------------------------------------------------*/
 
-foreign Group_SetPlayer(Group:g,p,bool:s);
+foreign void:Group_SetPlayer(Group:g,p,bool:s);
 
-global Group_SetPlayer(Group:g,p,bool:s)
+global void:Group_SetPlayer(Group:g,p,bool:s)
 {
 	if (_Group_IsValid(g) && 0 <= p < MAX_PLAYERS)
 	{
@@ -770,7 +770,7 @@ global Group_SetPlayer(Group:g,p,bool:s)
 				// groups they're in, taking in to account the new groups
 				// hierarchy and pass that new array about.
 				broadcastfunc _Group_SetPlayer(p, _Group_SetSome(p, _:g), sizeof (YSI_gTempGroups));
-				return 1;
+				return; //1;
 			}
 		}
 		else
@@ -780,11 +780,11 @@ global Group_SetPlayer(Group:g,p,bool:s)
 				YSI_gTempGroups = YSI_gGroupPlayers[p];
 				Bit_Vet(YSI_gTempGroups, _:g);
 				broadcastfunc _Group_SetPlayer(p, YSI_gTempGroups, sizeof (YSI_gTempGroups));
-				return 1;
+				return; //1;
 			}
 		}
 	}
-	return 0;
+	//return 0;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1038,9 +1038,9 @@ Notes:
 	Sets the name of a group.
 \*----------------------------------------------------------------------------*/
 
-foreign Group_SetName(Group:g,string:n[]);
+foreign void:Group_SetName(Group:g,string:n[]);
 
-global Group_SetName(Group:g,string:n[])
+global void:Group_SetName(Group:g,string:n[])
 {
 	P:2("Group_SetName called: %i, \"%s\"", _:g, n);
 	if (_Group_IsValid(g))
@@ -1057,7 +1057,7 @@ global Group_SetName(Group:g,string:n[])
 			YSI_gGroupData[_:g][E_GROUP_DATA_HASH] = YHash(n);
 		}
 	}
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1131,9 +1131,9 @@ Notes:
 	think it actually does anything in the latest code version!
 \*----------------------------------------------------------------------------*/
 
-foreign Group_SetGang(Group:g,bool:n);
+foreign void:Group_SetGang(Group:g,bool:n);
 
-global Group_SetGang(Group:g,bool:n)
+global void:Group_SetGang(Group:g,bool:n)
 {
 	P:2("Group_SetGang called: %i, %i", _:g, n);
 	if (_Group_IsValid(g))
@@ -1147,7 +1147,7 @@ global Group_SetGang(Group:g,bool:n)
 			_Group_VetGang(GROUP_TEMP_FIX(g));
 		}
 	}
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1186,9 +1186,9 @@ Notes:
 	This colour is not actually currently used anywhere.
 \*----------------------------------------------------------------------------*/
 
-foreign Group_SetColour(Group:g,c);
+foreign void:Group_SetColour(Group:g,c);
 
-global Group_SetColour(Group:g,c)
+global void:Group_SetColour(Group:g,c)
 {
 	P:2("Group_SetColour called: %i, %i", _:g, c);
 	if (_Group_IsValid(g))
@@ -1196,7 +1196,7 @@ global Group_SetColour(Group:g,c)
 		GROUP_FIX(g);
 		_Group_SetColor(g, c);
 	}
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1351,9 +1351,9 @@ Notes:
 \*----------------------------------------------------------------------------*/
 
 // Added for the fun of it.
-foreign Group_Destroy(Group:group);
+foreign void:Group_Destroy(Group:group);
 
-global Group_Destroy(Group:group)
+global void:Group_Destroy(Group:group)
 {
 	// TODO: Remove this group from all players and all other groups.
 	P:2("Group_Destroy called: %i", _:group);
@@ -1366,9 +1366,9 @@ global Group_Destroy(Group:group)
 		YSI_gGroupData[_:group][E_GROUP_DATA_FLAGS] = e_GROUP_FLAGS:0;
 		YSI_gGroupData[_:group][E_GROUP_DATA_HASH] = 0;
 		Iter_Clear(GroupPlayers[_:group]);
-		return 1;
+		//return 1;
 	}
-	return 0;
+	//return 0;
 }
 
 static remotefunc void:_Group_Destroy(g, gp@YSII_Ag[MAX_PLAYERS + 1], s)
@@ -1525,9 +1525,9 @@ Notes:
 	that second group, or any child groups.
 \*----------------------------------------------------------------------------*/
 
-foreign Group_SetGroup(Group:g,Group:el,bool:s);
+foreign void:Group_SetGroup(Group:g,Group:el,bool:s);
 
-global Group_SetGroup(Group:g,Group:el,bool:s)
+global void:Group_SetGroup(Group:g,Group:el,bool:s)
 {
 	P:2(#Group_SetGroup " called: %i, %i, %i", _:g, _:el, s);
 	// Set wether a group can use this item.
@@ -1540,7 +1540,7 @@ global Group_SetGroup(Group:g,Group:el,bool:s)
 			if (Bit_Get(YSI_g_sChildGroups[_:g], _:el))
 			{
 				// Child is already part of parent.
-				return 1;
+				return; //1;
 			}
 			Bit_Let(YSI_g_sChildGroups[_:g], _:el);
 			foreach (new p : GroupPlayers[_:g])
@@ -1550,7 +1550,7 @@ global Group_SetGroup(Group:g,Group:el,bool:s)
 					broadcastfunc _Group_SetPlayer(p, _Group_SetSome(p, _:el), bits<_MAX_GROUPS_G>);
 				}
 			}
-			return 1;
+			//return 1;
 		}
 		else
 		{
@@ -1558,13 +1558,13 @@ global Group_SetGroup(Group:g,Group:el,bool:s)
 			{
 				// Child is a part of parent.
 				Bit_Vet(YSI_g_sChildGroups[_:g], _:el);
-				return 1;
+				//return 1;
 			}
 			// DO NOT REMOVE PLAYERS.
-			return 1;
+			//return 1;
 		}
 	}
-	return 0;
+	//return 0;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1580,12 +1580,12 @@ Notes:
 	removed.
 \*----------------------------------------------------------------------------*/
 
-foreign Group_SetGlobalGroup(Group:el,bool:s);
+foreign void:Group_SetGlobalGroup(Group:el,bool:s);
 
-global Group_SetGlobalGroup(Group:el,bool:s)
+global void:Group_SetGlobalGroup(Group:el,bool:s)
 {
 	P:2(#Group_SetGlobalGroup " called: %i, %i", _:el, s);
-	return Group_SetGroup(GROUP_GLOBAL, el, s);
+	Group_SetGroup(GROUP_GLOBAL, el, s);
 }
 
 /*----------------------------------------------------------------------------*\

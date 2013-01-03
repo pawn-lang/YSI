@@ -186,7 +186,7 @@ forward Master_OnScriptClose(script);
 
 // Second "foreign" declaration.
 //#define @Zu:Y@();W@(#%0##,_YM@CX:,,);return%1(%2);}%3(%4);%5(%6)<%7> Y@();W@(#%0##,#);return%1(%2);}%3(%4);stock %5(%6)<%7>return @Zv:@Zq:%5&H@();
-#define @Zu:#%0,_YM@%8:,,);return%1(%2);}%5(%6)<%7> @Zl:#%0,#);return%1(%2);}stock%5(%6)<%7>return @Zv:@Zq:%5&H@()
+#define @Zu:#%0,_YM@C%8:,,);return%1(%2);}%5(%6)<%7> @Z%8:#%0,#);return%1(%2);}stock%5(%6)<%7>return @Zv:@Zq:%5&H@()
 //#define @Zu:#%0,_YM@CX:,,) @Zl:#%0,#)
 
 
@@ -203,8 +203,8 @@ forward Master_OnScriptClose(script);
 #define @Zp:%0||||||);%1}%2&H@(,%4||| @Zl:%0);%1}%2&H@(%4
 #define @Zy:%0||||||);%1}%2&H@(,%4||| @Zj:%0);%1}%2&H@(%4
 
-#define _YM@CX:%0,%1);%2}%3(%9)<%4> @Zn:@Zo:@Zp:##|||%0|||%1);%2}stock%3(%9)<%4>return @Zv:@Zq:%3&H@(|||)
-#define _YM@CY:%0,%1);%2}%3(%9)<%4> @Zn:@Zo:@Zy:##|||%0|||%1);%2}stock%3(%9)<%4>return @Zv:@Zq:%3&H@(|||)
+#define _YM@Cl:%0,%1);%2}%3(%9)<%4> @Zn:@Zo:@Zp:##|||%0|||%1);%2}stock%3(%9)<%4>return @Zv:@Zq:%3&H@(|||)
+#define _YM@Cj:%0,%1);%2}%3(%9)<%4> @Zn:@Zo:@Zy:##|||%0|||%1);%2}stock%3(%9)<%4>return @Zv:@Zq:%3&H@(|||)
 
 #define @Zl:%0);%8void:%3(%1);}%5<%6>return%4&%7; %0);}%5<%6>%7;
 #define @Zj:%0);%8void:%3(%1);}%5<%6>return%4&%7; %0);%3(%1);}%5<%6>%7;

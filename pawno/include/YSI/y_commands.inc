@@ -424,9 +424,9 @@ Notes:
 	-
 \*----------------------------------------------------------------------------*/
 
-foreign Command_SetDeniedReturn(bool:set);
+foreign void:Command_SetDeniedReturn(bool:set);
 
-global Command_SetDeniedReturn(bool:set)
+global void:Command_SetDeniedReturn(bool:set)
 {
 	P:2("Command_SetDeniedReturn called: %i", bool:set);
 	if (set)
@@ -437,7 +437,7 @@ global Command_SetDeniedReturn(bool:set)
 	{
 		YSI_g_sCommandFlags &= ~e_COMM_FLAG_PERMISSION_RET;
 	}
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -454,13 +454,13 @@ Notes:
 \*----------------------------------------------------------------------------*/
 
 #if YSIM_HAS_MASTER
-	foreign Command_SetProvider(p);
+	foreign void:Command_SetProvider(p);
 	
-	global Command_SetProvider(p)
+	global void:Command_SetProvider(p)
 	{
 		P:2("Command_SetProvider called: %i", p);
 		YSI_g_sCommandFlags = (YSI_g_sCommandFlags & ~e_COMM_FLAG_PROVIDER) | (e_COMM_FLAG:p & e_COMM_FLAG_PROVIDER) | e_COMM_FLAG_MULPRO;
-		return 1;
+		//return 1;
 	}
 	
 	foreign Command_GetProvider();
@@ -480,16 +480,16 @@ Notes:
 		return _:Command_DefaultProvider();
 	}
 	
-	foreign Command_SetPlayerProvider(playerid,p);
+	foreign void:Command_SetPlayerProvider(playerid,p);
 	
-	global Command_SetPlayerProvider(playerid,p)
+	global void:Command_SetPlayerProvider(playerid,p)
 	{
 		P:2("Command_SetPlayerProvider called: %i, %i", playerid, p);
 		if (0 <= playerid < MAX_PLAYERS)
 		{
 			YSI_g_sPlayerProvider{playerid} = p & 0xFF;
 		}
-		return 1;
+		//return 1;
 	}
 	
 	foreign Command_GetPlayerProvider(playerid);
@@ -589,9 +589,9 @@ Notes:
 	-
 \*----------------------------------------------------------------------------*/
 
-foreign Command_SetIllegalReturn(bool:set);
+foreign void:Command_SetIllegalReturn(bool:set);
 
-global Command_SetIllegalReturn(bool:set)
+global void:Command_SetIllegalReturn(bool:set)
 {
 	P:2("Command_SetIllegalReturn called: %i", bool:set);
 	if (set)
@@ -602,7 +602,7 @@ global Command_SetIllegalReturn(bool:set)
 	{
 		YSI_g_sCommandFlags &= ~e_COMM_FLAG_ILLEGAL;
 	}
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -649,9 +649,9 @@ Notes:
 	-
 \*----------------------------------------------------------------------------*/
 
-foreign Command_SetUnknownReturn(bool:set);
+foreign void:Command_SetUnknownReturn(bool:set);
 
-global Command_SetUnknownReturn(bool:set)
+global void:Command_SetUnknownReturn(bool:set)
 {
 	P:2("Command_SetUnknownReturn called: %i", bool:set);
 	if (set)
@@ -662,7 +662,7 @@ global Command_SetUnknownReturn(bool:set)
 	{
 		YSI_g_sCommandFlags &= ~e_COMM_FLAG_UNKNOWN;
 	}
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -709,9 +709,9 @@ Notes:
 	-
 \*----------------------------------------------------------------------------*/
 
-foreign Command_SetDisconnectReturn(bool:set);
+foreign void:Command_SetDisconnectReturn(bool:set);
 
-global Command_SetDisconnectReturn(bool:set)
+global void:Command_SetDisconnectReturn(bool:set)
 {
 	P:2("Command_SetDisconnectReturn called: %i", bool:set);
 	if (set)
@@ -722,7 +722,7 @@ global Command_SetDisconnectReturn(bool:set)
 	{
 		YSI_g_sCommandFlags &= ~e_COMM_FLAG_DISCONNECT;
 	}
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -769,9 +769,9 @@ Notes:
 	-
 \*----------------------------------------------------------------------------*/
 
-foreign Command_SetDeniedDisplay(bool:set);
+foreign void:Command_SetDeniedDisplay(bool:set);
 
-global Command_SetDeniedDisplay(bool:set)
+global void:Command_SetDeniedDisplay(bool:set)
 {
 	P:2("Command_SetDeniedDisplay called: %i", bool:set);
 	if (set)
@@ -782,7 +782,7 @@ global Command_SetDeniedDisplay(bool:set)
 	{
 		YSI_g_sCommandFlags &= ~e_COMM_FLAG_PERMISSION_WARN;
 	}
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -877,9 +877,9 @@ Notes:
 	-
 \*----------------------------------------------------------------------------*/
 
-foreign Command_Generate();
+foreign void:Command_Generate();
 
-global Command_Generate()
+global void:Command_Generate()
 {
 	P:2("Command_Generate called");
 	P:2("Command_Generate called");
@@ -923,43 +923,43 @@ global Command_Generate()
 		// Set sorted to true.
 		YSI_g_sCommandFlags |= e_COMM_FLAG_SORTED;
 	}
-	return 1;
+	//return 1;
 }
 
-foreign Command_IncOPCR();
+foreign void:Command_IncOPCR();
 
-global Command_IncOPCR()
+global void:Command_IncOPCR()
 {
 	P:2("Command_IncOPCR called");
 	YSI_g_sCommandFlags += e_COMM_FLAG_OPCR_ADD;
-	return 1;
+	//return 1;
 }
 
-foreign Command_DecOPCR();
+foreign void:Command_DecOPCR();
 
-global Command_DecOPCR()
+global void:Command_DecOPCR()
 {
 	P:2("Command_DecOPCR called");
 	YSI_g_sCommandFlags -= e_COMM_FLAG_OPCR_ADD;
-	return 1;
+	//return 1;
 }
 
-foreign Command_IncOPCP();
+foreign void:Command_IncOPCP();
 
-global Command_IncOPCP()
+global void:Command_IncOPCP()
 {
 	P:2("Command_IncOPCP called");
 	YSI_g_sCommandFlags += e_COMM_FLAG_OPCP_ADD;
-	return 1;
+	//return 1;
 }
 
-foreign Command_DecOPCP();
+foreign void:Command_DecOPCP();
 
-global Command_DecOPCP()
+global void:Command_DecOPCP()
 {
 	P:2("Command_DecOPCP called");
 	YSI_g_sCommandFlags -= e_COMM_FLAG_OPCP_ADD;
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1129,21 +1129,19 @@ Notes:
 	group.
 \*----------------------------------------------------------------------------*/
 
-foreign Command_TouchNamed(string:command[]);
+foreign void:Command_TouchNamed(string:command[]);
 
-global Command_TouchNamed(string:command[])
+global void:Command_TouchNamed(string:command[])
 {
 	new
 		id = Command_Find(command);
-	if (id == COMMAND_NOT_FOUND)
+	if (id != COMMAND_NOT_FOUND)
 	{
-		return 0;
+		NO_GROUPS(id)
+		{
+			return; //0;
+		}
 	}
-	NO_GROUPS(id)
-	{
-		return 0;
-	}
-	return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1158,19 +1156,19 @@ Notes:
 	group.
 \*----------------------------------------------------------------------------*/
 
-foreign Command_Touch(command);
+foreign void:Command_Touch(command);
 
-global Command_Touch(command)
+global void:Command_Touch(command)
 {
 	if (Command_IsValid(command))
 	{
 		NO_GROUPS(command)
 		{
-			return 0;
+			return; //0;
 		}
-		return 1;
+		//return 1;
 	}
-	return 0;
+	//return 0;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1758,9 +1756,9 @@ native bool:Command_SetPlayer(command, playerid, bool:set);
 
 \*----------------------------------------------------------------------------*/
 
-foreign Command_SetPlayer(c,p,bool:s);
+foreign void:Command_SetPlayer(c,p,bool:s);
 
-global Command_SetPlayer(c,p,bool:s)
+global void:Command_SetPlayer(c,p,bool:s)
 {
 	P:2("Command_SetPlayer called: %i, %i, %i", c, p, s);
 //	if (c < 0 || c >= YSI_g_sCommandIndex)
@@ -1773,7 +1771,7 @@ global Command_SetPlayer(c,p,bool:s)
 		// Not in range,
 //		return false;
 	}
-	return 1;
+	//return 1;
 //	return s;
 }
 
@@ -1793,13 +1791,13 @@ native bool:Command_SetPlayerNamed(funcname[], playerid, bool:set);
 
 \*----------------------------------------------------------------------------*/
 
-foreign Command_SetPlayerNamed(string:f[],p,bool:s);
+foreign void:Command_SetPlayerNamed(string:f[],p,bool:s);
 
-global Command_SetPlayerNamed(string:f[],p,bool:s)
+global void:Command_SetPlayerNamed(string:f[],p,bool:s)
 {
 	P:2("Command_SetPlayerNamed called: \"%s\", %i, %i", f, p, s);
 	Command_SetPlayer(Command_Find(f), p, s);
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1887,9 +1885,9 @@ static stock Command_RemoveFromBintree(func)
 	}
 }
 
-foreign Command_Remove(func);
+foreign void:Command_Remove(func);
 
-global Command_Remove(func)
+global void:Command_Remove(func)
 {
 	P:2("Command_Remove called: %i", func);
 	if (0 <= func < MAX_COMMANDS)
@@ -1924,17 +1922,17 @@ global Command_Remove(func)
 		//Bintree_Delete(YSI_g_sSearchTree, func, YSI_g_sCommandCount);
 		Command_RemoveFromBintree(func);
 		--YSI_g_sCommandCount;
-		return 1;
+		//return 1;
 	}
-	return 0;
+	//return 0;
 }
 
-foreign Command_RemoveNamed(string:func[]);
+foreign void:Command_RemoveNamed(string:func[]);
 
-global Command_RemoveNamed(string:func[])
+global void:Command_RemoveNamed(string:func[])
 {
 	P:2("Command_RemoveNamed called: \"%s\"", func);
-	return Command_Remove(Command_Find(func));
+	Command_Remove(Command_Find(func));
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1954,9 +1952,9 @@ native Command_Add(funcname[], script);
 
 \*----------------------------------------------------------------------------*/
 
-foreign Command_Add(string:f[],s);
+foreign void:Command_Add(string:f[],s);
 
-global Command_Add(string:f[],s)
+global void:Command_Add(string:f[],s)
 {
 	#if !YSIM_HAS_MASTER
 		#pragma unused s
@@ -1992,7 +1990,7 @@ global Command_Add(string:f[],s)
 				#if YSIM_HAS_MASTER
 					YSI_g_sCommands[idx][E_COMMANDS_MASTERS] |= 1 << s;
 				#endif
-				return 0;
+				return; //0;
 			}
 			if (!Command_HasCollisions())
 			{
@@ -2015,7 +2013,7 @@ global Command_Add(string:f[],s)
 				#if YSIM_HAS_MASTER
 					YSI_g_sCommands[idx][E_COMMANDS_MASTERS] |= 1 << s;
 				#endif
-				return 0;
+				return; //0;
 			}
 		}
 		YSI_g_sCommands[YSI_g_sCommandIndex][E_COMMANDS_FUNCTION][0] = COMMAND_FUNCTION_PREFIX;
@@ -2055,7 +2053,7 @@ global Command_Add(string:f[],s)
 		C:4(new str[32];strpack(str, f);printf("Command_Add: %08x%08x%08x%08x", str[0], str[1], str[2], str[3]););
 		++YSI_g_sCommandCount;
 	}
-	return 1;
+	//return 1;
 	/*else
 	{
 		// Not all hope is lost - check if this command name already exists.

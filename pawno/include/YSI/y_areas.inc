@@ -540,9 +540,9 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-foreign Area_Debug(area);
+foreign void:Area_Debug(area);
 
-global Area_Debug(area)
+global void:Area_Debug(area)
 {
 	new
 		e_AREA_FLAGS:flags = YSI_g_sAreas[area][E_AREA_FLAGS];
@@ -578,9 +578,9 @@ global Area_Debug(area)
 				}
 			}
 		}
-		return 1;
+		//return 1;
 	}
-	return 0;
+	//return 0;
 }
 
 /*----------------------------------------------------------------------------*-
@@ -617,13 +617,13 @@ Notes:
 	You can only remove areas which are at the start of a list.
 -*----------------------------------------------------------------------------*/
 
-foreign Area_Delete(area);
+foreign void:Area_Delete(area);
 
-global Area_Delete(area)
+global void:Area_Delete(area)
 {
 	if (!Area_IsActive(area))
 	{
-		return 0;
+		return; //0;
 	}
 	new
 		e_AREA_FLAGS:flags = YSI_g_sAreas[area][E_AREA_FLAGS];
@@ -631,7 +631,7 @@ global Area_Delete(area)
 	{
 		case e_AREA_FLAGS_UNUSED:
 		{
-			return 0;
+			return; //0;
 		}
 		case e_AREA_FLAGS_CHILD:
 		{
@@ -672,7 +672,7 @@ global Area_Delete(area)
 	}
 	// Remove this one from the zone it was in.
 	Area_DoRemove(_:(flags & e_AREA_FLAGS_ZONE), area, _:(flags & e_AREA_FLAGS_NEXT));
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*-
@@ -1213,20 +1213,20 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-foreign Area_SetAllWorlds(area, bool:set);
+foreign void:Area_SetAllWorlds(area, bool:set);
 
-global Area_SetAllWorlds(area, bool:set)
+global void:Area_SetAllWorlds(area, bool:set)
 {
 	#if AREA_WORLDS > 0
 		if (Area_IsActive(area))
 		{
 			Bit_SetAll(YSI_g_sAreas[area][E_AREA_WORLDS], set, bits<AREA_WORLDS>);
-			return 1;
+			//return 1;
 		}
 	#else
 		#pragma unused area, set
 	#endif
-	return 0;
+	//return 0;
 }
 
 /*----------------------------------------------------------------------------*-
@@ -2360,7 +2360,7 @@ stock Area_IsInPoly(Float:x, Float:y, Float:z, header)
 		// Has multiple children
 		header = YSI_g_sAreas[header][E_AREA_POLY_NEXT];
 		new
-			stop,
+			stp,
 			lines,
 			done = 2,
 			Float:fx = YSI_g_sAreas[header][E_AREA_CHILD_ELEMS][0],
@@ -2371,8 +2371,8 @@ stock Area_IsInPoly(Float:x, Float:y, Float:z, header)
 			Float:y1;
 		while (count > 0)
 		{
-			stop = min(count, CHILD_AREA_SLOTS);
-			while (done < stop)
+			stp = min(count, CHILD_AREA_SLOTS);
+			while (done < stp)
 			{
 				x1 = YSI_g_sAreas[header][E_AREA_CHILD_ELEMS][done++];
 				y1 = YSI_g_sAreas[header][E_AREA_CHILD_ELEMS][done++];
@@ -2560,16 +2560,16 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-foreign Area_SetPlayer(area, playerid, bool:set);
+foreign void:Area_SetPlayer(area, playerid, bool:set);
 
-global Area_SetPlayer(area, playerid, bool:set)
+global void:Area_SetPlayer(area, playerid, bool:set)
 {
 	if (Area_IsActive(area))
 	{
 		PA_Set(YSI_g_sAreas[area][E_AREA_PLAYERS], playerid, set);
-		return 1;
+		//return 1;
 	}
-	return 0;
+	//return 0;
 }
 
 /*----------------------------------------------------------------------------*-
@@ -2608,20 +2608,20 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-foreign Area_SetWorld(area, world, bool:set);
+foreign void:Area_SetWorld(area, world, bool:set);
 
-global Area_SetWorld(area, world, bool:set)
+global void:Area_SetWorld(area, world, bool:set)
 {
 	#if AREA_WORLDS > 0
 		if (Area_IsActive(area))
 		{
 			Bit_Set(YSI_g_sAreas[area][E_AREA_WORLDS], world, set);
-			return 1;
+			//return 1;
 		}
 	#else
 		#pragma unused area, world, set
 	#endif
-	return 0;
+	//return 0;
 }
 
 /*----------------------------------------------------------------------------*-
@@ -2664,16 +2664,16 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-foreign Area_SetAllPlayers(area, bool:set);
+foreign void:Area_SetAllPlayers(area, bool:set);
 
-global Area_SetAllPlayers(area, bool:set)
+global void:Area_SetAllPlayers(area, bool:set)
 {
 	if (Area_IsActive(area))
 	{
 		PA_Init(YSI_g_sAreas[area][E_AREA_PLAYERS], set);
-		return 1;
+		//return 1;
 	}
-	return 0;
+	//return 0;
 }
 
 /*----------------------------------------------------------------------------*-

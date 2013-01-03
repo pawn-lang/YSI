@@ -648,9 +648,9 @@ public _Class_OtherRequestClass(playerid, classid)
 		}
 #endif
 
-foreign Class_Goto(playerid, playerclass);
+foreign void:Class_Goto(playerid, playerclass);
 
-global Class_Goto(playerid, playerclass)
+global void:Class_Goto(playerid, playerclass)
 {
 	P:2("Class_Goto called: %i, %i", playerid, playerclass);
 	// This now sets the REAL spawn information, including spawn location.
@@ -660,7 +660,7 @@ global Class_Goto(playerid, playerclass)
 	// Save the last viewed class so that we know which direction the person
 	// went next time OnPlayerRequestClass is called.
 	P:2("Class_Goto() end %08h %08h %d", YSI_g_sSettings, _:e_CLASS_SETTING_OPRCE, playerclass);
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1221,16 +1221,16 @@ Notes:
 	Completely removes a class from the system.
 \*----------------------------------------------------------------------------*/
 
-foreign Class_Delete(classid);
+foreign void:Class_Delete(classid);
 
-global Class_Delete(classid)
+global void:Class_Delete(classid)
 {
 	P:2("Class_Delete called: %i", classid);
 	if (Class_Enable(classid, false))
 	{
 		YSI_g_sClasses[classid][E_CLASS_FLAGS] = e_CLASS_FLAGS:0;
 	}
-	return 1;
+	//return 1;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1246,12 +1246,12 @@ Notes:
 	-
 \*----------------------------------------------------------------------------*/
 
-foreign Class_SetPlayer(cl, pid, bool:s);
+foreign void:Class_SetPlayer(cl, pid, bool:s);
 
-global Class_SetPlayer(cl, pid, bool:s)
+global void:Class_SetPlayer(cl, pid, bool:s)
 {
 	//printf("CLASS SET PLAYER: %d %d %d", cl, pid, s);
-	return PA_Set(YSI_g_sClasses[cl][E_CLASS_PLAYERS], pid, s);
+	PA_Set(YSI_g_sClasses[cl][E_CLASS_PLAYERS], pid, s);
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1295,53 +1295,53 @@ global Class_Get(playerid)
 	return -1;
 }
 
-foreign Class_DisableSelection(playerid);
+foreign void:Class_DisableSelection(playerid);
 
-global Class_DisableSelection(playerid)
+global void:Class_DisableSelection(playerid)
 {
 	if (YSI_g_sPlayerClass[playerid] & e_PLAYER_CLASS_INSELECT)
 	{
 		Class_Spectate(playerid);
 		Class_TK(playerid);
 	}
-	return 1;
+	//return 1;
 }
 
-foreign Class_DisableReselection(playerid);
+foreign void:Class_DisableReselection(playerid);
 
-global Class_DisableReselection(playerid)
+global void:Class_DisableReselection(playerid)
 {
 	YSI_g_sPlayerClass[playerid] |= (e_PLAYER_CLASS_DISABLED);
 	// Disable "F4".
 	//ForceClassSelection(playerid);
-	return 1;
+	//return 1;
 }
 
-foreign Class_EnableReselection(playerid);
+foreign void:Class_EnableReselection(playerid);
 
-global Class_EnableReselection(playerid)
+global void:Class_EnableReselection(playerid)
 {
 	YSI_g_sPlayerClass[playerid] &= ~(e_PLAYER_CLASS_DISABLED);
-	return 1;
+	//return 1;
 }
 
-foreign Class_ForceReselection(playerid);
+foreign void:Class_ForceReselection(playerid);
 
-global Class_ForceReselection(playerid)
+global void:Class_ForceReselection(playerid)
 {
 	YSI_g_sPlayerClass[playerid] = (YSI_g_sPlayerClass[playerid] | e_PLAYER_CLASS_RETURNED) & ~(e_PLAYER_CLASS_SPAWNSINCE);
 	ForceClassSelection(playerid);
-	return 1;
+	//return 1;
 }
 
-foreign Class_ReturnToSelection(playerid);
+foreign void:Class_ReturnToSelection(playerid);
 
-global Class_ReturnToSelection(playerid)
+global void:Class_ReturnToSelection(playerid)
 {
 	YSI_g_sPlayerClass[playerid] |= (e_PLAYER_CLASS_INSTANT);
 	Class_ForceReselection(playerid);
 	TogglePlayerSpectating(playerid, false);
-	return 1;
+	//return 1;
 }
 
 static stock Class_Spectate(playerid)
