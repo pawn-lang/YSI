@@ -615,7 +615,7 @@ Notes:
 #if !defined BOTSYNC_IS_BOT
 	public OnPlayerConnect(playerid)
 	{
-		P:0("Iter_OnPlayerConnect: %d", playerid);
+		P:2("Iter_OnPlayerConnect: %d", playerid);
 		#if defined _FOREACH_BOT
 			if (!IsPlayerNPC(playerid))
 			{
@@ -637,7 +637,7 @@ Notes:
 		//	CallLocalFunction(YSI_gsOnPlayerConnect, YSI_gsSpecifier@i, playerid);
 		//}
 		Itter_OnPlayerConnect(playerid);
-		P:0("Iter_OnPlayerConnect end");
+		P:2("Iter_OnPlayerConnect end");
 		return 1;
 	}
 	
