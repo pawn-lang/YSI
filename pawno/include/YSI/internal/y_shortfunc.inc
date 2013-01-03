@@ -117,7 +117,7 @@ stock
 
 native _YSI_RE_NATIVE<U@|||id=0, const name[]="", value=cellmin, const string[]=""|||setproperty>
 
-native _YSI_RE_NATIVE<V@|||id=0, const name[]="", value=cellmin, string[]=""|||getproperty>
+native _YSI_RE_NATIVE<V@|||GLOBAL_TAG_TYPES:id=0, const name[]="", value=cellmin, string[]=""|||getproperty>
 
 #if defined _YSI_MINI_MODE
 	#undef CallRemoteFunction
@@ -139,7 +139,7 @@ native _YSI_RE_NATIVE<O@|||const function[], time, repeat, const format[], GLOBA
 
 native _YSI_RE_NATIVE<K@|||const function[], time, repeat|||SetTimer>
 
-stock X@(n)
+stock X@(GLOBAL_TAG_TYPES:n)
 {
 	P:3("X@ called: %i", n);
 	setproperty(8, YSIM_RETURN, n);
@@ -175,7 +175,7 @@ stock S@(GLOBAL_TAG_TYPES:v = -1)
 	getproperty(8, "", YSIM_STRING, Q@);
 	strunpack(Q@, Q@);
 	setproperty(8, YSIM_CALLER, v);
-	return 0;
+	return Q@;
 }
 
 stock R@(buffer[])
@@ -193,6 +193,14 @@ stock H@(GLOBAL_TAG_TYPES:...)
 stock G@(GLOBAL_TAG_TYPES:...)
 {
 	// Just a dead-end for spare parameters which returns a string.
+	return Q@;
+}
+
+stock F@()
+{
+	P:3("F@ called");
+	getproperty(8, "", YSIM_STRING, Q@);
+	strunpack(Q@, Q@);
 	return Q@;
 }
 
@@ -227,4 +235,8 @@ stock G@(GLOBAL_TAG_TYPES:...)
 // Used to get rid of the "string:" tag once it has been used.
 #if !defined string
 	#define string:
+#endif
+
+#if !defined void
+	#define void:
 #endif

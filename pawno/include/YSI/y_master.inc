@@ -1123,13 +1123,14 @@ Natives:
 			}
 		#endif
 		// FINALLY call the new next one.
-		CallLocalFunction(#_YCM_CALLBACK, "");
+		//CallLocalFunction(#_YCM_CALLBACK, "");
+		return _YCM_CALLBACK();
 	}
 	
 	// Don't need extra checks here as we KNOW it is already defined.
 	#undef OnMasterSystemInit
-	#define OnMasterSystemInit _YCM_CALLBACK
-	forward _YCM_CALLBACK();
+	#define OnMasterSystemInit(%0) _YCM_CALLBACK(%0) <_ALS_:hooked>
+	forward _YCM_CALLBACK();public _YCM_CALLBACK()<_ALS_:unhooked>{return 1;}public _YCM_CALLBACK()<>{return 1;}
 #endif
 
 // The code below is now deprecated in favour of foreign/global!
@@ -1167,9 +1168,10 @@ Natives:
 #if YSIM_HAS_MASTER
 	#if _YSIM_IS_SERVER
 		
-		#define foreign%0(%1); %0(%1);%0@(%1);
+		#define foreign%0(%1) %0(%1);%0@(%1)
+		#define @foreign foreign
 		//#define global%0(%1) %0@(%1);public%0@(%1)X@(_:@Zk:%0(_YM@CP:%1,,));%0(%1)
-		#define global%0(%1) public%0@(%1)X@(_:@Zk:_YM@CP:%0(%1,,));%0(%1)
+		#define global%0(%1) public%0@(%1)(@Zz:X@(@Zk:_YM@CP:%0(%1,,)));%0(%1)
 		
 		
 		
@@ -1240,17 +1242,13 @@ Natives:
 		// default to STUB.  This is NOT a complete definition - the "@Zu:"
 		// definition means that more processing is done (mainly for the
 		// definition of the "_YCM:m" function to not give warnings.
-		//#if MASTER_USE_CALLER
-		//	#define foreign%0(%1); stock %0(%1)<>{new i=_:@Zu:Y@();W@(#%0@##,_YM@CX:%1,,);return Z@(i);}%0@(%1);%0(%1)<_YCM:m>
-		//#else
-		#define foreign%0(%1); stock %0(%1)<>{new i=_:@Zu:Y@();W@(#%0@##,_YM@CX:%1,,);return Z@(i);}%0@(%1);%0(%1)<_YCM:m>
-			//#define foreign%0(%1); stock %0(%1)<>{return W@(#%0@##,_YM@CX:%1,,),Z@();}%0@(%1);%0(%1)<_YCM:m>
-		//#endif
-		//#define foreign%0(%1); %0(%1)<>{new i=Y@();W@(#%0@##,_YM@CM:%1,,);return Z@(i);}%0@(%1);
-		//#define foreign%0(%1); %0(%1)<>{new i=Y@();W@(#%0@##,_YM@CX:%1,,);return Z@(i);}%0@(%1);%0(%1)<_YCM:x>{}		
+		//#define foreign%0(%1); stock %0(%1)<>{new i=_:@Zu:Y@();W@(#%0@##,_YM@CX:%1,,);return Z@(i);}%0@(%1);%0(%1)<_YCM:m>
+		#define @foreign%0(%1) stock%0(%1)<>{new i=Y@();W@(@Zu:#%0@#,_YM@CY:%1,,);return Z@(i);}%0(%1)<_YCM:m>
+		
+		#define foreign%0(%1) stock%0(%1)<>{W@(@Zu:#%0@#,_YM@CX:%1,,);return V@(8,YSIM_RETURN);}%0(%1)<_YCM:m>
+		
 		#if _YSIM_IS_CLIENT
 			
-			//#define foreign%0(%1); stock %0(%1){new i=Y@();W@(#%0@##,_YM@CM:%1,,);return Z@(i);}
 			#define global%0(%1) stock %0_(%1)
 			
 			
@@ -1392,13 +1390,14 @@ Natives:
 				
 				//#define foreign%0(%1); %0(%1)<>{new i=Y@();W@(#%0@##,_YM@CM:%1,,);return Z@(i);}%0@(%1);%0(%1)<_YCM:x>{}
 				//#define global%0(%1) %0@(%1);public%0@(%1)<>{}public%0@(%1)<_YCM:y>X@(_:@Zk:%0(_YM@CP:%1,,));%0(%1)<_YCM:y>
-				#define global%0(%1) public%0@(%1)<>{}public%0@(%1)<_YCM:y>X@(_:@Zk:_YM@CP:%0(%1,,));stock %0(%1)<_YCM:y>
+				//#define global%0(%1) public%0@(%1)<>{}public%0@(%1)<_YCM:y>X@(_:@Zk:_YM@CP:%0(%1,,));stock %0(%1)<_YCM:y>
+				#define global%0(%1) %0@(%1);public%0@(%1)<>{}public%0@(%1)<_YCM:y>(@Zz:X@(@Zk:_YM@CP:%0(%1,,)));stock%0(%1)<_YCM:y>
 				
 				
 				// TODO: I just realised that I have NEVER used the
 				// "Master_Caller" feature of the master system EVER, despite
 				// all the overhead involved in activating and using it...
-				// Maybe I should just remove it!
+				// Maybe I should just remove it!  Update: Or make it optional.
 				
 				// This is a normal system with the possibility of being the
 				// master.  This is the very complicated one to write!
@@ -1481,8 +1480,9 @@ Natives:
 	#endif
 #else
 	
-	#define foreign%0(%1);
-	#define global%0(%1) stock %0(%1)
+	#define foreign forward
+	#define @foreign forward
+	#define global stock
 	
 	
 	
@@ -1699,110 +1699,6 @@ Natives:
 #if defined YSIM_STORED_SETTINGS
 	#undef YSIM_STORED_SETTINGS
 #endif
-
-/*
-
-//		@Zs:@Za:@Zd:#d#i @Zr:|||a|||@Ze: string:b[], array:d[], f);
-//@Zs:@Za:@Zs:@Za:@Zd:#d#i @Zr:|||a|||@Ze:string:b[],array:d[], f);
-//#define @Zs:@Za:@Zd:#%0#i%1||||string:%2[%3],%4); @Zs:@Za:@Zd:#%0s#i%1|||%2||||%4);
-
-//#define @Za:@Zd:#%0#i%1||||array:%2[%3],%4); @Zs:@Za:@Zd:#%0a#i%1|||%2||||%4);
-
-//#define @Zd:#%0#i%1||||%2,%4); @Zs:@Za:@Zd:#%0d#i%1|||%2||||%4);
-
-//#define @Zr:%0|||%1hze: ,%0
-
-//#define @Zs:@Zd:#%1|||%0string:%2[%3]|||%4,%5); @Zs:@Zd:#%1,s:%2|||%4|||%5);
-//#define @Zd:#%1|||%2|||%3,%4); @Zs:@Zd:#%1,d:%2|||%3|||%4);
-
-#define @Zs:@Za:@Zd:#%0#%1|||%2string:%3[%4]|||%5,%6) @Zs:@Za:@Zd:#%0s#%1,@Ze:%3|||%5|||%6)
-#define @Za:@Zd:#%0#%1|||%3[%4]|||%5,%6) @Zs:@Za:@Zd:#%0a#%1,@Ze:%3|||%5|||%6)
-#define @Zd:#%0#%1|||%3|||%5,%6) @Zs:@Za:@Zd:#%0i#%1,@Ze:%3|||%5|||%6)
-//#define @Zd:#%1|||%2|||%3,%4); @Zs:@Zd:#%1,d:%2|||%3|||%4);
-
-#define @Ze:%0|||||| @Ze:%0
-#define z,@Ze:||||||) )
-
-//#define @Zc:
-
-#define _YM@CM:%0,%1) @Zf:@Zs:@Za:@Zd:##z|||%0|||%1)
-
-// DO NOT USE THIS HERE AGAIN!  _YM@CR USED IN Y_REMOTE!
-//#define _YM@CR:%0(%1); W@(#%0@##,_YM@CM:%1,,);
-
-#define W@(#%0:%1##,%2);%3Z@(i) W@(#%1,%2);return %0:Z@(%0:i)
-#define Z@(%0string:i) S@(i),Q@
-
-#define string:
-
-#define foreign%0(%1); %0(%1)<>{new i=Y@();W@(#%0@##,_YM@CM:%1,,);return Z@(i);}%0@(%1);
-
-
-
-
-//#define @Zt:@Zb:@Zg:@Zh:%1|||%2:%3[%4]|||%5,%6) //@Zt:@Zb:@Zg:@Zh:%1%2:@Zi:%3,|||%5|||%6)
-//#define @Zb:@Zg:@Zh:%1|||%3[%4]|||%5,%6) @Zt:@Zb:@Zg:@Zh:%1hzi:%3,|||%5|||%6)
-//#define @Zg:@Zh:%1|||%2:%3|||%5,%6) @Zt:@Zb:@Zg:@Zh:%1%2:@Zi:%3,|||%5|||%6)
-//#define @Zh:%1|||%3|||%5,%6) @Zt:@Zb:@Zg:@Zh:%1hzi:%3,|||%5|||%6)
-
-#define @Zt:@Zb:@Zh:%1|||%2:%3|||%5) %1%2:@Zb:@Zh:|||%3|||%5)
-#define @Zb:@Zh:%1|||%3[%4]|||%5,%6) @Zt:@Zb:@Zh:%1hzi:%3,|||%5|||%6)
-//#define @Zg:@Zh:%1|||%2:%3|||%5,%6) @Zt:@Zb:@Zg:@Zh:%1%2:@Zi:%3,|||%5|||%6)
-#define @Zh:%1|||%3|||%5,%6) @Zt:@Zb:@Zh:%1hzi:%3,|||%5|||%6)
-//#define @Zd:#%1|||%2|||%3,%4); @Zs:@Zd:#%1,d:%2|||%3|||%4);
-
-#define @Zi:%0,|||||| @Zi:%0
-#define @Zj:X@(%0(_YM@CP:,,)) X@(%0())
-//#define @Zt:@Zb:@Zg:@Zh:||||||,) )
-//#define z,@Ze:||||||) )
-
-//#define @Zc:
-
-#define _YM@CP:%0,%1) @Zt:@Zb:@Zh:|||%0|||%1)
-
-#define X@(%0string:%1) R@(%1)
-
-#define global%0(%1) public%0@(%1)<>{}public%0@(%1)<_YCM:y>X@(_:%0(_YM@CP:%1,,));%0(%1)<_YCM:y>
-
-*/
-
-
-
-
-
-
-/*
-// "foreign" declaration.
-#define @Zs:@Za:@Zd:#%0#%1|||%2string:%3[%4]|||%5,%6) @Zs:@Za:@Zd:#%0s#%1,@Ze:%3|||%5|||%6)
-#define @Za:@Zd:#%0#%1|||%3[%4]|||%5,%6) @Zs:@Za:@Zd:#%0a#%1,@Ze:%3|||%5|||%6)
-#define @Zd:#%0#%1|||%3|||%5,%6) @Zs:@Za:@Zd:#%0i#%1,@Ze:%3|||%5|||%6)
-
-#define @Ze:%0|||||| @Ze:%0
-#define z,@Ze:||||||) )
-
-#define _YM@CM:%0,%1) @Zf:@Zs:@Za:@Zd:##z|||%0|||%1)
-
-#define W@(#%0:%1##,%2);%3Z@(i) W@(#%1,%2);return %0:Z@(%0:i)
-#define Z@(%0string:i) S@(i),Q@
-
-#define string:
-
-#define foreign%0(%1); %0(%1)<>{new i=Y@();W@(#%0@##,_YM@CM:%1,,);return Z@(i);}%0@(%1);
-
-// "global" declaration
-#define @Zt:@Zb:@Zh:%1|||%2:%3|||%5) %1%2:@Zb:@Zh:|||%3|||%5)
-#define @Zb:@Zh:%1|||%3[%4]|||%5,%6) @Zt:@Zb:@Zh:%1hzi:%3,|||%5|||%6)
-#define @Zh:%1|||%3|||%5,%6) @Zt:@Zb:@Zh:%1hzi:%3,|||%5|||%6)
-
-#define @Zi:%0,|||||| @Zi:%0
-#define @Zj:X@(%0(_YM@CP:,,)) X@(%0())
-
-#define _YM@CP:%0,%1) @Zt:@Zb:@Zh:|||%0|||%1)
-
-#define X@(%0string:%1) R@(%1)
-
-#define global%0(%1) public%0@(%1)<>{}public%0@(%1)<_YCM:y>X@(_:%0(_YM@CP:%1,,));%0(%1)<_YCM:y>
-*/
 
 // Clean up the new library definition code.
 #if defined _YSIM_LAST_LIBRARY_MASTER

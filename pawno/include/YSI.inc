@@ -1035,7 +1035,8 @@ Notes:
 	Called when the script first starts, regardless of what type it is.
 \*----------------------------------------------------------------------------*/
 
-forward OnScriptInit();
+forward OnScriptInit
+	();
 
 /*----------------------------------------------------------------------------*\
 Function:
@@ -1048,7 +1049,8 @@ Notes:
 	Called when the script ends, regardless of what type it is.
 \*----------------------------------------------------------------------------*/
 
-forward OnScriptExit();
+forward OnScriptExit
+	();
 
 /*----------------------------------------------------------------------------*\
 Function:

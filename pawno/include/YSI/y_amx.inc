@@ -241,12 +241,12 @@ public OnScriptInit()
 	#if defined YSI_LOCK_MODE
 		GetServerVarAsString(YSI_gLockData, YSI_gLockData[5], sizeof (YSI_gLockData) - 5);
 	#endif
-	CallLocalFunction("AMX_OnScriptInit", "");
+	return AMX_OnScriptInit();
 }
 
 #undef OnScriptInit
-#define OnScriptInit AMX_OnScriptInit
-forward OnScriptInit();
+#define OnScriptInit(%0) AMX_OnScriptInit(%0) <_ALS_:hooked>
+forward AMX_OnScriptInit();public AMX_OnScriptInit()<_ALS_:unhooked>{return 1;}public AMX_OnScriptInit()<>{return 1;}
 
 stock AMX_GetGlobalAddress(...)
 {

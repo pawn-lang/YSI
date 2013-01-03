@@ -1277,9 +1277,9 @@ Notes:
 
 #define _AREA_MIN(%0,%1) if (%1 < %0) %0 ^= %1, %1 ^= %0, %0 ^= %1
 
-foreign Area_AddCuboid(Float:x0,Float:y0,Float:z0,Float:x1,Float:y1,Float:z1);
+@foreign Area_AddCuboid(Float:x0,Float:y0,Float:z0,Float:x1,Float:y1,Float:z1);
 
-global Area_AddCuboid(Float:x0,Float:y0,Float:z0,Float:x1,Float:y1,Float:z1)
+@global Area_AddCuboid(Float:x0,Float:y0,Float:z0,Float:x1,Float:y1,Float:z1)
 {
 	new
 		slot = Area_GetFreeSlot();
@@ -1352,9 +1352,9 @@ stock Area_AddBox(Float:minx, Float:miny, Float:maxx, Float:maxy)
 }
 
 /*
-foreign Area_AddBox(Float:minx, Float:miny, Float:maxx, Float:maxy);
+@foreign Area_AddBox(Float:minx, Float:miny, Float:maxx, Float:maxy);
 
-global Area_AddBox(Float:minx, Float:miny, Float:maxx, Float:maxy)
+@global Area_AddBox(Float:minx, Float:miny, Float:maxx, Float:maxy)
 {
 	
 	new
@@ -1430,9 +1430,9 @@ Notes:
 	spare slot in the 4 float design which may as well have been used).
 -*----------------------------------------------------------------------------*/
 
-foreign Area_AddOval(Float:x,Float:y,Float:rx,Float:ry,Float:h,Float:d);
+@foreign Area_AddOval(Float:x,Float:y,Float:rx,Float:ry,Float:h,Float:d);
 
-global Area_AddOval(Float:x,Float:y,Float:rx,Float:ry,Float:h,Float:d)
+@global Area_AddOval(Float:x,Float:y,Float:rx,Float:ry,Float:h,Float:d)
 {
 	new
 		slot = Area_GetFreeSlot();
@@ -1523,9 +1523,9 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-foreign Area_AddOvoid(Float:x,Float:y,Float:z,Float:rx,Float:ry,Float:rz);
+@foreign Area_AddOvoid(Float:x,Float:y,Float:z,Float:rx,Float:ry,Float:rz);
 
-global Area_AddOvoid(Float:x,Float:y,Float:z,Float:rx,Float:ry,Float:rz)
+@global Area_AddOvoid(Float:x,Float:y,Float:z,Float:rx,Float:ry,Float:rz)
 {
 	new
 		slot = Area_GetFreeSlot();

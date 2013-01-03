@@ -187,6 +187,14 @@ Natives:
 	#endif
 #endif
 
+// Incognito's streamer is set as master number 16
+#if defined _inc_y_phone
+	#if !defined _YCM_p@ // q is letter 16
+		#define MASTER                  15
+		#endinput
+	#endif
+#endif
+
 // The help system is set as master number 29
 /*#if defined _inc_y_help
 	#if !defined _YCM_u@ // D is letter 29

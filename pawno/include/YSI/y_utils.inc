@@ -598,6 +598,12 @@ Notes:
 	http://forum.sa-mp.com/showthread.php?p=1606781#post1606781
 	
 	Modified to use binary flags instead of a loop.
+	
+	"memset" takes an array, the size of the array, and a value to fill it with
+	and sets the whole array to that value.
+	
+	"rawmemset" is similar, but takes an AMX data segment address instead and
+	the size is in bytes, not cells.
 \*----------------------------------------------------------------------------*/
 
 stock memset(arr[], size = sizeof (arr), val = 0)

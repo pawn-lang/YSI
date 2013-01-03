@@ -118,7 +118,7 @@ Changelog:
 #define INLINE_LOOP_PATTERN_2 0x13C0E7A1
 #define INLINE_LOOP_PATTERN_3 0x21495359
 
-#define INLINE_LOOP_PATTERNS INLINE_LOOP_PATTERN_0,INLINE_LOOP_PATTERN_1,INLINE_LOOP_PATTERN_2,INLINE_LOOP_PATTERN_3
+//#define INLINE_LOOP_PATTERNS INLINE_LOOP_PATTERN_0,INLINE_LOOP_PATTERN_1,INLINE_LOOP_PATTERN_2,INLINE_LOOP_PATTERN_3
 
 // This code uses a specialisation of my "tag macros" technique, embedding the
 // macro names in to a string instead of using them as tags.  This does mean
@@ -136,13 +136,13 @@ Changelog:
 //  3 - Cells in the enclosing function at this point (passed and declared).
 //  4 - Parameters format.
 //  
-#define inline%0(%1) new %0__;static const%0[]=#%0":..."#_YI@CP;for(new%1,,;Inline_Loop(INLINE_LOOP_PATTERNS,%0__,%0);)
+#define inline%0(%1) new %0__;static const%0[]=#%0":..."#_YI@CP;for(new%1,,;Inline_Loop(.y=%0__,.f=%0);)
 
 #define callback:%0) const callback_tag:callback_check:%0£££
 #define callback_tag:callback_check:%0,%1£££ callback_tag:%0[],%1)
 #define callback_check:%0£££ %0[])
 
-#define anonymous%0(%1) new __anonVar;Q@=#_YI@CA;for(new%1,,;Inline_Loop(INLINE_LOOP_PATTERNS,__anonVar,":...:"#);)
+#define anonymous%0(%1) new __anonVar;Q@=#_YI@CA;for(new%1,,;Inline_Loop(.y=__anonVar,.f=":...:"#);)
 
 #define _YI@CP;for(new%0,%1; @Ia#@Ib#@Ic#@Id#:;for(new @Iz|||%0|||%1;
 
@@ -350,6 +350,7 @@ public _Inline_FixCompiler@@()
 
 hook OnScriptInit()
 {
+	P:2("Inline_OnScriptInit");
 	static
 		// Default settings.
 		sSearch1[] =
@@ -401,6 +402,7 @@ hook OnScriptInit()
 
 static stock Inline_DoSearch(sSearch[], neg, size = sizeof (sSearch))
 {
+	P:4("Inline_DoSearch called");
 	new
 		//str[32],
 		addr,
@@ -411,6 +413,7 @@ static stock Inline_DoSearch(sSearch[], neg, size = sizeof (sSearch))
 	//printf("FIND FUNC: %s", sSearch);
 	while (AMX_TraceCode(sSearch, addr, func, size))
 	{
+		P:4("Inline_DoSearch: %d %d %d", addr, func, size);
 		// Get the function return address (make sure "pri" is always non-zero).
 		func = addr + ((size + 1) * 4);
 		//printf("stored function at %x", func);
@@ -491,13 +494,14 @@ static stock Inline_DoSearch(sSearch[], neg, size = sizeof (sSearch))
 	return last;
 }
 
-stock Inline_Loop(p0, p1, p2, p3, &__yil, volatile const format[])
+stock Inline_Loop(p0 = INLINE_LOOP_PATTERN_0, p1 = INLINE_LOOP_PATTERN_1, p2 = INLINE_LOOP_PATTERN_2, p3 = INLINE_LOOP_PATTERN_3, &y = 0, volatile const f[] = "")
+//stock Inline_Loop(p0, p1, p2, p3, &__yil, volatile const format[])
 {
 	#pragma unused p0, p1, p2, p3
 	//#emit LOAD.S.pri    4
 	//#emit STOR.S.pri    p0
 	//printf("ret: %d %d", p0, YSI_g_sInInline);
-	if (__yil)
+	if (y)
 	{
 		/*#emit LOAD.S.alt 0
 		#emit MOVE.pri
@@ -520,7 +524,7 @@ stock Inline_Loop(p0, p1, p2, p3, &__yil, volatile const format[])
 		#emit MOVE.pri
 		#emit SCTRL      6
 	}
-	__yil = 1;
+	y = 1;
 	static const
 		scSearch[] = ":";
 	// This function needs to be modified to store the stack size at this point
@@ -531,7 +535,7 @@ stock Inline_Loop(p0, p1, p2, p3, &__yil, volatile const format[])
 	#emit ADD.C         8
 	#emit LOAD.I
 	#emit PUSH.pri
-	// Get the local variable sizes.  Need to allocate the data somewhere.  First
+	// Get the local variable sizes.  Need to allocate the data somewhere.
 	#emit LCTRL         5
 	#emit LOAD.S.alt    0
 	// Subtract the parameters passed to this function.
@@ -542,7 +546,7 @@ stock Inline_Loop(p0, p1, p2, p3, &__yil, volatile const format[])
 	#emit PUSH.C        0
 	#emit PUSH.C        0
 	#emit PUSH.C        scSearch
-	#emit PUSH.S        format
+	#emit PUSH.S        f
 	#emit PUSH.C        16
 	#emit SYSREQ.C      strfind
 	#emit STACK         20
@@ -550,15 +554,15 @@ stock Inline_Loop(p0, p1, p2, p3, &__yil, volatile const format[])
 	#emit CONST.alt     4
 	#emit SMUL
 	#emit ADD.C         12
-	#emit LOAD.S.alt    format
+	#emit LOAD.S.alt    f
 	#emit ADD
-	#emit STOR.S.pri    format
+	#emit STOR.S.pri    f
 	#emit POP.alt
 	#emit SHL.C.alt     6
 	#emit POP.pri
 	#emit SHR.C.pri     2
 	#emit ADD
-	#emit SREF.S.pri    format
+	#emit SREF.S.pri    f
 	return 0;
 }
 
@@ -769,6 +773,7 @@ stock Callback_Get(callback:name, result[E_CALLBACK_DATA], expect = -1)
 	// Now we need to somehow store all this data somewhere (including, for
 	// speed, the extra data involved in calling a function).  Here "pos" is the
 	// number of bytes pushed to the owning function.
+	P:6("%04x%04x %04x%04x", _:result[E_CALLBACK_DATA_FLAGS] >>> 16, _:result[E_CALLBACK_DATA_FLAGS] & 0xFFFF, (num >>> 8), (num << 8) & 0xFFFF);
 	result[E_CALLBACK_DATA_FLAGS] -= e_CALLBACK_FLAGS:(num << 8);
 	pos = _:result[E_CALLBACK_DATA_FLAGS];
 	// Get the size of the closure.
@@ -808,6 +813,7 @@ stock Callback_Call(const result[E_CALLBACK_DATA], GLOBAL_TAG_TYPES:...)
 {
 	// Call the function with the given data.  We need some serious stack
 	// manipulation skills in here to make it all work.
+	//printf("Calling function at %d", _:result[E_CALLBACK_DATA_FLAGS]);
 	if (result[E_CALLBACK_DATA_FLAGS] & e_CALLBACK_FLAGS_PUBLIC)
 	{
 		// I think I've got an even better way.  NOPE!  None of this code will
@@ -884,6 +890,7 @@ stock Callback_Call(const result[E_CALLBACK_DATA], GLOBAL_TAG_TYPES:...)
 			//YSI_g_sInInline = result[E_CALLBACK_DATA_POINTER];
 		//	ininline = YSI_g_sInInline;
 		YSI_g_sInInline = result[E_CALLBACK_DATA_POINTER];
+		//printf("Calling function at 0x%08x", YSI_g_sInInline);
 		size = ((size & 0xFF) + (size >>> 8) + 3) * 4;
 		#emit LCTRL      4
 		#emit STOR.S.pri stack

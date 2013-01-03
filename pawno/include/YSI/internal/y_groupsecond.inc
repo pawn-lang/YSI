@@ -163,12 +163,107 @@ static stock Group_FU(playerid, el, Bit:previous[], Bit:current[], Bit:reference
 	// loops over all the groups in 32 group chunks.  When I say "loop", this
 	// could be in the form of a huge "if" statement with every iteration put in
 	// explicitly.
-	_GROUPS_CHECK(previous, reference)
+	// nr = NOT REFERENCE
+	// ar = ALOW REFERENCE
+	// cur = NEW SETTINGS
+	// pre = PREVIOUS SETTINGS
+	/*if (Bit_Get(gNotDat, el))
+	{
+		if (Bit_Get(gAndDat, el))
+		{
+			_GROUPS_CHECK_IN(ar, cur)
+			{
+				_GROUPS_CHECK_NONE(nr, cur)
+				{
+					_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, true);
+					return;
+				}
+			}
+			// SHOULD IT BE REMOVED?
+			{
+				_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, false);
+				return;
+			}
+		}
+		else
+		{
+			_GROUPS_CHECK_ANY(ar, cur)
+			{
+				_GROUPS_CHECK_NONE(nr, cur)
+				{
+					_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, true);
+					return;
+				}
+			}
+			// SHOULD IT BE REMOVED?
+			{
+				_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, false);
+				return;
+			}
+		}
+	}
+	else
+	{
+		if (Bit_Get(gAndDat, el))
+		{
+			_GROUPS_CHECK_IN(ar, cur)
+			{
+				_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, true);
+				return;
+			}
+			// SHOULD IT BE REMOVED?
+			{
+				_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, false);
+				return;
+			}
+		}
+		else
+		{
+			_GROUPS_CHECK_ANY(ar, cur)
+			{
+				_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, true);
+				return;
+			}
+			// SHOULD IT BE REMOVED?
+			{
+				_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, false);
+				return;
+			}
+		}
+	}*/
+	/*_GROUPS_CHECK_ALL(nr, ar)
+	{
+		_GROUPS_CHECK_IN(ar, cur)
+		{
+			_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, true);
+			return;
+		}
+		_GROUPS_CHECK_IN(ar, pre)
+		{
+			_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, false);
+			return;
+		}
+		return;
+	}
+	_GROUPS_CHECK_ANY(ar, cur)
+	{
+		_GROUPS_CHECK_NONE(nr, cur)
+		{
+			_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, true);
+			return;
+		}
+	}
+	_GROUPS_CHECK_IN(ar, pre)
+	{
+		_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, false);
+		return;
+	}*/
+	_GROUPS_CHECK_ANY(previous, reference)
 	{
 		// Could previously see this thing.  The thing about this design is that
 		// it can (best case) take just 2 comparisons to end - and that should
 		// be the common case!
-		_GROUPS_CHECK(current, reference)
+		_GROUPS_CHECK_ANY(current, reference)
 		{
 			// Still can.
 			return;
@@ -178,14 +273,14 @@ static stock Group_FU(playerid, el, Bit:previous[], Bit:current[], Bit:reference
 		return;
 	}
 	// Couldn't see it before.
-	_GROUPS_CHECK(current, reference)
+	_GROUPS_CHECK_ANY(current, reference)
 	{
 		// They have whatever this thing is.  Note that this may be called
 		// MULTIPLE times for an element, without anything actually changing.
 		// I.e. this could be set to "true" repeatedly while never being set
 		// to "false".
 		_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, true);
-		// We use "return" here because "_GROUPS_CHECK" MAY be a loop.
+		// We use "return" here because "_GROUPS_CHECK_ANY" MAY be a loop.
 		return;
 	}
 }

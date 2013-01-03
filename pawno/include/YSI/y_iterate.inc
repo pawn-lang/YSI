@@ -16,7 +16,7 @@ Legal:
 	The contents of this file are subject to the Mozilla Public License Version 
 	1.1 (the "License"); you may not use this file except in compliance with 
 	the License. You may obtain a copy of the License at 
-	http://www.mozilla.org/MPL/
+	[url]http://www.mozilla.org/MPL/[/url]
 	
 	Software distributed under the License is distributed on an "AS IS" basis,
 	WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
@@ -183,7 +183,7 @@ Iterators:
 \*----------------------------------------------------------------------------*/
 
 // "y_iterate" is always higher than "foreach".
-#define _Y_ITERATE_LOCAL_VERSION        18
+#define _Y_ITERATE_LOCAL_VERSION        20
 
 // Foreach is testing us.
 #if defined _FOREACH_INC_TEST
@@ -226,6 +226,8 @@ Iterators:
 //#include "y_hooks"
 
 #include "internal\y_natives"
+#include "y_debug"
+//#include "y_als"
 
 #if defined SendChat || defined FOREACH_NO_PLAYERS
 	#define BOTSYNC_IS_BOT     (true)
@@ -248,9 +250,13 @@ Iterators:
 
 #define _Y_ITER_C3:%0[%1]@YSII_Cg,%2[%3]@YSII_Ag[%4]={%5} _Y_ITER_C3:%0@YSII_Cg[%4-1],%0@YSII_Ag[%1][%4]
 
+//#if !defined BOTSYNC_IS_BOT
+//	static stock
+//		YSI_g_sCallbacks = 0;
+//#endif
+
 #if !defined BOTSYNC_IS_BOT
-	static stock
-		YSI_g_sCallbacks = 0;
+	forward Itter_OPDCInternal(playerid);
 #endif
 
 /*----------------------------------------------------------------------------*\
@@ -507,6 +513,21 @@ Create the internal itterators.
 #endif
 
 /*----------------------------------------------------------------------------*\
+	Variables to optimise memory usage by only having one copy of each string.
+	Note that only strings used more than once are put here because only they
+	have any gain to being located in only one place.
+\*----------------------------------------------------------------------------*/
+
+static stock
+	YSI_gsOnGameModeInit[] = "Itter_OnGameModeInit",
+	YSI_gsSpecifier@[] = "";
+/*	YSI_gsOnPlayerConnect[] = "Itter_OnPlayerConnect",
+	YSI_gsOnPlayerDisconnect[] = "Itter_OnPlayerDisconnect",
+	YSI_gsOnGameModeInit[] = "Itter_OnGameModeInit",
+	YSI_gsSpecifier@i[] = "i",
+	YSI_gsSpecifier@[] = "";*/
+
+/*----------------------------------------------------------------------------*\
 Function:
 	foreach
 Params:
@@ -594,6 +615,7 @@ Notes:
 #if !defined BOTSYNC_IS_BOT
 	public OnPlayerConnect(playerid)
 	{
+		P:0("Iter_OnPlayerConnect: %d", playerid);
 		#if defined _FOREACH_BOT
 			if (!IsPlayerNPC(playerid))
 			{
@@ -610,10 +632,12 @@ Notes:
 		#else
 			Itter_Add(Player, playerid);
 		#endif
-		if (YSI_g_sCallbacks & 2)
-		{
-			CallLocalFunction("Itter_OnPlayerConnect", "i", playerid);
-		}
+		//if (YSI_g_sCallbacks & 2)
+		//{
+		//	CallLocalFunction(YSI_gsOnPlayerConnect, YSI_gsSpecifier@i, playerid);
+		//}
+		Itter_OnPlayerConnect(playerid);
+		P:0("Iter_OnPlayerConnect end");
 		return 1;
 	}
 	
@@ -622,8 +646,104 @@ Notes:
 	#else
 		#define _ALS_OnPlayerConnect
 	#endif
-	#define OnPlayerConnect Itter_OnPlayerConnect
-	forward OnPlayerConnect(playerid);
+	#define OnPlayerConnect(%0) Itter_OnPlayerConnect(%0) <_ALS_:hooked>
+	forward Itter_OnPlayerConnect(playerid);public Itter_OnPlayerConnect(playerid)<_ALS_:unhooked>{return 1;}public Itter_OnPlayerConnect(playerid)<>{return 1;}
+#endif
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Itter_OnFilterScriptInit
+Params:
+	-
+Return:
+	-
+Notes:
+	Fixes a bug where callbacks are not detected when "loadfs" is used after the
+	GM has already started.  If this is a GM this is just never used called.
+\*----------------------------------------------------------------------------*/
+
+#if !defined BOTSYNC_IS_BOT
+	public OnFilterScriptInit()
+	{
+		P:0("Iter_OnFilterScriptInit start: %d", MAX_PLAYERS);
+		//if (funcidx(YSI_gsOnPlayerDisconnect) != -1)
+		//{
+		//	YSI_g_sCallbacks |= 1;
+		//}
+		//if (funcidx(YSI_gsOnPlayerConnect) != -1)
+		//{
+		//	YSI_g_sCallbacks |= 2;
+		//}
+		#if defined _FOREACH_BOT && !defined FOREACH_NO_BOTS
+			Bot@YSII_Cg = _Y_ITER_C3:0;
+			Character@YSII_Cg = _Y_ITER_C3:0;
+			new
+				lastBot = MAX_PLAYERS,
+				lastCharacter = MAX_PLAYERS;
+		#endif
+		Player@YSII_Cg = _Y_ITER_C3:0;
+		new
+			lastPlayer = MAX_PLAYERS;
+		for (new i = 0; i != MAX_PLAYERS; ++i)
+		{
+			if (IsPlayerConnected(i))
+			{
+				#if defined _FOREACH_BOT
+					// Had to do "if ! else" due to compile options.
+					if (!IsPlayerNPC(i))
+					{
+						Player@YSII_Ag[lastPlayer] = i;
+						++Player@YSII_Cg;
+						lastPlayer = i;
+					}
+					#if !defined FOREACH_NO_BOTS
+						else
+						{
+							Bot@YSII_Ag[lastBot] = i;
+							++Bot@YSII_Cg;
+							lastBot = i;
+						}
+						#pragma tabsize 4
+						Character@YSII_Ag[lastCharacter] = i;
+						++Character@YSII_Cg;
+						lastCharacter = i;
+					#endif
+				#else
+					Player@YSII_Ag[lastPlayer] = i;
+					++Player@YSII_Cg;
+					lastPlayer = i;
+				#endif
+			}
+			else
+			{
+				#if defined _FOREACH_BOT && !defined FOREACH_NO_BOTS
+					Bot@YSII_Ag[i] = MAX_PLAYERS + 1;
+					//Bot@YSII_Rg[i] = -1;
+					Character@YSII_Ag[i] = MAX_PLAYERS + 1;
+					//Character@YSII_Rg[i] = -1;
+				#endif
+				Player@YSII_Ag[i] = MAX_PLAYERS + 1;
+				//Player@YSII_Rg[i] = -1;
+			}
+		}
+		#if defined _FOREACH_BOT && !defined FOREACH_NO_BOTS
+			Bot@YSII_Ag[lastPlayer] = MAX_PLAYERS;
+			Character@YSII_Ag[lastPlayer] = MAX_PLAYERS;
+		#endif
+		Player@YSII_Ag[lastPlayer] = MAX_PLAYERS;
+		//CallLocalFunction("Itter_OnFilterScriptInit", YSI_gsSpecifier@);
+		Itter_OnFilterScriptInit();
+		P:0("Iter_OnFilterScriptInit end");
+		return 1;
+	}
+	
+	#if defined _ALS_OnFilterScriptInit
+		#undef OnFilterScriptInit
+	#else
+		#define _ALS_OnFilterScriptInit
+	#endif
+	#define OnFilterScriptInit(%0) Itter_OnFilterScriptInit(%0) <_ALS_:hooked>
+	forward Itter_OnFilterScriptInit();public Itter_OnFilterScriptInit()<_ALS_:unhooked>{return 1;}public Itter_OnFilterScriptInit()<>{return 1;}
 #endif
 
 /*----------------------------------------------------------------------------*\
@@ -643,21 +763,22 @@ Notes:
 #if !defined BOTSYNC_IS_BOT
 	public OnGameModeInit()
 	{
+		P:0("Iter_OnGameModeInit start: %d", MAX_PLAYERS);
 		// Clear everything.
-		if (funcidx("Itter_OnPlayerDisconnect") != -1)
-		{
-			YSI_g_sCallbacks |= 1;
-		}
-		if (funcidx("Itter_OnPlayerConnect") != -1)
-		{
-			YSI_g_sCallbacks |= 2;
-		}
+		//if (funcidx(YSI_gsOnPlayerDisconnect) != -1)
+		//{
+		//	YSI_g_sCallbacks |= 1;
+		//}
+		//if (funcidx(YSI_gsOnPlayerConnect) != -1)
+		//{
+		//	YSI_g_sCallbacks |= 2;
+		//}
 		if (!Player@YSII_Cg)
 		{
 			#if defined _FOREACH_BOT && !defined FOREACH_NO_BOTS
-				CallLocalFunction("Itter_OnGameModeInit", "", _:Bot@YSII_Cg, _:Character@YSII_Cg, _:Player@YSII_Cg);
+				CallLocalFunction(YSI_gsOnGameModeInit, YSI_gsSpecifier@, Bot@YSII_Cg, Character@YSII_Cg, Player@YSII_Cg);
 			#else
-				CallLocalFunction("Itter_OnGameModeInit", "", _:Player@YSII_Cg);
+				CallLocalFunction(YSI_gsOnGameModeInit, YSI_gsSpecifier@, Player@YSII_Cg);
 			#endif
 			#if defined _YSI_SPECIAL_DEBUG
 				for (new i = 0; i != MAX_PLAYERS; ++i)
@@ -667,6 +788,7 @@ Notes:
 				Player@YSII_Ag[MAX_PLAYERS] = 0;
 				Player@YSII_Cg = _Y_ITER_C3:MAX_PLAYERS;
 			#endif
+			P:0("Iter_OnGameModeInit: first");
 			return 1;
 		}
 		// Do the forward iterator list.
@@ -730,7 +852,8 @@ Notes:
 			Character@YSII_Ag[lastPlayer] = MAX_PLAYERS;
 		#endif
 		Player@YSII_Ag[lastPlayer] = MAX_PLAYERS;
-		CallLocalFunction("Itter_OnGameModeInit", "");
+		P:0("Iter_OnGameModeInit: lastplayer = %d", lastPlayer);
+		CallLocalFunction(YSI_gsOnGameModeInit, YSI_gsSpecifier@);
 		#if defined _YSI_SPECIAL_DEBUG
 			for (new i = 0; i != MAX_PLAYERS; ++i)
 			{
@@ -747,8 +870,10 @@ Notes:
 	#else
 		#define _ALS_OnGameModeInit
 	#endif
+	//#define OnGameModeInit(%0) Itter_OnGameModeInit(%0) <_ALS_:hooked>
+	//forward Itter_OnGameModeInit();public Itter_OnGameModeInit()<_ALS_:unhooked>{return 1;}public Itter_OnGameModeInit()<>{return 1;}
 	#define OnGameModeInit Itter_OnGameModeInit
-	forward OnGameModeInit();
+	forward Itter_OnGameModeInit();
 #endif
 
 /*----------------------------------------------------------------------------*\
@@ -767,9 +892,42 @@ Notes:
 #if !defined BOTSYNC_IS_BOT
 	public OnPlayerDisconnect(playerid, reason)
 	{
-		if (YSI_g_sCallbacks & 1)
+		//if (YSI_g_sCallbacks & 1)
+		//{
+		//	CallLocalFunction(YSI_gsOnPlayerDisconnect, "ii", playerid, reason);
+		//}
+		Itter_OnPlayerDisconnect(playerid, reason);
+		SetTimerEx("Itter_OPDCInternal", 0, false, "i", playerid);
+		return 1;
+	}
+	
+	#if defined _ALS_OnPlayerDisconnect
+		#undef OnPlayerDisconnect
+	#else
+		#define _ALS_OnPlayerDisconnect
+	#endif
+	#define OnPlayerDisconnect(%0) Itter_OnPlayerDisconnect(%0) <_ALS_:hooked>
+	forward Itter_OnPlayerDisconnect(playerid, reason);public Itter_OnPlayerDisconnect(playerid, reason)<_ALS_:unhooked>{return 1;}public Itter_OnPlayerDisconnect(playerid, reason)<>{return 1;}
+#endif
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Itter_OPDCInternal
+Params:
+	playerid - Player who left.
+Return:
+	-
+Notes:
+	Called AFTER "OnPlayerDisconnect" so that using "Kick" inside a "foreach"
+	loop doesn't crash the server due to an OOB error.
+\*----------------------------------------------------------------------------*/
+
+#if !defined BOTSYNC_IS_BOT
+	public Itter_OPDCInternal(playerid)
+	{
+		if (IsPlayerConnected(playerid))
 		{
-			CallLocalFunction("Itter_OnPlayerDisconnect", "ii", playerid, reason);
+			return;
 		}
 		#if defined _FOREACH_BOT
 			if (!IsPlayerNPC(playerid))
@@ -787,16 +945,7 @@ Notes:
 		#else
 			Itter_Remove(Player, playerid);
 		#endif
-		return 1;
 	}
-	
-	#if defined _ALS_OnPlayerDisconnect
-		#undef OnPlayerDisconnect
-	#else
-		#define _ALS_OnPlayerDisconnect
-	#endif
-	#define OnPlayerDisconnect Itter_OnPlayerDisconnect
-	forward OnPlayerDisconnect(playerid, reason);
 #endif
 
 /*----------------------------------------------------------------------------*\
@@ -1083,18 +1232,12 @@ stock
 {
 	if (0 <= slot <= size && array[slot] <= size)
 	{
-		new
-			last = size;
-		//for (new next = array[size]; next != size; next = array[next])
-		for ( ; ; )
+		for (new last = slot; last--; )
 		{
-			new
-				next = array[last];
-			if (next == slot)
+			if (array[last] == slot)
 			{
 				return last;
 			}
-			last = next;
 		}
 	}
 	return size;

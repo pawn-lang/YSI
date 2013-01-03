@@ -256,12 +256,12 @@ public OnGameModeInit()
 	{
 		if (YSI_g_sCallbacks & 16)
 		{
-			CallLocalFunction("TextInt_OnGameModeInit", "");
+			TextInt_OnGameModeInit();
 		}
 	}
 	else
 	{
-		CallLocalFunction("TextInt_OnGameModeInit", "");
+		TextInt_OnGameModeInit();
 		//Text_SpecialInit();
 		Text_RefreshLoaded();
 		_Styles_SpecialInit();
@@ -275,9 +275,9 @@ public OnGameModeInit()
 #else
 	#define _ALS_OnGameModeInit
 #endif
-#define OnGameModeInit TextInt_OnGameModeInit
+#define OnGameModeInit(%0) TextInt_OnGameModeInit(%0) <_ALS_:hooked>
 
-forward TextInt_OnGameModeInit();
+forward TextInt_OnGameModeInit();public TextInt_OnGameModeInit()<_ALS_:unhooked>{return 1;}public TextInt_OnGameModeInit()<>{return 1;}
 
 public OnFilterScriptInit()
 {
@@ -287,7 +287,7 @@ public OnFilterScriptInit()
 		YSI_g_sCallbacks |= 16;
 	}
 	// DO ALL (MOST) OTHER INITS FIRST.  ENSURE WE COME LATER.
-	CallLocalFunction("TextInt_OnFilterScriptInit", "");
+	TextInt_OnFilterScriptInit();
 	//Text_SpecialInit();
 	Text_RefreshLoaded();
 	_Styles_SpecialInit();
@@ -300,9 +300,9 @@ public OnFilterScriptInit()
 #else
 	#define _ALS_OnFilterScriptInit
 #endif
-#define OnFilterScriptInit TextInt_OnFilterScriptInit
+#define OnFilterScriptInit(%0) TextInt_OnFilterScriptInit(%0) <_ALS_:hooked>
 
-forward TextInt_OnFilterScriptInit();
+forward TextInt_OnFilterScriptInit();public TextInt_OnFilterScriptInit()<_ALS_:unhooked>{return 1;}public TextInt_OnFilterScriptInit()<>{return 1;}
 
 //forward Text_SpecialInit();
 //
@@ -2189,5 +2189,7 @@ stock _Text_DialogBox(@PlayerSet:players, style, callback:callback, csearch[], c
 		cd[E_CALLBACK_DATA];
 	Callback_Get(callback, cd, _F<iiiis>);
 	Dialog_SetCallbackData(dialog, cd); //AMX_GetPublicPointer(callback));
+	// Automatically free the dialog when we're done.
+	Dialog_Garbage(dialog);
 	return dialog;
 }

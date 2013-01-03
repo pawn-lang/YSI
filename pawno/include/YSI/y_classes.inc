@@ -986,7 +986,8 @@ Notes:
 
 stock Class_Add(skin, Float:x, Float:y, Float:z, Float:a, ...)
 {
-	P:3("Class_Add called: %i, %i, %i, %i, %i, %i (+%i)", skin, x, y, z, a, numargs() - 5);
+	//printf("Class_Add called: %i, %f, %f, %f, %f, (+%i)", skin, x, y, z, a, numargs() - 5);
+	P:3("Class_Add called: %i, %f, %f, %f, %f, (+%i)", skin, x, y, z, a, numargs() - 5);
 	new
 		n = numargs(),
 		w = 5,
@@ -1114,7 +1115,8 @@ foreign Class_AddClass(s,Float:x,Float:y,Float:z,Float:a,w[],c,Group:f,Group:g);
 
 global Class_AddClass(s,Float:x,Float:y,Float:z,Float:a,w[],c,Group:f,Group:g)
 {
-	P:2("Class_AddClass called: %i, %f, %f, %f, %f, %a, %i, %i, %i", s, x, y, z, a, w, c, _:f, _:g);
+	//printf("Class_AddClass called: %i, %f, %f, %f, %f, %s, %i, %i, %i", s, x, y, z, a, Debug_PrintArray(w, c), c, _:f, _:g);
+	P:2("Class_AddClass called: %i, %f, %f, %f, %f, %s, %i, %i, %i", s, x, y, z, a, Debug_PrintArray(w, c), c, _:f, _:g);
 	new
 		i;
 	while (i < MAX_CLASSES)
@@ -1137,10 +1139,14 @@ global Class_AddClass(s,Float:x,Float:y,Float:z,Float:a,w[],c,Group:f,Group:g)
 		YSI_g_sClasses[i][E_CLASS_WEAPONS][j] = w[j];
 		++j;
 	}
+	//printf("Class_AddClass: weapon %d %d %d", j, c, i);
 	PA_FastInit(YSI_g_sClasses[i][E_CLASS_PLAYERS]);
+	//printf("Class_AddClass: weapon %d %d %d", j, c, f);
 	Class_ResolveGroups(i, f, false);
+	//printf("Class_AddClass: weapon %d %d %d", j, c, g);
 	YSI_g_sClasses[i][E_CLASS_GROUP] = g;
 	YSI_g_sClassCount++;
+	//printf("Class_AddClass: weapon %d %d %d", j, c, YSI_g_sClassCount);
 	return i;
 }
 

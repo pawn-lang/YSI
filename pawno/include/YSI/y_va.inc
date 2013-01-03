@@ -278,6 +278,8 @@ stock va_CallLocalFunction(const function[], const fmat[], va_:STATIC_ARGS)
 
 stock va_SetTimerEx(const function[], interval, bool:repeating, const fmat[], va_:STATIC_ARGS)
 {
+	static
+		sRet;
 	new
 		num_args,
 		arg_start,
@@ -326,6 +328,7 @@ stock va_SetTimerEx(const function[], interval, bool:repeating, const fmat[], va
 	// seems to factor in them first, so you get the offset of the local
 	// variable instead of the index of the native.
 	#emit SYSREQ.C     SetTimerEx
+	#emit STOR.pri     sRet
 	// Clear the stack.
 	#emit CONST.pri    4
 	#emit ADD
@@ -335,6 +338,7 @@ stock va_SetTimerEx(const function[], interval, bool:repeating, const fmat[], va
 	#emit ADD
 	#emit SCTRL        4
 	// Now do the real return.
+	return sRet;
 }
 
 stock va_format(out[], size, const fmat[], va_:STATIC_ARGS)
@@ -532,6 +536,16 @@ stock va_getstring(dest[], arg, len = sizeof (dest))
 	#emit SYSREQ.C   strcat
 	// Restore the stack to its level before we called this native.
 	#emit STACK      16
+}
+
+stock PlayerText:va_CreatePlayerTextDraw(playerid, Float:x, Float:y, fmat[], va_args<>)
+{
+	return CreatePlayerTextDraw(playerid, x, y, va_return(fmat, va_start<4>));
+}
+
+stock Text:va_TextDrawCreate(Float:x, Float:y, fmat[], va_args<>)
+{
+	return TextDrawCreate(x, y, va_return(fmat, va_start<3>));
 }
 
 stock va_SendClientMessage(playerid, colour, const fmat[], va_args<>)

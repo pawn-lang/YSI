@@ -1111,6 +1111,8 @@ Notes:
 	
 	// Don't need ALS here as we did it supporting it at the start.
 	#undef OnScriptClose
+	//#define OnScriptClose(%0) Command_OnScriptClose(%0) <_ALS_:hooked>
+	//forward Command_OnScriptClose(script);public Command_OnScriptClose(script)<_ALS_:unhooked>{return 1;}public Command_OnScriptClose(script)<>{return 1;}
 	#define OnScriptClose Command_OnScriptClose
 	forward Command_OnScriptClose(script);
 #endif
