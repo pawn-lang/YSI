@@ -1128,7 +1128,7 @@ Notes:
 	corresponds to their data file.  Note that one user can have multiple nicks.
 \*----------------------------------------------------------------------------*/
 
-forward OnPlayerLogin(playerid, yid);
+forward OnPlayerLogin(playerid, uid);
 
 /*----------------------------------------------------------------------------*\
 Function:
@@ -1143,4 +1143,4 @@ Notes:
 	corresponds to their data file.  Note that one user can have multiple nicks.
 \*----------------------------------------------------------------------------*/
 
-forward OnPlayerLogout(playerid, yid);
+forward OnPlayerLogout(playerid, uid);
