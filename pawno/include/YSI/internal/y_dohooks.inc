@@ -483,7 +483,7 @@ public OnGameModeInit()
 		#emit SCTRL      6
 	}
 	while (start != end);
-	return ALS_R_GameModeExit;
+	return ALS_R_GameModeInit;
 }
 #if defined _ALS_OnGameModeInit
 	#undef OnGameModeInit
