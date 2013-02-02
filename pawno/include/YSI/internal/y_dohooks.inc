@@ -128,6 +128,7 @@ static Hooks_Blank_Return1()
 
 stock Hooks_RedirectPublic(from[], to[], final = 1)
 {
+	//return 0;
 	P:4("Hooks_RedirectPublic called: \"%s\", \"%s\"", from, to);
 	new
 		addr = strfind(from, "(");
@@ -267,6 +268,7 @@ Notes:
 	value (must be -1, 0, or 1).
 \*----------------------------------------------------------------------------*/
 
+/*
 static Hooks_RemovePublic(from[], final)
 {
 	P:4("Hooks_RemovePublic called: \"%s\", %d", from, final);
@@ -302,16 +304,20 @@ static Hooks_RemovePublic(from[], final)
 	}
 	return 0;
 }
+*/
 
 #define HOOKS_STRIP_ME)%0, ,
 
-#define HOOKS_DO_ONE_CALLBACK<%0> if(!Hooks_FindAll(#%0,cidx,_:YSI_g_sCallbackStart[ALS_On%0],_:YSI_g_sCallbackEnd[ALS_On%0]))Hooks_RemovePublic(#On%0(HOOKS_STRIP_ME),ALS_R_%0);
+//#define HOOKS_DO_ONE_CALLBACK<%0> if(!Hooks_FindAll(#%0,cidx,_:YSI_g_sCallbackStart[ALS_On%0],_:YSI_g_sCallbackEnd[ALS_On%0]))Hooks_RemovePublic(#On%0(HOOKS_STRIP_ME),ALS_R_%0);
+#define HOOKS_DO_ONE_CALLBACK<%0> Hooks_FindAll(#%0,cidx,_:YSI_g_sCallbackStart[ALS_On%0],_:YSI_g_sCallbackEnd[ALS_On%0]);
 
 //static Hooks_OnScriptInit()
 public OnScriptInit()
 {
 	P:2("Hooks_OnScriptInit called");
-	S@@_OnScriptInit();
+	#if defined S@@_OnScriptInit
+		S@@_OnScriptInit();
+	#endif
 	new
 		cidx;
 	printf(" ");
@@ -404,7 +410,7 @@ public OnScriptInit()
 	new
 		end   = _:YSI_g_sCallbackEnd[ALS_OnScriptInit] - 1,
 		start = _:YSI_g_sCallbackStart[ALS_OnScriptInit];
-	while (start++ < end)
+	while (start++ != end)
 	{
 		//printf("%d %d", start, end);
 		#emit PUSH.C     0
@@ -425,8 +431,10 @@ public OnScriptInit()
 #else
 	#define _ALS_OnScriptInit
 #endif
-#define OnScriptInit(%0) S@@_OnScriptInit(%0) <_ALS_:hooked>
-ALS_FORWARD<ScriptInit>
+#define OnScriptInit S@@_OnScriptInit
+#if defined S@@_OnScriptInit
+	forward S@@_OnScriptInit();
+#endif
 
 public OnScriptExit()
 {
@@ -434,13 +442,13 @@ public OnScriptExit()
 	new
 		end   = _:YSI_g_sCallbackEnd[ALS_OnScriptExit],
 		start = _:YSI_g_sCallbackStart[ALS_OnScriptExit];
-	do
+	while (start++ != end)
 	{
 		#emit PUSH.C     0
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -449,7 +457,6 @@ public OnScriptExit()
 		#emit MOVE.pri
 		#emit SCTRL      6
 	}
-	while (start != end);
 	return ALS_R_ScriptExit;
 }
 #if defined _ALS_OnScriptExit
@@ -457,7 +464,7 @@ public OnScriptExit()
 #else
 	#define _ALS_OnScriptExit
 #endif
-#define OnScriptExit(%0) S@@_OnScriptExit(%0)
+#define OnScriptExit S@@_OnScriptExit
 HOOK_FORWARD<ScriptExit>
 
 public OnGameModeInit()
@@ -466,14 +473,14 @@ public OnGameModeInit()
 	new
 		end   = _:YSI_g_sCallbackEnd[ALS_OnGameModeInit],
 		start = _:YSI_g_sCallbackStart[ALS_OnGameModeInit];
-	do
+	while (start++ != end)
 	{
 		//printf("Hooks_OnGameModeInit: %d %d %d", start, end, YSI_g_sCallbackAddresses[start]);
 		#emit PUSH.C     0
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -482,7 +489,6 @@ public OnGameModeInit()
 		#emit MOVE.pri
 		#emit SCTRL      6
 	}
-	while (start != end);
 	return ALS_R_GameModeInit;
 }
 #if defined _ALS_OnGameModeInit
@@ -490,22 +496,24 @@ public OnGameModeInit()
 #else
 	#define _ALS_OnGameModeInit
 #endif
-#define OnGameModeInit(%0) S@@_OnGameModeInit(%0)
+#define OnGameModeInit S@@_OnGameModeInit
 HOOK_FORWARD<GameModeInit>
 
 public OnGameModeExit()
 {
-	P:2("Hooks_OnGameModeExit called");
+	P:2("Hooks_OnGameModeExit called %d %d %d", _:ALS_OnGameModeExit, _:YSI_g_sCallbackStart[ALS_OnGameModeExit], _:YSI_g_sCallbackEnd[ALS_OnGameModeExit]);
 	new
 		end   = _:YSI_g_sCallbackEnd[ALS_OnGameModeExit],
 		start = _:YSI_g_sCallbackStart[ALS_OnGameModeExit];
-	do
+	while (start++ != end)
 	{
+		//printf("Hooks_OnGameModeExit: %d %d", start, end);
+		//printf("Hooks_OnGameModeExit: %d", YSI_g_sCallbackAddresses[start]);
 		#emit PUSH.C     0
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -514,7 +522,6 @@ public OnGameModeExit()
 		#emit MOVE.pri
 		#emit SCTRL      6
 	}
-	while (start != end);
 	return ALS_R_GameModeExit;
 }
 #if defined _ALS_OnGameModeExit
@@ -522,7 +529,7 @@ public OnGameModeExit()
 #else
 	#define _ALS_OnGameModeExit
 #endif
-#define OnGameModeExit(%0) S@@_OnGameModeExit(%0)
+#define OnGameModeExit S@@_OnGameModeExit
 HOOK_FORWARD<GameModeExit>
 
 public OnFilterScriptInit()
@@ -537,13 +544,13 @@ public OnFilterScriptInit()
 	new
 		end   = _:YSI_g_sCallbackEnd[ALS_OnFilterScriptInit],
 		start = _:YSI_g_sCallbackStart[ALS_OnFilterScriptInit];
-	do
+	while (start++ != end)
 	{
 		#emit PUSH.C     0
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -552,7 +559,6 @@ public OnFilterScriptInit()
 		#emit MOVE.pri
 		#emit SCTRL      6
 	}
-	while (start != end);
 	return ALS_R_FilterScriptInit;
 }
 #if defined _ALS_OnFilterScriptInit
@@ -560,7 +566,7 @@ public OnFilterScriptInit()
 #else
 	#define _ALS_OnFilterScriptInit
 #endif
-#define OnFilterScriptInit(%0) S@@_OnFilterScriptInit(%0)
+#define OnFilterScriptInit S@@_OnFilterScriptInit
 HOOK_FORWARD<FilterScriptInit>
 
 public OnFilterScriptExit()
@@ -569,13 +575,13 @@ public OnFilterScriptExit()
 	new
 		end   = _:YSI_g_sCallbackEnd[ALS_OnFilterScriptExit],
 		start = _:YSI_g_sCallbackStart[ALS_OnFilterScriptExit];
-	do
+	while (start++ != end)
 	{
 		#emit PUSH.C     0
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -584,7 +590,6 @@ public OnFilterScriptExit()
 		#emit MOVE.pri
 		#emit SCTRL      6
 	}
-	while (start != end);
 	return ALS_R_FilterScriptExit;
 }
 #if defined _ALS_OnFilterScriptExit
@@ -592,7 +597,7 @@ public OnFilterScriptExit()
 #else
 	#define _ALS_OnFilterScriptExit
 #endif
-#define OnFilterScriptExit(%0) S@@_OnFilterScriptExit(%0)
+#define OnFilterScriptExit S@@_OnFilterScriptExit
 HOOK_FORWARD<FilterScriptExit>
 
 public OnPlayerConnect(playerid)
@@ -602,14 +607,14 @@ public OnPlayerConnect(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerConnect],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerConnect],
 		ret = ALS_R_PlayerConnect;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -627,7 +632,7 @@ public OnPlayerConnect(playerid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerConnect
@@ -635,7 +640,7 @@ public OnPlayerConnect(playerid)
 #else
 	#define _ALS_OnPlayerConnect
 #endif
-#define OnPlayerConnect(%0) S@@_OnPlayerConnect(%0)
+#define OnPlayerConnect S@@_OnPlayerConnect
 HOOK_FORWARD<PlayerConnect>
 
 public OnPlayerDisconnect(playerid, reason)
@@ -645,15 +650,15 @@ public OnPlayerDisconnect(playerid, reason)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerDisconnect],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerDisconnect],
 		ret = ALS_R_PlayerDisconnect;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S reason
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -671,7 +676,7 @@ public OnPlayerDisconnect(playerid, reason)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerDisconnect
@@ -679,7 +684,7 @@ public OnPlayerDisconnect(playerid, reason)
 #else
 	#define _ALS_OnPlayerDisconnect
 #endif
-#define OnPlayerDisconnect(%0) S@@_OnPlayerDisconnect(%0)
+#define OnPlayerDisconnect S@@_OnPlayerDisconnect
 HOOK_FORWARD<PlayerDisconnect>
 
 public OnPlayerSpawn(playerid)
@@ -689,14 +694,14 @@ public OnPlayerSpawn(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerSpawn],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerSpawn],
 		ret = ALS_R_PlayerSpawn;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -714,7 +719,7 @@ public OnPlayerSpawn(playerid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerSpawn
@@ -722,7 +727,7 @@ public OnPlayerSpawn(playerid)
 #else
 	#define _ALS_OnPlayerSpawn
 #endif
-#define OnPlayerSpawn(%0) S@@_OnPlayerSpawn(%0)
+#define OnPlayerSpawn S@@_OnPlayerSpawn
 HOOK_FORWARD<PlayerSpawn>
 
 public OnPlayerDeath(playerid, killerid, reason)
@@ -732,7 +737,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerDeath],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerDeath],
 		ret = ALS_R_PlayerDeath;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S reason
 		#emit PUSH.S killerid
@@ -740,8 +745,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 		#emit PUSH.C     12
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -759,7 +764,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerDeath
@@ -767,7 +772,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 #else
 	#define _ALS_OnPlayerDeath
 #endif
-#define OnPlayerDeath(%0) S@@_OnPlayerDeath(%0)
+#define OnPlayerDeath S@@_OnPlayerDeath
 HOOK_FORWARD<PlayerDeath>
 
 public OnVehicleSpawn(vehicleid)
@@ -777,14 +782,14 @@ public OnVehicleSpawn(vehicleid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehicleSpawn],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehicleSpawn],
 		ret = ALS_R_VehicleSpawn;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S vehicleid
 		#emit PUSH.C     4
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -802,7 +807,7 @@ public OnVehicleSpawn(vehicleid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnVehicleSpawn
@@ -810,7 +815,7 @@ public OnVehicleSpawn(vehicleid)
 #else
 	#define _ALS_OnVehicleSpawn
 #endif
-#define OnVehicleSpawn(%0) S@@_OnVehicleSpawn(%0)
+#define OnVehicleSpawn S@@_OnVehicleSpawn
 HOOK_FORWARD<VehicleSpawn>
 
 public OnVehicleDeath(vehicleid, killerid)
@@ -820,15 +825,15 @@ public OnVehicleDeath(vehicleid, killerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehicleDeath],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehicleDeath],
 		ret = ALS_R_VehicleDeath;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S killerid
 		#emit PUSH.S vehicleid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -846,7 +851,7 @@ public OnVehicleDeath(vehicleid, killerid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnVehicleDeath
@@ -854,7 +859,7 @@ public OnVehicleDeath(vehicleid, killerid)
 #else
 	#define _ALS_OnVehicleDeath
 #endif
-#define OnVehicleDeath(%0) S@@_OnVehicleDeath(%0)
+#define OnVehicleDeath S@@_OnVehicleDeath
 HOOK_FORWARD<VehicleDeath>
 
 public OnPlayerText(playerid, text[])
@@ -864,15 +869,15 @@ public OnPlayerText(playerid, text[])
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerText],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerText],
 		ret = ALS_R_PlayerText;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S text
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -890,7 +895,7 @@ public OnPlayerText(playerid, text[])
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerText
@@ -898,7 +903,7 @@ public OnPlayerText(playerid, text[])
 #else
 	#define _ALS_OnPlayerText
 #endif
-#define OnPlayerText(%0) S@@_OnPlayerText(%0)
+#define OnPlayerText S@@_OnPlayerText
 HOOK_FORWARD<PlayerText>
 
 public OnPlayerCommandText(playerid, cmdtext[])
@@ -908,15 +913,15 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerCommandText],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerCommandText],
 		ret = ALS_R_PlayerCommandText;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S cmdtext
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -929,7 +934,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerCommandText
@@ -937,7 +942,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 #else
 	#define _ALS_OnPlayerCommandText
 #endif
-#define OnPlayerCommandText(%0) S@@_OnPlayerCommandText(%0)
+#define OnPlayerCommandText S@@_OnPlayerCommandText
 HOOK_FORWARD<PlayerCommandText>
 
 public OnPlayerRequestClass(playerid, classid)
@@ -947,15 +952,15 @@ public OnPlayerRequestClass(playerid, classid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerRequestClass],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerRequestClass],
 		ret = ALS_R_PlayerRequestClass;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S classid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -973,7 +978,7 @@ public OnPlayerRequestClass(playerid, classid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerRequestClass
@@ -981,7 +986,7 @@ public OnPlayerRequestClass(playerid, classid)
 #else
 	#define _ALS_OnPlayerRequestClass
 #endif
-#define OnPlayerRequestClass(%0) S@@_OnPlayerRequestClass(%0)
+#define OnPlayerRequestClass S@@_OnPlayerRequestClass
 HOOK_FORWARD<PlayerRequestClass>
 
 public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
@@ -991,7 +996,7 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEnterVehicle],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEnterVehicle],
 		ret = ALS_R_PlayerEnterVehicle;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S ispassenger
 		#emit PUSH.S vehicleid
@@ -999,8 +1004,8 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 		#emit PUSH.C     12
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1018,7 +1023,7 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerEnterVehicle
@@ -1026,7 +1031,7 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 #else
 	#define _ALS_OnPlayerEnterVehicle
 #endif
-#define OnPlayerEnterVehicle(%0) S@@_OnPlayerEnterVehicle(%0)
+#define OnPlayerEnterVehicle S@@_OnPlayerEnterVehicle
 HOOK_FORWARD<PlayerEnterVehicle>
 
 public OnPlayerExitVehicle(playerid, vehicleid)
@@ -1036,15 +1041,15 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerExitVehicle],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerExitVehicle],
 		ret = ALS_R_PlayerExitVehicle;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S vehicleid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1062,7 +1067,7 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerExitVehicle
@@ -1070,7 +1075,7 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 #else
 	#define _ALS_OnPlayerExitVehicle
 #endif
-#define OnPlayerExitVehicle(%0) S@@_OnPlayerExitVehicle(%0)
+#define OnPlayerExitVehicle S@@_OnPlayerExitVehicle
 HOOK_FORWARD<PlayerExitVehicle>
 
 public OnPlayerStateChange(playerid, newstate, oldstate)
@@ -1080,7 +1085,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerStateChange],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerStateChange],
 		ret = ALS_R_PlayerStateChange;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S oldstate
 		#emit PUSH.S newstate
@@ -1088,8 +1093,8 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		#emit PUSH.C     12
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1107,7 +1112,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerStateChange
@@ -1115,7 +1120,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 #else
 	#define _ALS_OnPlayerStateChange
 #endif
-#define OnPlayerStateChange(%0) S@@_OnPlayerStateChange(%0)
+#define OnPlayerStateChange S@@_OnPlayerStateChange
 HOOK_FORWARD<PlayerStateChange>
 
 public OnPlayerEnterCheckpoint(playerid)
@@ -1125,14 +1130,14 @@ public OnPlayerEnterCheckpoint(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEnterCheckpoint],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEnterCheckpoint],
 		ret = ALS_R_PlayerEnterCheckpoint;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1150,7 +1155,7 @@ public OnPlayerEnterCheckpoint(playerid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerEnterCheckpoint
@@ -1158,7 +1163,7 @@ public OnPlayerEnterCheckpoint(playerid)
 #else
 	#define _ALS_OnPlayerEnterCheckpoint
 #endif
-#define OnPlayerEnterCheckpoint(%0) S@@_OnPlayerEnterCheckpoint(%0)
+#define OnPlayerEnterCheckpoint S@@_OnPlayerEnterCheckpoint
 HOOK_FORWARD<PlayerEnterCheckpoint>
 
 public OnPlayerLeaveCheckpoint(playerid)
@@ -1168,14 +1173,14 @@ public OnPlayerLeaveCheckpoint(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerLeaveCheckpoint],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerLeaveCheckpoint],
 		ret = ALS_R_PlayerLeaveCheckpoint;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1193,7 +1198,7 @@ public OnPlayerLeaveCheckpoint(playerid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerLeaveCheckpoint
@@ -1201,7 +1206,7 @@ public OnPlayerLeaveCheckpoint(playerid)
 #else
 	#define _ALS_OnPlayerLeaveCheckpoint
 #endif
-#define OnPlayerLeaveCheckpoint(%0) S@@_OnPlayerLeaveCheckpoint(%0)
+#define OnPlayerLeaveCheckpoint S@@_OnPlayerLeaveCheckpoint
 HOOK_FORWARD<PlayerLeaveCheckpoint>
 
 public OnPlayerEnterRaceCheckpoint(playerid)
@@ -1211,14 +1216,14 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEnterRaceCheckpoint],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEnterRaceCheckpoint],
 		ret = ALS_R_PlayerEnterRaceCheckpoint;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1236,7 +1241,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerEnterRaceCP
@@ -1244,7 +1249,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 #else
 	#define _ALS_OnPlayerEnterRaceCP
 #endif
-#define OnPlayerEnterRaceCheckpoint(%0) S@@_OnPlayerEnterRaceCheckpoint(%0)
+#define OnPlayerEnterRaceCheckpoint S@@_OnPlayerEnterRaceCheckpoint
 HOOK_FORWARD<PlayerEnterRaceCheckpoint>
 
 public OnPlayerLeaveRaceCheckpoint(playerid)
@@ -1254,14 +1259,14 @@ public OnPlayerLeaveRaceCheckpoint(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerLeaveRaceCheckpoint],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerLeaveRaceCheckpoint],
 		ret = ALS_R_PlayerLeaveRaceCheckpoint;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1279,7 +1284,7 @@ public OnPlayerLeaveRaceCheckpoint(playerid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerLeaveRaceCP
@@ -1287,7 +1292,7 @@ public OnPlayerLeaveRaceCheckpoint(playerid)
 #else
 	#define _ALS_OnPlayerLeaveRaceCP
 #endif
-#define OnPlayerLeaveRaceCheckpoint(%0) S@@_OnPlayerLeaveRaceCheckpoint(%0)
+#define OnPlayerLeaveRaceCheckpoint S@@_OnPlayerLeaveRaceCheckpoint
 HOOK_FORWARD<PlayerLeaveRaceCheckpoint>
 
 public OnRconCommand(cmd[])
@@ -1297,14 +1302,14 @@ public OnRconCommand(cmd[])
 		end   = _:YSI_g_sCallbackEnd[ALS_OnRconCommand],
 		start = _:YSI_g_sCallbackStart[ALS_OnRconCommand],
 		ret = ALS_R_RconCommand;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S cmd
 		#emit PUSH.C     4
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1322,7 +1327,7 @@ public OnRconCommand(cmd[])
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnRconCommand
@@ -1330,7 +1335,7 @@ public OnRconCommand(cmd[])
 #else
 	#define _ALS_OnRconCommand
 #endif
-#define OnRconCommand(%0) S@@_OnRconCommand(%0)
+#define OnRconCommand S@@_OnRconCommand
 HOOK_FORWARD<RconCommand>
 
 public OnPlayerRequestSpawn(playerid)
@@ -1340,15 +1345,15 @@ public OnPlayerRequestSpawn(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerRequestSpawn],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerRequestSpawn],
 		ret = ALS_R_PlayerRequestSpawn;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		//printf("start: %d", start);
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1367,7 +1372,7 @@ public OnPlayerRequestSpawn(playerid)
 		#emit STOR.S.pri ret
 		//printf("ret: %d", ret);
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerRequestSpawn
@@ -1375,7 +1380,7 @@ public OnPlayerRequestSpawn(playerid)
 #else
 	#define _ALS_OnPlayerRequestSpawn
 #endif
-#define OnPlayerRequestSpawn(%0) S@@_OnPlayerRequestSpawn(%0)
+#define OnPlayerRequestSpawn S@@_OnPlayerRequestSpawn
 HOOK_FORWARD<PlayerRequestSpawn>
 
 public OnObjectMoved(objectid)
@@ -1385,14 +1390,14 @@ public OnObjectMoved(objectid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnObjectMoved],
 		start = _:YSI_g_sCallbackStart[ALS_OnObjectMoved],
 		ret = ALS_R_ObjectMoved;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S objectid
 		#emit PUSH.C     4
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1410,7 +1415,7 @@ public OnObjectMoved(objectid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnObjectMoved
@@ -1418,7 +1423,7 @@ public OnObjectMoved(objectid)
 #else
 	#define _ALS_OnObjectMoved
 #endif
-#define OnObjectMoved(%0) S@@_OnObjectMoved(%0)
+#define OnObjectMoved S@@_OnObjectMoved
 HOOK_FORWARD<ObjectMoved>
 
 public OnPlayerObjectMoved(playerid, objectid)
@@ -1428,15 +1433,15 @@ public OnPlayerObjectMoved(playerid, objectid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerObjectMoved],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerObjectMoved],
 		ret = ALS_R_PlayerObjectMoved;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S objectid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1454,7 +1459,7 @@ public OnPlayerObjectMoved(playerid, objectid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerObjectMoved
@@ -1462,7 +1467,7 @@ public OnPlayerObjectMoved(playerid, objectid)
 #else
 	#define _ALS_OnPlayerObjectMoved
 #endif
-#define OnPlayerObjectMoved(%0) S@@_OnPlayerObjectMoved(%0)
+#define OnPlayerObjectMoved S@@_OnPlayerObjectMoved
 HOOK_FORWARD<PlayerObjectMoved>
 
 public OnPlayerPickUpPickup(playerid, pickupid)
@@ -1472,15 +1477,15 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerPickUpPickup],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerPickUpPickup],
 		ret = ALS_R_PlayerPickUpPickup;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S pickupid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1498,7 +1503,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerPickUpPickup
@@ -1506,7 +1511,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 #else
 	#define _ALS_OnPlayerPickUpPickup
 #endif
-#define OnPlayerPickUpPickup(%0) S@@_OnPlayerPickUpPickup(%0)
+#define OnPlayerPickUpPickup S@@_OnPlayerPickUpPickup
 HOOK_FORWARD<PlayerPickUpPickup>
 
 public OnVehicleMod(playerid, vehicleid, componentid)
@@ -1516,7 +1521,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehicleMod],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehicleMod],
 		ret = ALS_R_VehicleMod;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S componentid
 		#emit PUSH.S vehicleid
@@ -1524,8 +1529,8 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 		#emit PUSH.C     12
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1543,7 +1548,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnVehicleMod
@@ -1551,7 +1556,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 #else
 	#define _ALS_OnVehicleMod
 #endif
-#define OnVehicleMod(%0) S@@_OnVehicleMod(%0)
+#define OnVehicleMod S@@_OnVehicleMod
 HOOK_FORWARD<VehicleMod>
 
 public OnEnterExitModShop(playerid, enterexit, interiorid)
@@ -1561,7 +1566,7 @@ public OnEnterExitModShop(playerid, enterexit, interiorid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnEnterExitModShop],
 		start = _:YSI_g_sCallbackStart[ALS_OnEnterExitModShop],
 		ret = ALS_R_EnterExitModShop;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S interiorid
 		#emit PUSH.S enterexit
@@ -1569,8 +1574,8 @@ public OnEnterExitModShop(playerid, enterexit, interiorid)
 		#emit PUSH.C     12
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1588,7 +1593,7 @@ public OnEnterExitModShop(playerid, enterexit, interiorid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnEnterExitModShop
@@ -1596,7 +1601,7 @@ public OnEnterExitModShop(playerid, enterexit, interiorid)
 #else
 	#define _ALS_OnEnterExitModShop
 #endif
-#define OnEnterExitModShop(%0) S@@_OnEnterExitModShop(%0)
+#define OnEnterExitModShop S@@_OnEnterExitModShop
 HOOK_FORWARD<EnterExitModShop>
 
 public OnVehiclePaintjob(playerid, vehicleid, paintjobid)
@@ -1606,7 +1611,7 @@ public OnVehiclePaintjob(playerid, vehicleid, paintjobid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehiclePaintjob],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehiclePaintjob],
 		ret = ALS_R_VehiclePaintjob;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S paintjobid
 		#emit PUSH.S vehicleid
@@ -1614,8 +1619,8 @@ public OnVehiclePaintjob(playerid, vehicleid, paintjobid)
 		#emit PUSH.C     12
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1633,7 +1638,7 @@ public OnVehiclePaintjob(playerid, vehicleid, paintjobid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnVehiclePaintjob
@@ -1641,7 +1646,7 @@ public OnVehiclePaintjob(playerid, vehicleid, paintjobid)
 #else
 	#define _ALS_OnVehiclePaintjob
 #endif
-#define OnVehiclePaintjob(%0) S@@_OnVehiclePaintjob(%0)
+#define OnVehiclePaintjob S@@_OnVehiclePaintjob
 HOOK_FORWARD<VehiclePaintjob>
 
 public OnVehicleRespray(playerid, vehicleid, color1, color2)
@@ -1651,7 +1656,7 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehicleRespray],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehicleRespray],
 		ret = ALS_R_VehicleRespray;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S color2
 		#emit PUSH.S color1
@@ -1660,8 +1665,8 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 		#emit PUSH.C     16
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1679,7 +1684,7 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnVehicleRespray
@@ -1687,7 +1692,7 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 #else
 	#define _ALS_OnVehicleRespray
 #endif
-#define OnVehicleRespray(%0) S@@_OnVehicleRespray(%0)
+#define OnVehicleRespray S@@_OnVehicleRespray
 HOOK_FORWARD<VehicleRespray>
 
 public OnVehicleDamageStatusUpdate(vehicleid, playerid)
@@ -1697,15 +1702,15 @@ public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehicleDamageStatusUpdate],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehicleDamageStatusUpdate],
 		ret = ALS_R_VehicleDamageStatusUpdate;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.S vehicleid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1723,7 +1728,7 @@ public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnVehicleDamageStatusUpd
@@ -1731,7 +1736,7 @@ public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 #else
 	#define _ALS_OnVehicleDamageStatusUpd
 #endif
-#define OnVehicleDamageStatusUpdate(%0) S@@_OnVehicleDamageStatusUpdate(%0)
+#define OnVehicleDamageStatusUpdate S@@_OnVehicleDamageStatusUpdate
 HOOK_FORWARD<VehicleDamageStatusUpdate>
 
 public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat)
@@ -1741,7 +1746,7 @@ public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnUnoccupiedVehicleUpdate],
 		start = _:YSI_g_sCallbackStart[ALS_OnUnoccupiedVehicleUpdate],
 		ret = ALS_R_UnoccupiedVehicleUpdate;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S passenger_seat
 		#emit PUSH.S playerid
@@ -1752,8 +1757,8 @@ public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat)
 		#emit PUSH.C     12
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1771,7 +1776,7 @@ public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnUnoccupiedVehicleUpdate
@@ -1779,7 +1784,7 @@ public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat)
 #else
 	#define _ALS_OnUnoccupiedVehicleUpdate
 #endif
-#define OnUnoccupiedVehicleUpdate(%0) S@@_OnUnoccupiedVehicleUpdate(%0)
+#define OnUnoccupiedVehicleUpdate S@@_OnUnoccupiedVehicleUpdate
 HOOK_FORWARD<UnoccupiedVehicleUpdate>
 
 public OnPlayerSelectedMenuRow(playerid, row)
@@ -1789,15 +1794,15 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerSelectedMenuRow],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerSelectedMenuRow],
 		ret = ALS_R_PlayerSelectedMenuRow;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S row
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1815,7 +1820,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerSelectedMenuRow
@@ -1823,7 +1828,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 #else
 	#define _ALS_OnPlayerSelectedMenuRow
 #endif
-#define OnPlayerSelectedMenuRow(%0) S@@_OnPlayerSelectedMenuRow(%0)
+#define OnPlayerSelectedMenuRow S@@_OnPlayerSelectedMenuRow
 HOOK_FORWARD<PlayerSelectedMenuRow>
 
 public OnPlayerExitedMenu(playerid)
@@ -1833,14 +1838,14 @@ public OnPlayerExitedMenu(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerExitedMenu],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerExitedMenu],
 		ret = ALS_R_PlayerExitedMenu;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1858,7 +1863,7 @@ public OnPlayerExitedMenu(playerid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerExitedMenu
@@ -1866,7 +1871,7 @@ public OnPlayerExitedMenu(playerid)
 #else
 	#define _ALS_OnPlayerExitedMenu
 #endif
-#define OnPlayerExitedMenu(%0) S@@_OnPlayerExitedMenu(%0)
+#define OnPlayerExitedMenu S@@_OnPlayerExitedMenu
 HOOK_FORWARD<PlayerExitedMenu>
 
 public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
@@ -1876,7 +1881,7 @@ public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerInteriorChange],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerInteriorChange],
 		ret = ALS_R_PlayerInteriorChange;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S oldinteriorid
 		#emit PUSH.S newinteriorid
@@ -1884,8 +1889,8 @@ public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 		#emit PUSH.C     12
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1903,7 +1908,7 @@ public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerInteriorChange
@@ -1911,7 +1916,7 @@ public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 #else
 	#define _ALS_OnPlayerInteriorChange
 #endif
-#define OnPlayerInteriorChange(%0) S@@_OnPlayerInteriorChange(%0)
+#define OnPlayerInteriorChange S@@_OnPlayerInteriorChange
 HOOK_FORWARD<PlayerInteriorChange>
 
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
@@ -1921,7 +1926,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerKeyStateChange],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerKeyStateChange],
 		ret = ALS_R_PlayerKeyStateChange;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S oldkeys
 		#emit PUSH.S newkeys
@@ -1929,8 +1934,8 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		#emit PUSH.C     12
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1948,7 +1953,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerKeyStateChange
@@ -1956,7 +1961,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 #else
 	#define _ALS_OnPlayerKeyStateChange
 #endif
-#define OnPlayerKeyStateChange(%0) S@@_OnPlayerKeyStateChange(%0)
+#define OnPlayerKeyStateChange S@@_OnPlayerKeyStateChange
 HOOK_FORWARD<PlayerKeyStateChange>
 
 public OnRconLoginAttempt(ip[], password[], success)
@@ -1966,7 +1971,7 @@ public OnRconLoginAttempt(ip[], password[], success)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnRconLoginAttempt],
 		start = _:YSI_g_sCallbackStart[ALS_OnRconLoginAttempt],
 		ret = ALS_R_RconLoginAttempt;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S success
 		#emit PUSH.S password
@@ -1974,8 +1979,8 @@ public OnRconLoginAttempt(ip[], password[], success)
 		#emit PUSH.C     12
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -1993,7 +1998,7 @@ public OnRconLoginAttempt(ip[], password[], success)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnRconLoginAttempt
@@ -2001,7 +2006,7 @@ public OnRconLoginAttempt(ip[], password[], success)
 #else
 	#define _ALS_OnRconLoginAttempt
 #endif
-#define OnRconLoginAttempt(%0) S@@_OnRconLoginAttempt(%0)
+#define OnRconLoginAttempt S@@_OnRconLoginAttempt
 HOOK_FORWARD<RconLoginAttempt>
 
 public OnPlayerUpdate(playerid)
@@ -2011,14 +2016,14 @@ public OnPlayerUpdate(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerUpdate],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerUpdate],
 		ret = ALS_R_PlayerUpdate;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2036,7 +2041,7 @@ public OnPlayerUpdate(playerid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerUpdate
@@ -2044,7 +2049,7 @@ public OnPlayerUpdate(playerid)
 #else
 	#define _ALS_OnPlayerUpdate
 #endif
-#define OnPlayerUpdate(%0) S@@_OnPlayerUpdate(%0)
+#define OnPlayerUpdate S@@_OnPlayerUpdate
 HOOK_FORWARD<PlayerUpdate>
 
 public OnPlayerStreamIn(playerid, forplayerid)
@@ -2054,15 +2059,15 @@ public OnPlayerStreamIn(playerid, forplayerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerStreamIn],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerStreamIn],
 		ret = ALS_R_PlayerStreamIn;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S forplayerid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2080,7 +2085,7 @@ public OnPlayerStreamIn(playerid, forplayerid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerStreamIn
@@ -2088,7 +2093,7 @@ public OnPlayerStreamIn(playerid, forplayerid)
 #else
 	#define _ALS_OnPlayerStreamIn
 #endif
-#define OnPlayerStreamIn(%0) S@@_OnPlayerStreamIn(%0)
+#define OnPlayerStreamIn S@@_OnPlayerStreamIn
 HOOK_FORWARD<PlayerStreamIn>
 
 public OnPlayerStreamOut(playerid, forplayerid)
@@ -2098,15 +2103,15 @@ public OnPlayerStreamOut(playerid, forplayerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerStreamOut],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerStreamOut],
 		ret = ALS_R_PlayerStreamOut;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S forplayerid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2124,7 +2129,7 @@ public OnPlayerStreamOut(playerid, forplayerid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerStreamOut
@@ -2132,7 +2137,7 @@ public OnPlayerStreamOut(playerid, forplayerid)
 #else
 	#define _ALS_OnPlayerStreamOut
 #endif
-#define OnPlayerStreamOut(%0) S@@_OnPlayerStreamOut(%0)
+#define OnPlayerStreamOut S@@_OnPlayerStreamOut
 HOOK_FORWARD<PlayerStreamOut>
 
 public OnVehicleStreamIn(vehicleid, forplayerid)
@@ -2142,15 +2147,15 @@ public OnVehicleStreamIn(vehicleid, forplayerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehicleStreamIn],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehicleStreamIn],
 		ret = ALS_R_VehicleStreamIn;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S forplayerid
 		#emit PUSH.S vehicleid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2168,7 +2173,7 @@ public OnVehicleStreamIn(vehicleid, forplayerid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnVehicleStreamIn
@@ -2176,7 +2181,7 @@ public OnVehicleStreamIn(vehicleid, forplayerid)
 #else
 	#define _ALS_OnVehicleStreamIn
 #endif
-#define OnVehicleStreamIn(%0) S@@_OnVehicleStreamIn(%0)
+#define OnVehicleStreamIn S@@_OnVehicleStreamIn
 HOOK_FORWARD<VehicleStreamIn>
 
 public OnVehicleStreamOut(vehicleid, forplayerid)
@@ -2186,15 +2191,15 @@ public OnVehicleStreamOut(vehicleid, forplayerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehicleStreamOut],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehicleStreamOut],
 		ret = ALS_R_VehicleStreamOut;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S forplayerid
 		#emit PUSH.S vehicleid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2212,7 +2217,7 @@ public OnVehicleStreamOut(vehicleid, forplayerid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnVehicleStreamOut
@@ -2220,7 +2225,7 @@ public OnVehicleStreamOut(vehicleid, forplayerid)
 #else
 	#define _ALS_OnVehicleStreamOut
 #endif
-#define OnVehicleStreamOut(%0) S@@_OnVehicleStreamOut(%0)
+#define OnVehicleStreamOut S@@_OnVehicleStreamOut
 HOOK_FORWARD<VehicleStreamOut>
 
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
@@ -2230,7 +2235,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		end   = _:YSI_g_sCallbackEnd[ALS_OnDialogResponse],
 		start = _:YSI_g_sCallbackStart[ALS_OnDialogResponse],
 		ret = ALS_R_DialogResponse;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S inputtext
 		#emit PUSH.S listitem
@@ -2240,8 +2245,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		#emit PUSH.C     20
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2259,7 +2264,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnDialogResponse
@@ -2267,7 +2272,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 #else
 	#define _ALS_OnDialogResponse
 #endif
-#define OnDialogResponse(%0) S@@_OnDialogResponse(%0)
+#define OnDialogResponse S@@_OnDialogResponse
 HOOK_FORWARD<DialogResponse>
 
 public OnPlayerClickPlayer(playerid, clickedplayerid, source)
@@ -2277,7 +2282,7 @@ public OnPlayerClickPlayer(playerid, clickedplayerid, source)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerClickPlayer],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerClickPlayer],
 		ret = ALS_R_PlayerClickPlayer;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S source
 		#emit PUSH.S clickedplayerid
@@ -2285,8 +2290,8 @@ public OnPlayerClickPlayer(playerid, clickedplayerid, source)
 		#emit PUSH.C     12
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2304,7 +2309,7 @@ public OnPlayerClickPlayer(playerid, clickedplayerid, source)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerClickPlayer
@@ -2312,7 +2317,7 @@ public OnPlayerClickPlayer(playerid, clickedplayerid, source)
 #else
 	#define _ALS_OnPlayerClickPlayer
 #endif
-#define OnPlayerClickPlayer(%0) S@@_OnPlayerClickPlayer(%0)
+#define OnPlayerClickPlayer S@@_OnPlayerClickPlayer
 HOOK_FORWARD<PlayerClickPlayer>
 
 public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid)
@@ -2322,7 +2327,7 @@ public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerTakeDamage],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerTakeDamage],
 		ret = ALS_R_PlayerTakeDamage;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S weaponid
 		#emit PUSH.S amount
@@ -2331,8 +2336,8 @@ public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid)
 		#emit PUSH.C     16
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2350,7 +2355,7 @@ public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerTakeDamage
@@ -2358,7 +2363,7 @@ public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid)
 #else
 	#define _ALS_OnPlayerTakeDamage
 #endif
-#define OnPlayerTakeDamage(%0) S@@_OnPlayerTakeDamage(%0)
+#define OnPlayerTakeDamage S@@_OnPlayerTakeDamage
 HOOK_FORWARD<PlayerTakeDamage>
 
 public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid)
@@ -2368,7 +2373,7 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerGiveDamage],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerGiveDamage],
 		ret = ALS_R_PlayerGiveDamage;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S weaponid
 		#emit PUSH.S amount
@@ -2377,8 +2382,8 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid)
 		#emit PUSH.C     16
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2396,7 +2401,7 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerGiveDamage
@@ -2404,7 +2409,7 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid)
 #else
 	#define _ALS_OnPlayerGiveDamage
 #endif
-#define OnPlayerGiveDamage(%0) S@@_OnPlayerGiveDamage(%0)
+#define OnPlayerGiveDamage S@@_OnPlayerGiveDamage
 HOOK_FORWARD<PlayerGiveDamage>
 
 #if !defined _ALS_OnPlayerLogin
@@ -2418,15 +2423,15 @@ public OnPlayerLogin(playerid, uid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerLogin],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerLogin],
 		ret = ALS_R_PlayerLogin;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S uid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2444,7 +2449,7 @@ public OnPlayerLogin(playerid, uid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerLogin
@@ -2452,7 +2457,7 @@ public OnPlayerLogin(playerid, uid)
 #else
 	#define _ALS_OnPlayerLogin
 #endif
-#define OnPlayerLogin(%0) S@@_OnPlayerLogin(%0)
+#define OnPlayerLogin S@@_OnPlayerLogin
 HOOK_FORWARD<PlayerLogin>
 
 #if !defined _ALS_OnPlayerLogout
@@ -2466,15 +2471,15 @@ public OnPlayerLogout(playerid, uid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerLogout],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerLogout],
 		ret = ALS_R_PlayerLogout;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S uid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2492,7 +2497,7 @@ public OnPlayerLogout(playerid, uid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerLogout
@@ -2500,7 +2505,7 @@ public OnPlayerLogout(playerid, uid)
 #else
 	#define _ALS_OnPlayerLogout
 #endif
-#define OnPlayerLogout(%0) S@@_OnPlayerLogout(%0)
+#define OnPlayerLogout S@@_OnPlayerLogout
 HOOK_FORWARD<PlayerLogout>
 
 #if !defined OnPlayerClickMap
@@ -2515,7 +2520,7 @@ public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerClickMap],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerClickMap],
 		ret = ALS_R_PlayerClickMap;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S fZ
 		#emit PUSH.S fY
@@ -2524,8 +2529,8 @@ public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 		#emit PUSH.C     16
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2543,7 +2548,7 @@ public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerClickMap
@@ -2551,7 +2556,7 @@ public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 #else
 	#define _ALS_OnPlayerClickMap
 #endif
-#define OnPlayerClickMap(%0) S@@_OnPlayerClickMap(%0)
+#define OnPlayerClickMap S@@_OnPlayerClickMap
 HOOK_FORWARD<PlayerClickMap>
 
 public OnPlayerClickTextDraw(playerid, Text:clickedid)
@@ -2561,15 +2566,15 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerClickTextDraw],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerClickTextDraw],
 		ret = ALS_R_PlayerClickTextDraw;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S clickedid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2587,7 +2592,7 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerClickTextDraw
@@ -2595,7 +2600,7 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 #else
 	#define _ALS_OnPlayerClickTextDraw
 #endif
-#define OnPlayerClickTextDraw(%0) S@@_OnPlayerClickTextDraw(%0)
+#define OnPlayerClickTextDraw S@@_OnPlayerClickTextDraw
 HOOK_FORWARD<PlayerClickTextDraw>
 
 public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
@@ -2605,15 +2610,15 @@ public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerClickPlayerTextDraw],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerClickPlayerTextDraw],
 		ret = ALS_R_PlayerClickPlayerTextDraw;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S playertextid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2631,7 +2636,7 @@ public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerClickPlayerTD
@@ -2639,7 +2644,7 @@ public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 #else
 	#define _ALS_OnPlayerClickPlayerTD
 #endif
-#define OnPlayerClickPlayerTextDraw(%0) S@@_OnPlayerClickPlayerTextDraw(%0)
+#define OnPlayerClickPlayerTextDraw S@@_OnPlayerClickPlayerTextDraw
 HOOK_FORWARD<PlayerClickPlayerTextDraw>
 
 public OnPlayerEditObject(playerid, playerobject, objectid, response, Float:fX, Float:fY, Float:fZ, Float:fRotX, Float:fRotY, Float:fRotZ)
@@ -2649,7 +2654,7 @@ public OnPlayerEditObject(playerid, playerobject, objectid, response, Float:fX, 
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEditObject],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEditObject],
 		ret = ALS_R_PlayerEditObject;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S fRotZ
 		#emit PUSH.S fRotY
@@ -2664,8 +2669,8 @@ public OnPlayerEditObject(playerid, playerobject, objectid, response, Float:fX, 
 		#emit PUSH.C     40
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2683,7 +2688,7 @@ public OnPlayerEditObject(playerid, playerobject, objectid, response, Float:fX, 
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerEditObject
@@ -2691,11 +2696,8 @@ public OnPlayerEditObject(playerid, playerobject, objectid, response, Float:fX, 
 #else
 	#define _ALS_OnPlayerEditObject
 #endif
-#define OnPlayerEditObject(%0) S@@_OnPlayerEditObject(%0)
+#define OnPlayerEditObject S@@_OnPlayerEditObject
 HOOK_FORWARD<PlayerEditObject>
-//forward S@@_OnPlayerEditObject(playerid,playerobject,objectid,response,Float:fX,Float:fY,Float:fZ,Float:fRotX,Float:fRotY,Float:fRotZ);
-//public S@@_OnPlayerEditObject(playerid,playerobject,objectid,response,Float:fX,Float:fY,Float:fZ,Float:fRotX,Float:fRotY,Float:fRotZ)<_ALS_:unhooked>{return 1;}
-//public S@@_OnPlayerEditObject(playerid,playerobject,objectid,response,Float:fX,Float:fY,Float:fZ,Float:fRotX,Float:fRotY,Float:fRotZ)<>{return 1;}
 
 public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Float:fOffsetX, Float:fOffsetY, Float:fOffsetZ, Float:fRotX, Float:fRotY, Float:fRotZ, Float:fScaleX, Float:fScaleY, Float:fScaleZ)
 {
@@ -2704,7 +2706,7 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEditAttachedObject],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEditAttachedObject],
 		ret = ALS_R_PlayerEditAttachedObject;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S fScaleZ
 		#emit PUSH.S fScaleY
@@ -2723,8 +2725,8 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
 		#emit PUSH.C     56
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2742,7 +2744,7 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerEditAttachedObject
@@ -2750,7 +2752,7 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
 #else
 	#define _ALS_OnPlayerEditAttachedObject
 #endif
-#define OnPlayerEditAttachedObject(%0) S@@_OnPlayerEditAttachedObject(%0)
+#define OnPlayerEditAttachedObject S@@_OnPlayerEditAttachedObject
 HOOK_FORWARD<PlayerEditAttachedObject>
 //forward S@@_OnPlayerEditAttachedObject(playerid,response,index,modelid,boneid,Float:fOffsetX,Float:fOffsetY,Float:fOffsetZ,Float:fRotX,Float:fRotY,Float:fRotZ,Float:fScaleX,Float:fScaleY,Float:fScaleZ);
 //public S@@_OnPlayerEditAttachedObject(playerid,response,index,modelid,boneid,Float:fOffsetX,Float:fOffsetY,Float:fOffsetZ,Float:fRotX,Float:fRotY,Float:fRotZ,Float:fScaleX,Float:fScaleY,Float:fScaleZ)<_ALS_:unhooked>{return 1;}
@@ -2763,7 +2765,7 @@ public OnPlayerSelectObject(playerid, type, objectid, modelid, Float:fX, Float:f
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerSelectObject],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerSelectObject],
 		ret = ALS_R_PlayerSelectObject;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S fZ
 		#emit PUSH.S fY
@@ -2775,8 +2777,8 @@ public OnPlayerSelectObject(playerid, type, objectid, modelid, Float:fX, Float:f
 		#emit PUSH.C     28
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2794,7 +2796,7 @@ public OnPlayerSelectObject(playerid, type, objectid, modelid, Float:fX, Float:f
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerSelectObject
@@ -2802,7 +2804,7 @@ public OnPlayerSelectObject(playerid, type, objectid, modelid, Float:fX, Float:f
 #else
 	#define _ALS_OnPlayerSelectObject
 #endif
-#define OnPlayerSelectObject(%0) S@@_OnPlayerSelectObject(%0)
+#define OnPlayerSelectObject S@@_OnPlayerSelectObject
 HOOK_FORWARD<PlayerSelectObject>
 
 // Allow hooking of streamer plugin callbacks.
@@ -2818,14 +2820,14 @@ public OnDynamicObjectMoved(objectid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnDynamicObjectMoved],
 		start = _:YSI_g_sCallbackStart[ALS_OnDynamicObjectMoved],
 		ret = ALS_R_DynamicObjectMoved;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S objectid
 		#emit PUSH.C     4
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2843,7 +2845,7 @@ public OnDynamicObjectMoved(objectid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnDynamicObjectMoved
@@ -2851,7 +2853,7 @@ public OnDynamicObjectMoved(objectid)
 #else
 	#define _ALS_OnDynamicObjectMoved
 #endif
-#define OnDynamicObjectMoved(%0) S@@_OnDynamicObjectMoved(%0)
+#define OnDynamicObjectMoved S@@_OnDynamicObjectMoved
 HOOK_FORWARD<DynamicObjectMoved>
 
 public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz)
@@ -2861,7 +2863,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEditDynamicObject],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEditDynamicObject],
 		ret = ALS_R_PlayerEditDynamicObject;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S rz
 		#emit PUSH.S ry
@@ -2875,8 +2877,8 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 		#emit PUSH.C     36
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2894,7 +2896,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerEditDynamicObject
@@ -2902,7 +2904,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 #else
 	#define _ALS_OnPlayerEditDynamicObject
 #endif
-#define OnPlayerEditDynamicObject(%0) S@@_OnPlayerEditDynamicObject(%0)
+#define OnPlayerEditDynamicObject S@@_OnPlayerEditDynamicObject
 HOOK_FORWARD<PlayerEditDynamicObject>
 //forward S@@_OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz);
 //public S@@_OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz)<_ALS_:unhooked>{return 1;}
@@ -2915,7 +2917,7 @@ public OnPlayerSelectDynamicObject(playerid, objectid, modelid, Float:x, Float:y
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerSelectDynamicObject],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerSelectDynamicObject],
 		ret = ALS_R_PlayerSelectDynamicObject;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S z
 		#emit PUSH.S y
@@ -2926,8 +2928,8 @@ public OnPlayerSelectDynamicObject(playerid, objectid, modelid, Float:x, Float:y
 		#emit PUSH.C     24
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2945,7 +2947,7 @@ public OnPlayerSelectDynamicObject(playerid, objectid, modelid, Float:x, Float:y
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerSelectDynamicObj
@@ -2953,7 +2955,7 @@ public OnPlayerSelectDynamicObject(playerid, objectid, modelid, Float:x, Float:y
 #else
 	#define _ALS_OnPlayerSelectDynamicObj
 #endif
-#define OnPlayerSelectDynamicObject(%0) S@@_OnPlayerSelectDynamicObject(%0)
+#define OnPlayerSelectDynamicObject S@@_OnPlayerSelectDynamicObject
 HOOK_FORWARD<PlayerSelectDynamicObject>
 //forward S@@_OnPlayerEditDynamicObject(playerid, objectid, modelid, Float:x, Float:y, Float:z);
 //public S@@_OnPlayerEditDynamicObject(playerid, objectid, modelid, Float:x, Float:y, Float:z)<_ALS_:unhooked>{return 1;}
@@ -2966,15 +2968,15 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerPickUpDynamicPickup],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerPickUpDynamicPickup],
 		ret = ALS_R_PlayerPickUpDynamicPickup;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S pickupid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -2992,7 +2994,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerPickUpDynamicPUp
@@ -3000,7 +3002,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 #else
 	#define _ALS_OnPlayerPickUpDynamicPUp
 #endif
-#define OnPlayerPickUpDynamicPickup(%0) S@@_OnPlayerPickUpDynamicPickup(%0)
+#define OnPlayerPickUpDynamicPickup S@@_OnPlayerPickUpDynamicPickup
 HOOK_FORWARD<PlayerPickUpDynamicPickup>
 
 public OnPlayerEnterDynamicCP(playerid, checkpointid)
@@ -3010,15 +3012,15 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEnterDynamicCP],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEnterDynamicCP],
 		ret = ALS_R_PlayerEnterDynamicCP;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S checkpointid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -3036,7 +3038,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerEnterDynamicCP
@@ -3044,7 +3046,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 #else
 	#define _ALS_OnPlayerEnterDynamicCP
 #endif
-#define OnPlayerEnterDynamicCP(%0) S@@_OnPlayerEnterDynamicCP(%0)
+#define OnPlayerEnterDynamicCP S@@_OnPlayerEnterDynamicCP
 HOOK_FORWARD<PlayerEnterDynamicCP>
 
 public OnPlayerLeaveDynamicCP(playerid, checkpointid)
@@ -3054,15 +3056,15 @@ public OnPlayerLeaveDynamicCP(playerid, checkpointid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerLeaveDynamicCP],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerLeaveDynamicCP],
 		ret = ALS_R_PlayerLeaveDynamicCP;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S checkpointid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -3080,7 +3082,7 @@ public OnPlayerLeaveDynamicCP(playerid, checkpointid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerLeaveDynamicCP
@@ -3088,7 +3090,7 @@ public OnPlayerLeaveDynamicCP(playerid, checkpointid)
 #else
 	#define _ALS_OnPlayerLeaveDynamicCP
 #endif
-#define OnPlayerLeaveDynamicCP(%0) S@@_OnPlayerLeaveDynamicCP(%0)
+#define OnPlayerLeaveDynamicCP S@@_OnPlayerLeaveDynamicCP
 HOOK_FORWARD<PlayerLeaveDynamicCP>
 
 public OnPlayerEnterDynamicRaceCP(playerid, checkpointid)
@@ -3098,15 +3100,15 @@ public OnPlayerEnterDynamicRaceCP(playerid, checkpointid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEnterDynamicRaceCP],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEnterDynamicRaceCP],
 		ret = ALS_R_PlayerEnterDynamicRaceCP;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S checkpointid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -3124,7 +3126,7 @@ public OnPlayerEnterDynamicRaceCP(playerid, checkpointid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerEnterDynamicRaceCP
@@ -3132,7 +3134,7 @@ public OnPlayerEnterDynamicRaceCP(playerid, checkpointid)
 #else
 	#define _ALS_OnPlayerEnterDynamicRaceCP
 #endif
-#define OnPlayerEnterDynamicRaceCP(%0) S@@_OnPlayerEnterDynamicRaceCP(%0)
+#define OnPlayerEnterDynamicRaceCP S@@_OnPlayerEnterDynamicRaceCP
 HOOK_FORWARD<PlayerEnterDynamicRaceCP>
 
 public OnPlayerLeaveDynamicRaceCP(playerid, checkpointid)
@@ -3142,15 +3144,15 @@ public OnPlayerLeaveDynamicRaceCP(playerid, checkpointid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerLeaveDynamicRaceCP],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerLeaveDynamicRaceCP],
 		ret = ALS_R_PlayerLeaveDynamicRaceCP;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S checkpointid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -3168,7 +3170,7 @@ public OnPlayerLeaveDynamicRaceCP(playerid, checkpointid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerLeaveDynamicRaceCP
@@ -3176,7 +3178,7 @@ public OnPlayerLeaveDynamicRaceCP(playerid, checkpointid)
 #else
 	#define _ALS_OnPlayerLeaveDynamicRaceCP
 #endif
-#define OnPlayerLeaveDynamicRaceCP(%0) S@@_OnPlayerLeaveDynamicRaceCP(%0)
+#define OnPlayerLeaveDynamicRaceCP S@@_OnPlayerLeaveDynamicRaceCP
 HOOK_FORWARD<PlayerLeaveDynamicRaceCP>
 
 public OnPlayerEnterDynamicArea(playerid, areaid)
@@ -3186,15 +3188,15 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEnterDynamicArea],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEnterDynamicArea],
 		ret = ALS_R_PlayerEnterDynamicArea;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S areaid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -3212,7 +3214,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerEnterDynamicArea
@@ -3220,7 +3222,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 #else
 	#define _ALS_OnPlayerEnterDynamicArea
 #endif
-#define OnPlayerEnterDynamicArea(%0) S@@_OnPlayerEnterDynamicArea(%0)
+#define OnPlayerEnterDynamicArea S@@_OnPlayerEnterDynamicArea
 HOOK_FORWARD<PlayerEnterDynamicArea>
 
 public OnPlayerLeaveDynamicArea(playerid, areaid)
@@ -3230,15 +3232,15 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerLeaveDynamicArea],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerLeaveDynamicArea],
 		ret = ALS_R_PlayerLeaveDynamicArea;
-	do
+	while (start++ != end && ret >= 0)
 	{
 		#emit PUSH.S areaid
 		#emit PUSH.S playerid
 		#emit PUSH.C     8
 		#emit CONST.alt  YSI_g_sCallbackAddresses
 		#emit LOAD.S.pri start
-		#emit INC.pri
-		#emit STOR.S.pri start
+		//#emit INC.pri
+		//#emit STOR.S.pri start
 		#emit LIDX
 		#emit MOVE.alt
 		#emit LCTRL      6
@@ -3256,7 +3258,7 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 		#emit OR
 		#emit STOR.S.pri ret
 	}
-	while (start != end && ret >= 0);
+	
 	return (ret == 1);
 }
 #if defined _ALS_OnPlayerLeaveDynamicArea
@@ -3264,7 +3266,7 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 #else
 	#define _ALS_OnPlayerLeaveDynamicArea
 #endif
-#define OnPlayerLeaveDynamicArea(%0) S@@_OnPlayerLeaveDynamicArea(%0)
+#define OnPlayerLeaveDynamicArea S@@_OnPlayerLeaveDynamicArea
 HOOK_FORWARD<PlayerLeaveDynamicArea>
 
 #undef ALS_MAKE

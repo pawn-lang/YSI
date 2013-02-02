@@ -222,7 +222,7 @@ static stock
 	YSI_g_sDistributionID = -1,
 	YSI_g_sUnusedSlot = 0,
 	YSI_g_sCurLoadTextFile[64],
-	YSI_g_sCallbacks,
+	//YSI_g_sCallbacks,
 	YSI_g_sRemaining = sizeof (YSI_g_sTextStrings) * sizeof (YSI_g_sTextStrings[]),
 	Language:YSI_g_sLangIndex;
 
@@ -252,16 +252,11 @@ Notes:
 public OnGameModeInit()
 {
 	P:1("TextInt_OnGameModeInit called");
-	if (YSI_FILTERSCRIPT)
-	{
-		if (YSI_g_sCallbacks & 16)
-		{
-			TextInt_OnGameModeInit();
-		}
-	}
-	else
-	{
+	#if defined TextInt_OnGameModeInit
 		TextInt_OnGameModeInit();
+	#endif
+	if (!YSI_FILTERSCRIPT)
+	{
 		//Text_SpecialInit();
 		Text_RefreshLoaded();
 		_Styles_SpecialInit();
@@ -275,19 +270,18 @@ public OnGameModeInit()
 #else
 	#define _ALS_OnGameModeInit
 #endif
-#define OnGameModeInit(%0) TextInt_OnGameModeInit(%0) <_ALS_:hooked>
-
-forward TextInt_OnGameModeInit();public TextInt_OnGameModeInit()<_ALS_:unhooked>{return 1;}public TextInt_OnGameModeInit()<>{return 1;}
+#define OnGameModeInit TextInt_OnGameModeInit
+#if defined TextInt_OnGameModeInit
+	forward TextInt_OnGameModeInit();
+#endif
 
 public OnFilterScriptInit()
 {
 	P:1("TextInt_OnFilterScriptInit called");
-	if (funcidx("TextInt_OnGameModeInit") != -1)
-	{
-		YSI_g_sCallbacks |= 16;
-	}
 	// DO ALL (MOST) OTHER INITS FIRST.  ENSURE WE COME LATER.
-	TextInt_OnFilterScriptInit();
+	#if defined TextInt_OnFilterScriptInit
+		TextInt_OnFilterScriptInit();
+	#endif
 	//Text_SpecialInit();
 	Text_RefreshLoaded();
 	_Styles_SpecialInit();
@@ -300,9 +294,10 @@ public OnFilterScriptInit()
 #else
 	#define _ALS_OnFilterScriptInit
 #endif
-#define OnFilterScriptInit(%0) TextInt_OnFilterScriptInit(%0) <_ALS_:hooked>
-
-forward TextInt_OnFilterScriptInit();public TextInt_OnFilterScriptInit()<_ALS_:unhooked>{return 1;}public TextInt_OnFilterScriptInit()<>{return 1;}
+#define OnFilterScriptInit TextInt_OnFilterScriptInit
+#if defined TextInt_OnFilterScriptInit
+	forward TextInt_OnFilterScriptInit();
+#endif
 
 //forward Text_SpecialInit();
 //

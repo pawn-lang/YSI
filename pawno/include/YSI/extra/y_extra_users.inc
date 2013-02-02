@@ -5,6 +5,21 @@
 
 loadtext core[ysi_players], core[ysi_extras], core[ysi_dialog];
 
+/*----------------------------------------------------------------------------*\
+Function:
+	Extra_DoLogin
+	/login
+Params:
+	playerid - Player trying to log in.
+	string:pw[] - The password they entered.
+Return:
+	-
+Notes:
+	Called when a player attempts to log in.  If "pw" is empty (NULL) this
+	prompts the user for a password with a dialog.  If it isn't empty then it
+	takes that as the password.
+\*----------------------------------------------------------------------------*/
+
 stock Extra_DoLogin(playerid, string:pw[])
 {
 	if (Player_IsLoggedIn(playerid))
@@ -48,6 +63,24 @@ YCMD:login(playerid, params[], help)
 	}
 	return 1;
 }
+
+/*----------------------------------------------------------------------------*\
+Function:
+	Extra_DoRegister
+	/register
+Params:
+	playerid - Player trying to log in.
+	string:pw[] - The password they entered.
+Return:
+	-
+Notes:
+	Called when a player attempts to register.  If "pw" is empty (NULL) this
+	prompts the user for a password with a dialog.  If it isn't empty then it
+	takes that as the password and asks for confirmation.
+	
+	Currently this only checks the length of the password for strength, it
+	doesn't check other properties such as number/case/symbol mixes.
+\*----------------------------------------------------------------------------*/
 
 stock Extra_DoRegister(playerid, string:pw[])
 {

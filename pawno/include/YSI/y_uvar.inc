@@ -396,7 +396,7 @@ public OnPlayerLogout(playerid, uid)
 #if defined Uvar_OnPlayerLogout
 	forward Uvar_OnPlayerLogout(playerid, uid);
 #endif
-#define OnPlayerLogout(%0) Uvar_OnPlayerLogout(%0) //<_ALS_:hooked>
+#define OnPlayerLogout(%0) Uvar_OnPlayerLogout(%0)
 
 hook OnPlayerConnect(playerid)
 {
