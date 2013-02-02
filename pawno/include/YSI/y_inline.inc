@@ -429,31 +429,6 @@ hook OnScriptInit()
 {
 	P:2("Inline_OnScriptInit");
 	static
-		// Default settings.
-		sSearch1[] =
-			{
-				AMX_PUSH_C, INLINE_LOOP_PATTERN_3,
-				AMX_PUSH_C, INLINE_LOOP_PATTERN_2,
-				AMX_PUSH_C, INLINE_LOOP_PATTERN_1,
-				AMX_PUSH_C, INLINE_LOOP_PATTERN_0,
-				AMX_PUSH_C, 0x18,
-				AMX_CALL
-			},
-		// Debug settings.
-		sSearch2[] =
-			{
-				AMX_CONST_PRI, INLINE_LOOP_PATTERN_3,
-				AMX_PUSH_PRI,
-				AMX_CONST_PRI, INLINE_LOOP_PATTERN_2,
-				AMX_PUSH_PRI,
-				AMX_CONST_PRI, INLINE_LOOP_PATTERN_1,
-				AMX_PUSH_PRI,
-				AMX_CONST_PRI, INLINE_LOOP_PATTERN_0,
-				AMX_PUSH_PRI,
-				AMX_PUSH_C, 0x18,
-				AMX_CALL
-			};
-	static
 		sAddr,
 		sType = 0,
 		sSearch[15];
@@ -476,7 +451,6 @@ hook OnScriptInit()
 			P:5("Inline_OnScriptInit: Loading type 1");
 			AMX_ReadArray(sAddr, sSearch, 11);
 			P:7("Inline_OnScriptInit: Loaded type 1");
-			P:C(for (new i = 0; i != 11; ++i) printf("Inline_OnScriptInit (%d): %d = %d", i, sSearch[i], sSearch1[i]););
 			sType = 1;
 		}
 		else if (AMX_Read(addr + 10 * 4) == INLINE_LOOP_PATTERN_3)
