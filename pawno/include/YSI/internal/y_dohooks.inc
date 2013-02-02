@@ -2500,7 +2500,7 @@ public OnPlayerLogout(playerid, uid)
 #else
 	#define _ALS_OnPlayerLogout
 #endif
-#define OnPlayerLogout(%0) S@@_OnPlayerlogout(%0)
+#define OnPlayerLogout(%0) S@@_OnPlayerLogout(%0)
 HOOK_FORWARD<PlayerLogout>
 
 #if !defined OnPlayerClickMap
