@@ -479,6 +479,14 @@ hook OnScriptInit()
 			P:C(for (new i = 0; i != 11; ++i) printf("Inline_OnScriptInit (%d): %d = %d", i, sSearch[i], sSearch1[i]););
 			sType = 1;
 		}
+		else if (AMX_Read(addr + 10 * 4) == INLINE_LOOP_PATTERN_3)
+		{
+			sAddr = addr + 9 * 4;
+			P:5("Inline_OnScriptInit: Loading type 3");
+			AMX_ReadArray(sAddr, sSearch, 11);
+			P:7("Inline_OnScriptInit: Loaded type 3");
+			sType = 3;
+		}
 		else if (AMX_Read(addr + 14 * 4) == INLINE_LOOP_PATTERN_3)
 		{
 			sAddr = addr + 13 * 4;
@@ -496,7 +504,7 @@ hook OnScriptInit()
 	P:7("Inline_OnScriptInit: Beginning search.");
 	switch (sType)
 	{
-		case 1:
+		case 1, 3:
 		{
 			Inline_DoSearch(sSearch, 3, 11, sAddr);
 		}
