@@ -96,9 +96,9 @@ Operators:
 
 #include <a_samp>
 
-forward OnPlayerLogin(playerid, yid);
+forward OnPlayerLogin(playerid, uid);
 
-forward OnPlayerLogout(playerid, yid);
+forward OnPlayerLogout(playerid, uid);
 
 //#if !defined HAS_USER_CALLBACKS
 //	#define HAS_USER_CALLBACKS
@@ -535,7 +535,7 @@ hook OnPlayerDisconnect(playerid, reason)
 	YSI_g_sPlayerYID[playerid] = -2;
 }
 
-static remotefunc _Player_IsLoggedIn(playerid)
+static remotefunc void:_Player_IsLoggedIn(playerid)
 {
 	P:4("_Player_IsLoggedIn called: %d %d", playerid, YSI_g_sPlayerYID[playerid]);
 	if (YSI_g_sPlayerYID[playerid] != -2)
@@ -661,7 +661,7 @@ global Player_ForceLogin(playerid)
 	return 0;
 }
 
-/*static*/ remotefunc Player_DoLogin(playerid, yid)
+/*static*/ remotefunc void:Player_DoLogin(playerid, yid)
 {
 	// Called when a player logs in - either locally (new script) or globally
 	// (actually only just logged in).
@@ -674,12 +674,7 @@ global Player_ForceLogin(playerid)
 	// INI_ParseFile will ONLY load the data for THIS mode, as well as data
 	// which is mode independent (though there should be none).
 	INI_ParseFile(filename, "@yU_%s", .bExtra = true, .extra = playerid, .bLocal = true, .bFilter = false, .filter = #MODE_NAME);
-	Hooks_OnPlayerLogin(playerid, yid);
-	if (YSI_g_sCallbacks & 1)
-	{
-		//CallLocalFunction("OnPlayerLogin", "ii", playerid, yid);
-		call OnPlayerLogin(playerid, yid);
-	}
+	CallLocalFunction("OnPlayerLogin", "ii", playerid, yid);
 }
 
 /*----------------------------------------------------------------------------*\
@@ -837,11 +832,7 @@ static stock Player_DoLogout(playerid, yid)
 	YSI_g_sPlayerWriteFile = INI_Open(filename);
 	if (YSI_g_sPlayerWriteFile != INI_NO_FILE)
 	{
-		Hooks_OnPlayerLogout(playerid, yid);
-		if (YSI_g_sCallbacks & 2)
-		{
-			call OnPlayerLogout(playerid, yid);
-		}
+		CallLocalFunction("OnPlayerLogout", "ii", playerid, yid);
 		INI_Close(YSI_g_sPlayerWriteFile);
 	}
 	// Do ALL the saving from ONE place.  Detect one or many scripts ending.
@@ -918,7 +909,7 @@ static stock Player_HashPass(pass[], target[])
 		#error SHA1 unsupported.
 	#elseif defined PP_YSI
 		static
-			charset[] = "A,UbRgdnS#|rT_%5+ZvEK¬NF<9¦IH[(C)2O07 Y-Less]$Qw^?/om4;@'8k£Pp.c{&l\\3zay>DfxV:WXjuG6*!1\"i~=Mh`JB}qt",
+			charset[] = "A,UbRgdnS#|rT_%5+ZvEKï¿½NF<9ï¿½IH[(C)2O07 Y-Less]$Qw^?/om4;@'8kï¿½Pp.c{&l\\3zay>DfxV:WXjuG6*!1\"i~=Mh`JB}qt",
 			css = 99;
 		new
 			//target[MAX_PASSWORD_LENGTH + 1],
