@@ -268,7 +268,6 @@ Notes:
 	value (must be -1, 0, or 1).
 \*----------------------------------------------------------------------------*/
 
-/*
 static Hooks_RemovePublic(from[], final)
 {
 	P:4("Hooks_RemovePublic called: \"%s\", %d", from, final);
@@ -304,12 +303,11 @@ static Hooks_RemovePublic(from[], final)
 	}
 	return 0;
 }
-*/
 
 #define HOOKS_STRIP_ME)%0, ,
 
-//#define HOOKS_DO_ONE_CALLBACK<%0> if(!Hooks_FindAll(#%0,cidx,_:YSI_g_sCallbackStart[ALS_On%0],_:YSI_g_sCallbackEnd[ALS_On%0]))Hooks_RemovePublic(#On%0(HOOKS_STRIP_ME),ALS_R_%0);
-#define HOOKS_DO_ONE_CALLBACK<%0> Hooks_FindAll(#%0,cidx,_:YSI_g_sCallbackStart[ALS_On%0],_:YSI_g_sCallbackEnd[ALS_On%0]);
+#define HOOKS_DO_ONE_CALLBACK<%0> if(!Hooks_FindAll(#%0,cidx,_:YSI_g_sCallbackStart[ALS_On%0],_:YSI_g_sCallbackEnd[ALS_On%0]))Hooks_RemovePublic(#On%0(HOOKS_STRIP_ME),ALS_R_%0);
+//#define HOOKS_DO_ONE_CALLBACK<%0> Hooks_FindAll(#%0,cidx,_:YSI_g_sCallbackStart[ALS_On%0],_:YSI_g_sCallbackEnd[ALS_On%0]);
 
 //static Hooks_OnScriptInit()
 public OnScriptInit()

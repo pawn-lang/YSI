@@ -415,12 +415,12 @@ public OnGameModeInit()
 	}
 	else
 	{
-		//Users_OnGameModeInit();
-		Users_DoUpgrade0();
-		Users_DoUpgrade1();
 		#if defined Users_OnGameModeInit
 			Users_OnGameModeInit();
 		#endif
+		//Users_OnGameModeInit();
+		Users_DoUpgrade0();
+		Users_DoUpgrade1();
 	}
 	return 1;
 }
@@ -443,11 +443,11 @@ public OnFilterScriptInit()
 	//}
 	// DO ALL (MOST) OTHER INITS FIRST.  ENSURE WE COME LATER.
 	//Users_OnFilterScriptInit();
-	Users_DoUpgrade0();
-	Users_DoUpgrade1();
 	#if defined Users_OnFilterScriptInit
 		Users_OnFilterScriptInit();
 	#endif
+	Users_DoUpgrade0();
+	Users_DoUpgrade1();
 	return 1;
 }
 
@@ -472,113 +472,118 @@ static stock Users_DoUpgrade0()
 		}
 		case 1:
 		{
-			// Do the upgrade to add languages to all files (could take a little
-			// while, but needs doing).
-			P:I("Please wait, upgrading user files.");
-			new
-				ch,
-				filename[] = USER_FILE_PATH "ind_X.YSI",
-				File:f,
-				File:g,
-				line[INDEX_DATA_LINE_LENGTH],
-				//Language:def = Langs_GetLanguageAt(0),
-				code[3];
-			strcpy(code, Langs_GetCode(Langs_GetLanguageAt(0)));
-			for (new i = -2; i != 26; ++i)
-			{
-				if (i == -2)
+			#if !defined YSI_DO_USER_UPGRADE
+				P:E("y_users needs to upgrade user files.  Please back up the old ones and recompile/rerun once with YSI_DO_USER_UPGRADE.");
+				fremove(USER_FILE_PATH "y_users_v2_1.YSI");
+			#else
+				// Do the upgrade to add languages to all files (could take a
+				// little while, but needs doing).
+				P:I("Please wait, upgrading user files.");
+				new
+					ch,
+					filename[] = USER_FILE_PATH "ind_X.YSI",
+					File:f,
+					File:g,
+					line[INDEX_DATA_LINE_LENGTH],
+					//Language:def = Langs_GetLanguageAt(0),
+					code[3];
+				strcpy(code, Langs_GetCode(Langs_GetLanguageAt(0)));
+				for (new i = -2; i != 26; ++i)
 				{
-					ch = '_';
+					if (i == -2)
+					{
+						ch = '_';
+					}
+					else if (i == -1)
+					{
+						ch = '0';
+					}
+					else
+					{
+						ch = 'a' + i;
+					}
+					Player_GetIndexFile(filename, ch);
+					f = fopen(filename, io_read);
+					if (!f)
+					{
+						if (fexist(filename))
+						{
+							P:E("Upgrade %c failed.", filename[USER_FILE_LENGTH + 4]);
+						}
+						continue;
+					}
+					g = ftemp();
+					if (!g)
+					{
+						fclose(f);
+						P:E("Upgrade %c failed.", filename[USER_FILE_LENGTH + 4]);
+						continue;
+					}
+					while ((ch = fread(f, line)))
+					{
+						//ch = strlen(line);
+						if (ch > 3)
+						{
+							if (line[ch - 2] < ' ')
+							{
+								// "/r/n" or "/n/r".
+								// Copy the existing line ending.
+								line[ch + 1] = line[ch - 2];
+								line[ch + 2] = line[ch - 1];
+								
+								line[ch - 2] = ' ';
+								line[ch - 1] = code[0];
+								line[ch    ] = code[1];
+								
+								line[ch + 3] = '\0';
+								//line[ch - 1] = '\0';
+								fwrite(g, line);
+							}
+							else
+							{
+								// "/n" or "/r".
+								// Copy the existing line ending.
+								line[ch + 2] = line[ch - 1];
+								
+								line[ch - 1] = ' ';
+								line[ch    ] = code[0];
+								line[ch + 1] = code[1];
+								
+								line[ch + 2] = '\0';
+								//line[ch - 1] = '\0';
+								fwrite(g, line);
+							}
+						}
+					}
+					fseek(g);
+					fclose(f);
+					fremove(filename);
+					f = fopen(filename, io_write);
+					if (!f)
+					{
+						fclose(g);
+						P:E("Upgrade %c failed.", filename[USER_FILE_LENGTH + 4]);
+						continue;
+					}
+					while (fread(g, line))
+					{
+						fwrite(f, line);
+					}
+					fclose(f);
+					fclose(g);
 				}
-				else if (i == -1)
+				f = fopen(USER_FILE_PATH "index.YSI", io_append);
+				if (f)
 				{
-					ch = '0';
+					fwrite(f, "        ");
+					fclose(f);
 				}
 				else
 				{
-					ch = 'a' + i;
+					P:E("Upgrade index failed.");
 				}
-				Player_GetIndexFile(filename, ch);
-				f = fopen(filename, io_read);
-				if (!f)
-				{
-					if (fexist(filename))
-					{
-						P:E("Upgrade %c failed.", filename[USER_FILE_LENGTH + 4]);
-					}
-					continue;
-				}
-				g = ftemp();
-				if (!g)
-				{
-					fclose(f);
-					P:E("Upgrade %c failed.", filename[USER_FILE_LENGTH + 4]);
-					continue;
-				}
-				while (fread(f, line))
-				{
-					ch = strlen(line);
-					if (ch > 3)
-					{
-						if (line[ch - 2] < ' ')
-						{
-							// "/r/n" or "/n/r".
-							// Copy the existing line ending.
-							line[ch + 1] = line[ch - 2];
-							line[ch + 2] = line[ch - 1];
-							
-							line[ch -  2] = ' ';
-							line[ch -  1] = code[0];
-							line[ch -  0] = code[1];
-							
-							line[ch + 3] = '\0';
-							//line[ch - 1] = '\0';
-							fwrite(g, line);
-						}
-						else
-						{
-							// "/n" or "/r".
-							// Copy the existing line ending.
-							line[ch + 2] = line[ch - 1];
-							
-							line[ch -  1] = ' ';
-							line[ch -  0] = code[0];
-							line[ch - -1] = code[1];
-							
-							line[ch + 3] = '\0';
-							//line[ch - 1] = '\0';
-							fwrite(g, line);
-						}
-					}
-				}
-				fseek(g);
-				fclose(f);
-				fremove(filename);
-				f = fopen(filename, io_write);
-				if (!f)
-				{
-					fclose(g);
-					P:E("Upgrade %c failed.", filename[USER_FILE_LENGTH + 4]);
-					continue;
-				}
-				while (fread(g, line))
-				{
-					fwrite(f, line);
-				}
-				fclose(f);
-				fclose(g);
-			}
-			f = fopen(USER_FILE_PATH "index.YSI", io_append);
-			if (f)
-			{
-				fwrite(f, "        ");
-				fclose(f);
-			}
-			else
-			{
-				P:E("Upgrade index failed.");
-			}
-			P:I("Upgrade complete.");
+				P:I("Upgrade complete.");
+			#endif
 		}
 	}
 }
@@ -595,103 +600,114 @@ static stock Users_DoUpgrade1()
 		}
 		case 1:
 		{
-			// Do the upgrade to add languages to all files (could take a little
-			// while, but needs doing).
-			P:I("Please wait, upgrading user files.");
-			new
-				ch,
-				hash[MAX_PASSWORD_LENGTH + MAX_INDEX_LENGTH + 1],
-				filename[] = USER_FILE_PATH "ind_X.YSI",
-				File:f,
-				File:g,
-				line[INDEX_DATA_LINE_LENGTH],
-				//Language:def = Langs_GetLanguageAt(0),
-				code[3];
-			strcpy(code, Langs_GetCode(Langs_GetLanguageAt(0)));
-			for (new i = -2; i != 26; ++i)
-			{
-				if (i == -2)
+			#if !defined YSI_DO_USER_UPGRADE
+				P:E("y_users needs to upgrade user files.  Please back up the old ones and recompile/rerun once with YSI_DO_USER_UPGRADE.");
+				fremove(USER_FILE_PATH "y_users_v2_2.YSI");
+			#else
+				// Do the upgrade to add languages to all files (could take a
+				// little while, but needs doing).
+				P:I("Please wait, upgrading user files.");
+				new
+					ch,
+					hash[MAX_PASSWORD_LENGTH + MAX_INDEX_LENGTH + 1],
+					filename[] = USER_FILE_PATH "ind_X.YSI",
+					File:f,
+					File:g,
+					line[INDEX_DATA_LINE_LENGTH],
+					//Language:def = Langs_GetLanguageAt(0),
+					code[3];
+				strcpy(code, Langs_GetCode(Langs_GetLanguageAt(0)));
+				for (new i = -2; i != 26; ++i)
 				{
-					ch = '_';
+					if (i == -2)
+					{
+						ch = '_';
+					}
+					else if (i == -1)
+					{
+						ch = '0';
+					}
+					else
+					{
+						ch = 'a' + i;
+					}
+					Player_GetIndexFile(filename, ch);
+					f = fopen(filename, io_read);
+					if (!f)
+					{
+						if (fexist(filename))
+						{
+							P:E("Upgrade %c failed.", filename[USER_FILE_LENGTH + 4]);
+						}
+						continue;
+					}
+					g = ftemp();
+					if (!g)
+					{
+						fclose(f);
+						P:E("Upgrade %c failed.", filename[USER_FILE_LENGTH + 4]);
+						continue;
+					}
+					while (fread(f, line))
+					{
+						ch = strlen(line);
+						if (ch > 3)
+						{
+							// Get the current hash.
+							strcpy(hash, line[MAX_INDEX_LENGTH + 1 + MAX_PLAYER_NAME + 1], MAX_PASSWORD_LENGTH + 1);
+							//hash[MAX_PASSWORD_LENGTH] = '\0';
+							// Append their ID (not QUITE their join time, but
+							// best we can do retrospectively).
+							//line[MAX_INDEX_LENGTH] = '\0';
+							strcat(hash, line, sizeof (hash));
+							//line[MAX_INDEX_LENGTH] = ' ';
+							//hash[MAX_PASSWORD_LENGTH + MAX_INDEX_LENGTH] = '\0';
+							//printf("HASH 1: %s", hash);
+							Player_HashPass(hash, hash);
+							//printf("HASH 2: %s", hash);
+							// Copy the correct line ending.
+							if (line[ch - 2] < ' ')
+							{
+								format(line, sizeof (line), "%.*s %s %.2s 00000000 %.8s%s", MAX_INDEX_LENGTH + 1 + MAX_PLAYER_NAME, line, hash, line[MAX_INDEX_LENGTH + 1 + MAX_PLAYER_NAME + 1 + MAX_PASSWORD_LENGTH + 1], line[0], line[ch - 2]);
+								//format(line[ch - 2], 21, " 00000000 %.*s%s", MAX_INDEX_LENGTH, line[0], line[ch - 2]);
+							}
+							else
+							{
+								format(line, sizeof (line), "%.*s %s %.2s 00000000 %.8s%s", MAX_INDEX_LENGTH + 1 + MAX_PLAYER_NAME, line, hash, line[MAX_INDEX_LENGTH + 1 + MAX_PLAYER_NAME + 1 + MAX_PASSWORD_LENGTH + 1], line[0], line[ch - 1]);
+								//format(line[ch - 1], 21, " 00000000 %.*s%s", MAX_INDEX_LENGTH, line[0], line[ch - 1]);
+							}
+							fwrite(g, line);
+						}
+					}
+					fseek(g);
+					fclose(f);
+					fremove(filename);
+					f = fopen(filename, io_write);
+					if (!f)
+					{
+						fclose(g);
+						P:E("Upgrade %c failed.", filename[USER_FILE_LENGTH + 4]);
+						continue;
+					}
+					while (fread(g, line))
+					{
+						fwrite(f, line);
+					}
+					fclose(f);
+					fclose(g);
 				}
-				else if (i == -1)
+				f = fopen(USER_FILE_PATH "index.YSI", io_append);
+				if (f)
 				{
-					ch = '0';
+					fwrite(f, "        ");
+					fclose(f);
 				}
 				else
 				{
-					ch = 'a' + i;
+					P:E("Upgrade index failed.");
 				}
-				Player_GetIndexFile(filename, ch);
-				f = fopen(filename, io_read);
-				if (!f)
-				{
-					if (fexist(filename))
-					{
-						P:E("Upgrade %c failed.", filename[USER_FILE_LENGTH + 4]);
-					}
-					continue;
-				}
-				g = ftemp();
-				if (!g)
-				{
-					fclose(f);
-					P:E("Upgrade %c failed.", filename[USER_FILE_LENGTH + 4]);
-					continue;
-				}
-				while (fread(f, line))
-				{
-					ch = strlen(line);
-					if (ch > 3)
-					{
-						// Get the current hash.
-						strcpy(hash, line[MAX_INDEX_LENGTH + 1 + MAX_PLAYER_NAME + 1], MAX_PASSWORD_LENGTH + 1);
-						// Append their ID (not QUITE their join time, but best
-						// we can do retrospectively).
-						strcat(hash, line, MAX_INDEX_LENGTH + 1);
-						Player_HashPass(hash, hash);
-						// Copy the correct line ending.
-						if (line[ch - 2] < ' ')
-						{
-							format(line, sizeof (line), "%.*s %s %.2s 00000000 %.8s%s", MAX_INDEX_LENGTH + 1 + MAX_PLAYER_NAME, line, hash, line[MAX_INDEX_LENGTH + 1 + MAX_PLAYER_NAME + 1 + MAX_PASSWORD_LENGTH + 1], line[0], line[ch - 2]);
-							//format(line[ch - 2], 21, " 00000000 %.*s%s", MAX_INDEX_LENGTH, line[0], line[ch - 2]);
-						}
-						else
-						{
-							format(line, sizeof (line), "%.*s %s %.2s 00000000 %.8s%s", MAX_INDEX_LENGTH + 1 + MAX_PLAYER_NAME, line, hash, line[MAX_INDEX_LENGTH + 1 + MAX_PLAYER_NAME + 1 + MAX_PASSWORD_LENGTH + 1], line[0], line[ch - 1]);
-							//format(line[ch - 1], 21, " 00000000 %.*s%s", MAX_INDEX_LENGTH, line[0], line[ch - 1]);
-						}
-						fwrite(g, line);
-					}
-				}
-				fseek(g);
-				fclose(f);
-				fremove(filename);
-				f = fopen(filename, io_write);
-				if (!f)
-				{
-					fclose(g);
-					P:E("Upgrade %c failed.", filename[USER_FILE_LENGTH + 4]);
-					continue;
-				}
-				while (fread(g, line))
-				{
-					fwrite(f, line);
-				}
-				fclose(f);
-				fclose(g);
-			}
-			f = fopen(USER_FILE_PATH "index.YSI", io_append);
-			if (f)
-			{
-				fwrite(f, "        ");
-				fclose(f);
-			}
-			else
-			{
-				P:E("Upgrade index failed.");
-			}
-			P:I("Upgrade complete.");
+				P:I("Upgrade complete.");
+			#endif
 		}
 	}
 }
@@ -805,7 +821,10 @@ global Player_TryLogin(playerid, string:password[])
 		hash[MAX_PASSWORD_LENGTH + 8 + 1];
 	Player_HashPass(password, hash);
 	format(hash[MAX_PASSWORD_LENGTH], sizeof (hash) - MAX_PASSWORD_LENGTH, "%04x%04x", YSI_g_sPreloadData[playerid][E_USER_PRELOAD_DATE] >>> 16, YSI_g_sPreloadData[playerid][E_USER_PRELOAD_DATE] & 0xFFFF);
+	//printf("HASH 1: %s", hash);
 	Player_HashPass(hash, hash);
+	//printf("HASH 2: %s", hash);
+	//Player_HashPass(hash, hash);
 	switch (YSI_g_sPreloadData[playerid][E_USER_PRELOAD_YID])
 	{
 		case -2:
@@ -819,7 +838,7 @@ global Player_TryLogin(playerid, string:password[])
 		default:
 		{
 			// Match the password.
-			if (!strcmp(YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS], hash, false, MAX_PASSWORD_LENGTH) && YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS][0])
+			if (YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS][0] && !strcmp(YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS], hash, false, MAX_PASSWORD_LENGTH))
 			{
 				// Wipe the password from memory.
 				memset(YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS], MAX_PASSWORD_LENGTH, 0);
@@ -1293,8 +1312,8 @@ global Player_TryRegister(playerid, string:password[])
 			d = gettime(),
 			date[9];
 		format(date, sizeof (date), "%04x%04x", d >>> 16, d & 0xFFFF);
-		strcat(hash, date);
-		Player_HashPass(hash, hash);
+		//strcat(hash, date);
+		//Player_HashPass(hash, hash);
 		format(line, sizeof (line), "%0" #MAX_INDEX_LENGTH "d %" #MAX_PLAYER_NAME "s %" #MAX_PASSWORD_LENGTH "s %02s 00000000 %s" INI_NEW_LINE, uid, name, hash, Langs_GetCode(Langs_GetPlayerLanguage(playerid)), date);
 		fwrite(fIndex, line);
 		fclose(fIndex);
