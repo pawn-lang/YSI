@@ -1312,8 +1312,8 @@ global Player_TryRegister(playerid, string:password[])
 			d = gettime(),
 			date[9];
 		format(date, sizeof (date), "%04x%04x", d >>> 16, d & 0xFFFF);
-		//strcat(hash, date);
-		//Player_HashPass(hash, hash);
+		strcat(hash, date);
+		Player_HashPass(hash, hash);
 		format(line, sizeof (line), "%0" #MAX_INDEX_LENGTH "d %" #MAX_PLAYER_NAME "s %" #MAX_PASSWORD_LENGTH "s %02s 00000000 %s" INI_NEW_LINE, uid, name, hash, Langs_GetCode(Langs_GetPlayerLanguage(playerid)), date);
 		fwrite(fIndex, line);
 		fclose(fIndex);
