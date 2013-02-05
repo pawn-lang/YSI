@@ -143,7 +143,7 @@ forward _ScriptInit_FixState();
 		#if defined ScriptInit_OnFilterScriptInit
 			return ScriptInit_OnFilterScriptInit();
 		#else
-			return ALS_R_FilterScriptInit;
+			return 1;
 		#endif
 		//ScriptInit_OnScriptInitLate();
 	}
@@ -156,7 +156,7 @@ forward _ScriptInit_FixState();
 			#if defined ScriptInit_OnGameModeInit
 				return ScriptInit_OnGameModeInit();
 			#else
-				return ALS_R_GameModeInit;
+				return 1;
 			#endif
 		}
 		else
@@ -192,7 +192,7 @@ forward _ScriptInit_FixState();
 			#if defined ScriptInit_OnGameModeInit
 				return ScriptInit_OnGameModeInit();
 			#else
-				return ALS_R_GameModeInit;
+				return 1;
 			#endif
 			//ScriptInit_OnScriptLate();
 			//CallLocalFunction("Text_SpecialInit", "");
@@ -288,7 +288,7 @@ forward _ScriptInit_FixState();
 			#if defined ScriptInit_OnGameModeExit
 				return ScriptInit_OnGameModeExit();
 			#else
-				return ALS_R_GameModeExit;
+				return 1;
 			#endif
 		}
 		else
