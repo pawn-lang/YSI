@@ -202,7 +202,7 @@ YSI_EXTRA_LOGIN_TITLE = Login
 YSI_EXTRA_LOGIN_PROMPT = Please enter your password to log in:
 
 YSI_EXTRA_REGISTER_TITLE = Register
-YSI_EXTRA_REGISTER_PROMPT = Please enter your password to register:
+YSI_EXTRA_REGISTER_PROMPT = Please enter a password to register:
 YSI_EXTRA_REGISTER_MISMATCH = The passwords do not match.  Please try again.
 
 YSI_EXTRA_CONFIRM_PROMPT = Please confirm your password:

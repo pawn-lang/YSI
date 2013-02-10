@@ -1439,7 +1439,21 @@ foreign Group@YSII_Ag(Group:group, start);
 
 global Group@YSII_Ag(Group:group, start)
 {
-	return Iter_Next(GroupPlayers[_:GROUP_TEMP_FIX(group)], start);
+	GROUP_FIX(group);
+	if (start == -1)
+	{
+		//start = Iter_Begin(GroupPlayers[]);
+		start = Iter_First(GroupPlayers[_:GROUP_TEMP_FIX(group)]);
+	}
+	else
+	{
+		start = Iter_Next(GroupPlayers[_:GROUP_TEMP_FIX(group)], start);
+	}
+	if (start == Iter_End(GroupPlayers[]))
+	{
+		return -1;
+	}
+	return start;
 }
 
 /*----------------------------------------------------------------------------*\
