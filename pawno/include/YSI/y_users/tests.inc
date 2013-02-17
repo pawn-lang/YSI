@@ -78,10 +78,10 @@ PTest:Player_ChangePassword(playerid)
 		ret[E_USER_PRELOAD];
 	// Change their password.
 	Player_Preload("TestPlayer", ret);
-	ASSERT(!strcmp(ret[E_USER_PRELOAD_PASS], "");
+	ASSERT(!strcmp(ret[E_USER_PRELOAD_PASS], "24954A7C4E607137A70D701986CC3C3140C143E5B5886362A8ACB647B81592CF1F092C65178F6E3FFFC6691B044D2290215058E09BBE029D23D1D67F41640090"));
 	Player_ChangePassword(gBot, "thisisabadpass");
 	Player_Preload("TestPlayer", ret);
-	ASSERT(!strcmp(ret[E_USER_PRELOAD_PASS], "0E7FD2E6CC6B63AE3F5199113EBDEE95D59B37D3BF2FF22FFAA910E5A1DAC9BB7D52A5D8BA813423900B1BFA629D9A1A579DA21C0316BFB69291859D535BE60F");
+	ASSERT(!strcmp(ret[E_USER_PRELOAD_PASS], "B506FEEEDFB83EF44A5DC2E00BF1535E58E3B37A044730F2A6718497A224B5455A441F39F9EB91967B38607416A9B85E5DE3CBE3A48E7A77AB5808674EF33822"));
 }
 
 PTestClose:Player_ChangePassword(playerid)
@@ -91,16 +91,21 @@ PTestClose:Player_ChangePassword(playerid)
 	//Kick(gBot);
 }
 
+PTestInit:Player_Preload(playerid)
+{
+	Player_ForceLogin(gBot);
+}
+
 PTest:Player_Preload(playerid)
 {
 	new
-		name[MAX_PLAYER_NAME],
+		//name[MAX_PLAYER_NAME],
 		ret[E_USER_PRELOAD];
-	GetPlayerName(playerid, name, sizeof (name));
-	Player_Preload(name, ret);
-	ASSERT(Player_GetYID(playerid) == ret[E_USER_PRELOAD_YID]);
-	ASSERT(Langs_GetPlayerLanguage(playerid) == ret[E_USER_PRELOAD_LANG]);
-	ASSERT(0 == ret[E_USER_PRELOAD_BITS]);
+	//GetPlayerName(playerid, name, sizeof (name));
+	Player_Preload("TestPlayer", ret);
+	ASSERT(Player_GetYID(gBot) == ret[E_USER_PRELOAD_YID]);
+	ASSERT(Langs_GetPlayerLanguage(gBot) == ret[E_USER_PRELOAD_LANG]);
+	ASSERT(0x12345678 == ret[E_USER_PRELOAD_BITS]);
 	ASSERT(gettime() >= ret[E_USER_PRELOAD_DATE]);
 }
 
