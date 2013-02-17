@@ -629,7 +629,7 @@ public OnPlayerConnect(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -673,7 +673,7 @@ public OnPlayerDisconnect(playerid, reason)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -716,7 +716,7 @@ public OnPlayerSpawn(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -761,7 +761,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -804,7 +804,7 @@ public OnVehicleSpawn(vehicleid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -848,7 +848,7 @@ public OnVehicleDeath(vehicleid, killerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -892,7 +892,7 @@ public OnPlayerText(playerid, text[])
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -931,7 +931,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		#emit LOAD.S.alt ret
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -975,7 +975,7 @@ public OnPlayerRequestClass(playerid, classid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1020,7 +1020,7 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1064,7 +1064,7 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1109,7 +1109,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1152,7 +1152,7 @@ public OnPlayerEnterCheckpoint(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1195,7 +1195,7 @@ public OnPlayerLeaveCheckpoint(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1238,7 +1238,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1281,7 +1281,7 @@ public OnPlayerLeaveRaceCheckpoint(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1324,7 +1324,7 @@ public OnRconCommand(cmd[])
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1368,7 +1368,7 @@ public OnPlayerRequestSpawn(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 		//printf("ret: %d", ret);
 	}
 	return ret;
@@ -1412,7 +1412,7 @@ public OnObjectMoved(objectid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1456,7 +1456,7 @@ public OnPlayerObjectMoved(playerid, objectid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1500,7 +1500,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1545,7 +1545,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1590,7 +1590,7 @@ public OnEnterExitModShop(playerid, enterexit, interiorid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1635,7 +1635,7 @@ public OnVehiclePaintjob(playerid, vehicleid, paintjobid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1681,7 +1681,7 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1725,7 +1725,7 @@ public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1773,7 +1773,7 @@ public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1817,7 +1817,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1860,7 +1860,7 @@ public OnPlayerExitedMenu(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1905,7 +1905,7 @@ public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1950,7 +1950,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -1995,7 +1995,7 @@ public OnRconLoginAttempt(ip[], password[], success)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2038,7 +2038,7 @@ public OnPlayerUpdate(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2082,7 +2082,7 @@ public OnPlayerStreamIn(playerid, forplayerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2126,7 +2126,7 @@ public OnPlayerStreamOut(playerid, forplayerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2170,7 +2170,7 @@ public OnVehicleStreamIn(vehicleid, forplayerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2214,7 +2214,7 @@ public OnVehicleStreamOut(vehicleid, forplayerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2261,7 +2261,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2306,7 +2306,7 @@ public OnPlayerClickPlayer(playerid, clickedplayerid, source)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2352,7 +2352,7 @@ public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2398,7 +2398,7 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2446,7 +2446,7 @@ public OnPlayerLogin(playerid, uid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2494,7 +2494,7 @@ public OnPlayerLogout(playerid, uid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2545,7 +2545,7 @@ public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2589,7 +2589,7 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2633,7 +2633,7 @@ public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2685,7 +2685,7 @@ public OnPlayerEditObject(playerid, playerobject, objectid, response, Float:fX, 
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2741,7 +2741,7 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2793,7 +2793,7 @@ public OnPlayerSelectObject(playerid, type, objectid, modelid, Float:fX, Float:f
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2842,7 +2842,7 @@ public OnDynamicObjectMoved(objectid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2893,7 +2893,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2944,7 +2944,7 @@ public OnPlayerSelectDynamicObject(playerid, objectid, modelid, Float:x, Float:y
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -2991,7 +2991,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -3035,7 +3035,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -3079,7 +3079,7 @@ public OnPlayerLeaveDynamicCP(playerid, checkpointid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -3123,7 +3123,7 @@ public OnPlayerEnterDynamicRaceCP(playerid, checkpointid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -3167,7 +3167,7 @@ public OnPlayerLeaveDynamicRaceCP(playerid, checkpointid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -3211,7 +3211,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }
@@ -3255,7 +3255,7 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
-		if (ret < 0) return 0;
+		if (ret < 0) return ret + 1;
 	}
 	return ret;
 }

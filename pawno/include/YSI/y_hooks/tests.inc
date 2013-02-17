@@ -57,6 +57,17 @@ Test:y_hooks_ReturnM1()
 	YSI_g_sValue = 0;
 }
 
+Test:y_hooks_ReturnM2()
+{
+	// Using -1 as a return should stop all processing.
+	YSI_g_sValue = -3;
+	new
+		ret = call OnRconCommand("IGNORE_ME");
+	ASSERT(ret == -1);
+	ASSERT(YSI_g_sValue == -2);
+	YSI_g_sValue = 0;
+}
+
 Test:y_hooks_Callback()
 {
 	// Using -1 as a return should stop all processing.
