@@ -165,6 +165,7 @@ Changelog:
 static stock
 	YSI_g_sFailMessage[512],
 	YSI_g_sPlayer = cellmax,
+	bool:YSI_g_sAsked,
 	YSI_g_sTests,
 	YSI_g_sFails;
 
@@ -185,6 +186,7 @@ stock Testing_Ask(playerid, str[] = "", va_args<>)
 {
 	va_format(YSI_g_sFailMessage, sizeof (YSI_g_sFailMessage), str, va_start<2>);
 	ShowPlayerDialog(playerid, Y_TESTING_DIALOG_ID, DIALOG_STYLE_MSGBOX, "Did the test pass?", YSI_g_sFailMessage, "Yes", "No");
+	YSI_g_sAsked = true;
 }
 
 stock Testing_Test(bool:x, str[] = "", va_args<>)
@@ -441,49 +443,63 @@ stock bool:Testing_Player(playerid, &idx, &tests, &fails, lastfail[33] = "", boo
 			{
 				new
 					buffer[32];
-				// Get the last test (nicely fails for cellmax).
-				if ((YSI_g_sPlayer = AMX_GetPublicName(YSI_g_sPlayer, buffer, "Tezp_@")))
+				for ( ; ; )
 				{
-					strunpack(buffer, buffer);
-					// Call the shutdown function if there is one.
-					buffer[0] = 'S';
-					buffer[1] = 'h';
-					buffer[2] = 'u';
-					buffer[3] = 'p';
-					CallLocalFunction(buffer, "i", playerid);
-				}
-				// Get the new test, but don't store the index.
-				if (AMX_GetPublicName(YSI_g_sPlayer, buffer, "Tezp_@"))
-				{
-					++YSI_g_sTests;
-					strunpack(buffer, buffer);
-					// Call the setup function if there is one.
-					buffer[0] = 'I';
-					buffer[1] = 'n';
-					buffer[2] = 'i';
-					buffer[3] = 'p';
-					CallLocalFunction(buffer, "i", playerid);
-					// Call the test.
-					buffer[0] = 'T';
-					buffer[1] = 'e';
-					buffer[2] = 'z';
-					buffer[3] = 'p';
-					P:5("Testing_Next(): Calling %s", buffer[6]);
-					CallLocalFunction(buffer, "i", playerid);
-				}
-				else
-				{
-					// No more tests.
-					printf("*** Tests: %d, Fails: %d", YSI_g_sTests, YSI_g_sFails);
-					if (!YSI_g_sFails)
+					// Get the last test (nicely fails for cellmax).
+					if ((YSI_g_sPlayer = AMX_GetPublicName(YSI_g_sPlayer, buffer, "Tezp_@")))
 					{
-						printf(" ");
-						printf("  ||==========================||  ");
-						printf("  || ALL PLAYER TESTS PASSED! ||  ");
-						printf("  ||==========================||  ");
-						printf(" ");
+						strunpack(buffer, buffer);
+						// Call the shutdown function if there is one.
+						buffer[0] = 'S';
+						buffer[1] = 'h';
+						buffer[2] = 'u';
+						buffer[3] = 'p';
+						CallLocalFunction(buffer, "i", playerid);
 					}
+					// Get the new test, but don't store the index.
+					if (AMX_GetPublicName(YSI_g_sPlayer, buffer, "Tezp_@"))
+					{
+						YSI_g_sAsked = false;
+						++YSI_g_sTests;
+						strunpack(buffer, buffer);
+						// Call the setup function if there is one.
+						buffer[0] = 'I';
+						buffer[1] = 'n';
+						buffer[2] = 'i';
+						buffer[3] = 'p';
+						CallLocalFunction(buffer, "i", playerid);
+						// Call the test.
+						buffer[0] = 'T';
+						buffer[1] = 'e';
+						buffer[2] = 'z';
+						buffer[3] = 'p';
+						P:5("Testing_Next(): Calling %s", buffer[6]);
+						CallLocalFunction(buffer, "i", playerid);
+					}
+					else
+					{
+						YSI_g_sAsked = true;
+						// No more tests.
+						printf("*** Tests: %d, Fails: %d", YSI_g_sTests, YSI_g_sFails);
+						if (!YSI_g_sFails)
+						{
+							printf(" ");
+							printf("  ||==========================||  ");
+							printf("  || ALL PLAYER TESTS PASSED! ||  ");
+							printf("  ||==========================||  ");
+							printf(" ");
+						}
+					}
+					// If the test needs a player but doesn't ask them anything
+					// then we can't wait for "OnDialogResponse" to run the next
+					// one.
+					if (YSI_g_sAsked)
+					{
+						break;
+					}
+					printf(TEST_PASSED);
 				}
+				//while (!YSI_g_sAsked);
 			}
 			
 			public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])

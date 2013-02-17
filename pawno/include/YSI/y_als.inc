@@ -56,12 +56,6 @@ Changelog:
 		First version
 \*----------------------------------------------------------------------------*/
 
-#include "internal\y_version"
-#include "y_utils"
-#include "y_scriptinit"
-#include "y_bit"
-#include "internal\y_shortfunc"
-
 // Yes - FORWARD slash here!
 #include "y_als/impl"
 #if defined YSI_TESTS

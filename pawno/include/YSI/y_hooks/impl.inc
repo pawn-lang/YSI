@@ -66,14 +66,14 @@ Changelog:
 		First version
 \*----------------------------------------------------------------------------*/
 
-#include "y_version"
+#include "internal\y_version"
 
 #include <a_samp>
 
-#include "..\y_debug"
-#include "..\y_amx"
+#include "y_debug"
+#include "y_amx"
 
-#include "y_plugins"
+#include "internal\y_plugins"
 
 #define ALS_MAKE<%0...%1> %0S@@%1
 
@@ -87,7 +87,7 @@ Changelog:
 
 #define Hook:%0On%1(%2) UNIQUE_FUNCTION<@yH_%1...%0>(%2);UNIQUE_FUNCTION<@yH_%1...%0>(%2)
 
-#include "..\y_als"
+#include "y_als"
 
 #if !defined HOOKS_MAX_UPDATES
 	// Slight increase from the previous version.
@@ -605,7 +605,7 @@ public OnPlayerConnect(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerConnect],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerConnect],
 		ret = ALS_R_PlayerConnect;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
@@ -629,9 +629,9 @@ public OnPlayerConnect(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerConnect
 	#undef OnPlayerConnect
@@ -648,7 +648,7 @@ public OnPlayerDisconnect(playerid, reason)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerDisconnect],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerDisconnect],
 		ret = ALS_R_PlayerDisconnect;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S reason
 		#emit PUSH.S playerid
@@ -673,9 +673,9 @@ public OnPlayerDisconnect(playerid, reason)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerDisconnect
 	#undef OnPlayerDisconnect
@@ -692,7 +692,7 @@ public OnPlayerSpawn(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerSpawn],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerSpawn],
 		ret = ALS_R_PlayerSpawn;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
@@ -716,9 +716,9 @@ public OnPlayerSpawn(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerSpawn
 	#undef OnPlayerSpawn
@@ -735,7 +735,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerDeath],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerDeath],
 		ret = ALS_R_PlayerDeath;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S reason
 		#emit PUSH.S killerid
@@ -761,9 +761,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerDeath
 	#undef OnPlayerDeath
@@ -780,7 +780,7 @@ public OnVehicleSpawn(vehicleid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehicleSpawn],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehicleSpawn],
 		ret = ALS_R_VehicleSpawn;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S vehicleid
 		#emit PUSH.C     4
@@ -804,9 +804,9 @@ public OnVehicleSpawn(vehicleid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnVehicleSpawn
 	#undef OnVehicleSpawn
@@ -823,7 +823,7 @@ public OnVehicleDeath(vehicleid, killerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehicleDeath],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehicleDeath],
 		ret = ALS_R_VehicleDeath;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S killerid
 		#emit PUSH.S vehicleid
@@ -848,9 +848,9 @@ public OnVehicleDeath(vehicleid, killerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnVehicleDeath
 	#undef OnVehicleDeath
@@ -867,7 +867,7 @@ public OnPlayerText(playerid, text[])
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerText],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerText],
 		ret = ALS_R_PlayerText;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S text
 		#emit PUSH.S playerid
@@ -892,9 +892,9 @@ public OnPlayerText(playerid, text[])
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerText
 	#undef OnPlayerText
@@ -911,7 +911,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerCommandText],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerCommandText],
 		ret = ALS_R_PlayerCommandText;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S cmdtext
 		#emit PUSH.S playerid
@@ -931,9 +931,9 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		#emit LOAD.S.alt ret
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerCommandText
 	#undef OnPlayerCommandText
@@ -950,7 +950,7 @@ public OnPlayerRequestClass(playerid, classid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerRequestClass],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerRequestClass],
 		ret = ALS_R_PlayerRequestClass;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S classid
 		#emit PUSH.S playerid
@@ -975,9 +975,9 @@ public OnPlayerRequestClass(playerid, classid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerRequestClass
 	#undef OnPlayerRequestClass
@@ -994,7 +994,7 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEnterVehicle],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEnterVehicle],
 		ret = ALS_R_PlayerEnterVehicle;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S ispassenger
 		#emit PUSH.S vehicleid
@@ -1020,9 +1020,9 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerEnterVehicle
 	#undef OnPlayerEnterVehicle
@@ -1039,7 +1039,7 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerExitVehicle],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerExitVehicle],
 		ret = ALS_R_PlayerExitVehicle;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S vehicleid
 		#emit PUSH.S playerid
@@ -1064,9 +1064,9 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerExitVehicle
 	#undef OnPlayerExitVehicle
@@ -1083,7 +1083,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerStateChange],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerStateChange],
 		ret = ALS_R_PlayerStateChange;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S oldstate
 		#emit PUSH.S newstate
@@ -1109,9 +1109,9 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerStateChange
 	#undef OnPlayerStateChange
@@ -1128,7 +1128,7 @@ public OnPlayerEnterCheckpoint(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEnterCheckpoint],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEnterCheckpoint],
 		ret = ALS_R_PlayerEnterCheckpoint;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
@@ -1152,9 +1152,9 @@ public OnPlayerEnterCheckpoint(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerEnterCheckpoint
 	#undef OnPlayerEnterCheckpoint
@@ -1171,7 +1171,7 @@ public OnPlayerLeaveCheckpoint(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerLeaveCheckpoint],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerLeaveCheckpoint],
 		ret = ALS_R_PlayerLeaveCheckpoint;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
@@ -1195,9 +1195,9 @@ public OnPlayerLeaveCheckpoint(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerLeaveCheckpoint
 	#undef OnPlayerLeaveCheckpoint
@@ -1214,7 +1214,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEnterRaceCheckpoint],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEnterRaceCheckpoint],
 		ret = ALS_R_PlayerEnterRaceCheckpoint;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
@@ -1238,9 +1238,9 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerEnterRaceCP
 	#undef OnPlayerEnterRaceCheckpoint
@@ -1257,7 +1257,7 @@ public OnPlayerLeaveRaceCheckpoint(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerLeaveRaceCheckpoint],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerLeaveRaceCheckpoint],
 		ret = ALS_R_PlayerLeaveRaceCheckpoint;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
@@ -1281,9 +1281,9 @@ public OnPlayerLeaveRaceCheckpoint(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerLeaveRaceCP
 	#undef OnPlayerLeaveRaceCheckpoint
@@ -1300,7 +1300,7 @@ public OnRconCommand(cmd[])
 		end   = _:YSI_g_sCallbackEnd[ALS_OnRconCommand],
 		start = _:YSI_g_sCallbackStart[ALS_OnRconCommand],
 		ret = ALS_R_RconCommand;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S cmd
 		#emit PUSH.C     4
@@ -1324,9 +1324,9 @@ public OnRconCommand(cmd[])
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnRconCommand
 	#undef OnRconCommand
@@ -1343,7 +1343,7 @@ public OnPlayerRequestSpawn(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerRequestSpawn],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerRequestSpawn],
 		ret = ALS_R_PlayerRequestSpawn;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		//printf("start: %d", start);
 		#emit PUSH.S playerid
@@ -1368,10 +1368,10 @@ public OnPlayerRequestSpawn(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 		//printf("ret: %d", ret);
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerRequestSpawn
 	#undef OnPlayerRequestSpawn
@@ -1388,7 +1388,7 @@ public OnObjectMoved(objectid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnObjectMoved],
 		start = _:YSI_g_sCallbackStart[ALS_OnObjectMoved],
 		ret = ALS_R_ObjectMoved;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S objectid
 		#emit PUSH.C     4
@@ -1412,9 +1412,9 @@ public OnObjectMoved(objectid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnObjectMoved
 	#undef OnObjectMoved
@@ -1431,7 +1431,7 @@ public OnPlayerObjectMoved(playerid, objectid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerObjectMoved],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerObjectMoved],
 		ret = ALS_R_PlayerObjectMoved;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S objectid
 		#emit PUSH.S playerid
@@ -1456,9 +1456,9 @@ public OnPlayerObjectMoved(playerid, objectid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerObjectMoved
 	#undef OnPlayerObjectMoved
@@ -1475,7 +1475,7 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerPickUpPickup],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerPickUpPickup],
 		ret = ALS_R_PlayerPickUpPickup;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S pickupid
 		#emit PUSH.S playerid
@@ -1500,9 +1500,9 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerPickUpPickup
 	#undef OnPlayerPickUpPickup
@@ -1519,7 +1519,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehicleMod],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehicleMod],
 		ret = ALS_R_VehicleMod;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S componentid
 		#emit PUSH.S vehicleid
@@ -1545,9 +1545,9 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnVehicleMod
 	#undef OnVehicleMod
@@ -1564,7 +1564,7 @@ public OnEnterExitModShop(playerid, enterexit, interiorid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnEnterExitModShop],
 		start = _:YSI_g_sCallbackStart[ALS_OnEnterExitModShop],
 		ret = ALS_R_EnterExitModShop;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S interiorid
 		#emit PUSH.S enterexit
@@ -1590,9 +1590,9 @@ public OnEnterExitModShop(playerid, enterexit, interiorid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnEnterExitModShop
 	#undef OnEnterExitModShop
@@ -1609,7 +1609,7 @@ public OnVehiclePaintjob(playerid, vehicleid, paintjobid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehiclePaintjob],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehiclePaintjob],
 		ret = ALS_R_VehiclePaintjob;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S paintjobid
 		#emit PUSH.S vehicleid
@@ -1635,9 +1635,9 @@ public OnVehiclePaintjob(playerid, vehicleid, paintjobid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnVehiclePaintjob
 	#undef OnVehiclePaintjob
@@ -1654,7 +1654,7 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehicleRespray],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehicleRespray],
 		ret = ALS_R_VehicleRespray;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S color2
 		#emit PUSH.S color1
@@ -1681,9 +1681,9 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnVehicleRespray
 	#undef OnVehicleRespray
@@ -1700,7 +1700,7 @@ public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehicleDamageStatusUpdate],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehicleDamageStatusUpdate],
 		ret = ALS_R_VehicleDamageStatusUpdate;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.S vehicleid
@@ -1725,9 +1725,9 @@ public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnVehicleDamageStatusUpd
 	#undef OnVehicleDamageStatusUpdate
@@ -1744,7 +1744,7 @@ public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnUnoccupiedVehicleUpdate],
 		start = _:YSI_g_sCallbackStart[ALS_OnUnoccupiedVehicleUpdate],
 		ret = ALS_R_UnoccupiedVehicleUpdate;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S passenger_seat
 		#emit PUSH.S playerid
@@ -1773,9 +1773,9 @@ public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnUnoccupiedVehicleUpdate
 	#undef OnUnoccupiedVehicleUpdate
@@ -1792,7 +1792,7 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerSelectedMenuRow],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerSelectedMenuRow],
 		ret = ALS_R_PlayerSelectedMenuRow;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S row
 		#emit PUSH.S playerid
@@ -1817,9 +1817,9 @@ public OnPlayerSelectedMenuRow(playerid, row)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerSelectedMenuRow
 	#undef OnPlayerSelectedMenuRow
@@ -1836,7 +1836,7 @@ public OnPlayerExitedMenu(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerExitedMenu],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerExitedMenu],
 		ret = ALS_R_PlayerExitedMenu;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
@@ -1860,9 +1860,9 @@ public OnPlayerExitedMenu(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerExitedMenu
 	#undef OnPlayerExitedMenu
@@ -1879,7 +1879,7 @@ public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerInteriorChange],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerInteriorChange],
 		ret = ALS_R_PlayerInteriorChange;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S oldinteriorid
 		#emit PUSH.S newinteriorid
@@ -1905,9 +1905,9 @@ public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerInteriorChange
 	#undef OnPlayerInteriorChange
@@ -1924,7 +1924,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerKeyStateChange],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerKeyStateChange],
 		ret = ALS_R_PlayerKeyStateChange;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S oldkeys
 		#emit PUSH.S newkeys
@@ -1950,9 +1950,9 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerKeyStateChange
 	#undef OnPlayerKeyStateChange
@@ -1969,7 +1969,7 @@ public OnRconLoginAttempt(ip[], password[], success)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnRconLoginAttempt],
 		start = _:YSI_g_sCallbackStart[ALS_OnRconLoginAttempt],
 		ret = ALS_R_RconLoginAttempt;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S success
 		#emit PUSH.S password
@@ -1995,9 +1995,9 @@ public OnRconLoginAttempt(ip[], password[], success)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnRconLoginAttempt
 	#undef OnRconLoginAttempt
@@ -2014,7 +2014,7 @@ public OnPlayerUpdate(playerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerUpdate],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerUpdate],
 		ret = ALS_R_PlayerUpdate;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S playerid
 		#emit PUSH.C     4
@@ -2038,9 +2038,9 @@ public OnPlayerUpdate(playerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerUpdate
 	#undef OnPlayerUpdate
@@ -2057,7 +2057,7 @@ public OnPlayerStreamIn(playerid, forplayerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerStreamIn],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerStreamIn],
 		ret = ALS_R_PlayerStreamIn;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S forplayerid
 		#emit PUSH.S playerid
@@ -2082,9 +2082,9 @@ public OnPlayerStreamIn(playerid, forplayerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerStreamIn
 	#undef OnPlayerStreamIn
@@ -2101,7 +2101,7 @@ public OnPlayerStreamOut(playerid, forplayerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerStreamOut],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerStreamOut],
 		ret = ALS_R_PlayerStreamOut;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S forplayerid
 		#emit PUSH.S playerid
@@ -2126,9 +2126,9 @@ public OnPlayerStreamOut(playerid, forplayerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerStreamOut
 	#undef OnPlayerStreamOut
@@ -2145,7 +2145,7 @@ public OnVehicleStreamIn(vehicleid, forplayerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehicleStreamIn],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehicleStreamIn],
 		ret = ALS_R_VehicleStreamIn;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S forplayerid
 		#emit PUSH.S vehicleid
@@ -2170,9 +2170,9 @@ public OnVehicleStreamIn(vehicleid, forplayerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnVehicleStreamIn
 	#undef OnVehicleStreamIn
@@ -2189,7 +2189,7 @@ public OnVehicleStreamOut(vehicleid, forplayerid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnVehicleStreamOut],
 		start = _:YSI_g_sCallbackStart[ALS_OnVehicleStreamOut],
 		ret = ALS_R_VehicleStreamOut;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S forplayerid
 		#emit PUSH.S vehicleid
@@ -2214,9 +2214,9 @@ public OnVehicleStreamOut(vehicleid, forplayerid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnVehicleStreamOut
 	#undef OnVehicleStreamOut
@@ -2233,7 +2233,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		end   = _:YSI_g_sCallbackEnd[ALS_OnDialogResponse],
 		start = _:YSI_g_sCallbackStart[ALS_OnDialogResponse],
 		ret = ALS_R_DialogResponse;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S inputtext
 		#emit PUSH.S listitem
@@ -2261,9 +2261,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnDialogResponse
 	#undef OnDialogResponse
@@ -2280,7 +2280,7 @@ public OnPlayerClickPlayer(playerid, clickedplayerid, source)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerClickPlayer],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerClickPlayer],
 		ret = ALS_R_PlayerClickPlayer;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S source
 		#emit PUSH.S clickedplayerid
@@ -2306,9 +2306,9 @@ public OnPlayerClickPlayer(playerid, clickedplayerid, source)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerClickPlayer
 	#undef OnPlayerClickPlayer
@@ -2325,7 +2325,7 @@ public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerTakeDamage],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerTakeDamage],
 		ret = ALS_R_PlayerTakeDamage;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S weaponid
 		#emit PUSH.S amount
@@ -2352,9 +2352,9 @@ public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerTakeDamage
 	#undef OnPlayerTakeDamage
@@ -2371,7 +2371,7 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerGiveDamage],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerGiveDamage],
 		ret = ALS_R_PlayerGiveDamage;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S weaponid
 		#emit PUSH.S amount
@@ -2398,9 +2398,9 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerGiveDamage
 	#undef OnPlayerGiveDamage
@@ -2421,7 +2421,7 @@ public OnPlayerLogin(playerid, uid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerLogin],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerLogin],
 		ret = ALS_R_PlayerLogin;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S uid
 		#emit PUSH.S playerid
@@ -2446,9 +2446,9 @@ public OnPlayerLogin(playerid, uid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerLogin
 	#undef OnPlayerLogin
@@ -2469,7 +2469,7 @@ public OnPlayerLogout(playerid, uid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerLogout],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerLogout],
 		ret = ALS_R_PlayerLogout;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S uid
 		#emit PUSH.S playerid
@@ -2494,9 +2494,9 @@ public OnPlayerLogout(playerid, uid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerLogout
 	#undef OnPlayerLogout
@@ -2518,7 +2518,7 @@ public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerClickMap],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerClickMap],
 		ret = ALS_R_PlayerClickMap;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S fZ
 		#emit PUSH.S fY
@@ -2545,9 +2545,9 @@ public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerClickMap
 	#undef OnPlayerClickMap
@@ -2564,7 +2564,7 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerClickTextDraw],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerClickTextDraw],
 		ret = ALS_R_PlayerClickTextDraw;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S clickedid
 		#emit PUSH.S playerid
@@ -2589,9 +2589,9 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerClickTextDraw
 	#undef OnPlayerClickTextDraw
@@ -2608,7 +2608,7 @@ public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerClickPlayerTextDraw],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerClickPlayerTextDraw],
 		ret = ALS_R_PlayerClickPlayerTextDraw;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S playertextid
 		#emit PUSH.S playerid
@@ -2633,9 +2633,9 @@ public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerClickPlayerTD
 	#undef OnPlayerClickPlayerTextDraw
@@ -2652,7 +2652,7 @@ public OnPlayerEditObject(playerid, playerobject, objectid, response, Float:fX, 
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEditObject],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEditObject],
 		ret = ALS_R_PlayerEditObject;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S fRotZ
 		#emit PUSH.S fRotY
@@ -2685,9 +2685,9 @@ public OnPlayerEditObject(playerid, playerobject, objectid, response, Float:fX, 
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerEditObject
 	#undef OnPlayerEditObject
@@ -2704,7 +2704,7 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEditAttachedObject],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEditAttachedObject],
 		ret = ALS_R_PlayerEditAttachedObject;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S fScaleZ
 		#emit PUSH.S fScaleY
@@ -2741,9 +2741,9 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerEditAttachedObject
 	#undef OnPlayerEditAttachedObject
@@ -2763,7 +2763,7 @@ public OnPlayerSelectObject(playerid, type, objectid, modelid, Float:fX, Float:f
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerSelectObject],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerSelectObject],
 		ret = ALS_R_PlayerSelectObject;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S fZ
 		#emit PUSH.S fY
@@ -2793,9 +2793,9 @@ public OnPlayerSelectObject(playerid, type, objectid, modelid, Float:fX, Float:f
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerSelectObject
 	#undef OnPlayerSelectObject
@@ -2818,7 +2818,7 @@ public OnDynamicObjectMoved(objectid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnDynamicObjectMoved],
 		start = _:YSI_g_sCallbackStart[ALS_OnDynamicObjectMoved],
 		ret = ALS_R_DynamicObjectMoved;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S objectid
 		#emit PUSH.C     4
@@ -2842,9 +2842,9 @@ public OnDynamicObjectMoved(objectid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnDynamicObjectMoved
 	#undef OnDynamicObjectMoved
@@ -2861,7 +2861,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEditDynamicObject],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEditDynamicObject],
 		ret = ALS_R_PlayerEditDynamicObject;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S rz
 		#emit PUSH.S ry
@@ -2893,9 +2893,9 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerEditDynamicObject
 	#undef OnPlayerEditDynamicObject
@@ -2915,7 +2915,7 @@ public OnPlayerSelectDynamicObject(playerid, objectid, modelid, Float:x, Float:y
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerSelectDynamicObject],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerSelectDynamicObject],
 		ret = ALS_R_PlayerSelectDynamicObject;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S z
 		#emit PUSH.S y
@@ -2944,9 +2944,9 @@ public OnPlayerSelectDynamicObject(playerid, objectid, modelid, Float:x, Float:y
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerSelectDynamicObj
 	#undef OnPlayerSelectDynamicObject
@@ -2966,7 +2966,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerPickUpDynamicPickup],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerPickUpDynamicPickup],
 		ret = ALS_R_PlayerPickUpDynamicPickup;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S pickupid
 		#emit PUSH.S playerid
@@ -2991,9 +2991,9 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerPickUpDynamicPUp
 	#undef OnPlayerPickUpDynamicPickup
@@ -3010,7 +3010,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEnterDynamicCP],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEnterDynamicCP],
 		ret = ALS_R_PlayerEnterDynamicCP;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S checkpointid
 		#emit PUSH.S playerid
@@ -3035,9 +3035,9 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerEnterDynamicCP
 	#undef OnPlayerEnterDynamicCP
@@ -3054,7 +3054,7 @@ public OnPlayerLeaveDynamicCP(playerid, checkpointid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerLeaveDynamicCP],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerLeaveDynamicCP],
 		ret = ALS_R_PlayerLeaveDynamicCP;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S checkpointid
 		#emit PUSH.S playerid
@@ -3079,9 +3079,9 @@ public OnPlayerLeaveDynamicCP(playerid, checkpointid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerLeaveDynamicCP
 	#undef OnPlayerLeaveDynamicCP
@@ -3098,7 +3098,7 @@ public OnPlayerEnterDynamicRaceCP(playerid, checkpointid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEnterDynamicRaceCP],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEnterDynamicRaceCP],
 		ret = ALS_R_PlayerEnterDynamicRaceCP;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S checkpointid
 		#emit PUSH.S playerid
@@ -3123,9 +3123,9 @@ public OnPlayerEnterDynamicRaceCP(playerid, checkpointid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerEnterDynamicRaceCP
 	#undef OnPlayerEnterDynamicRaceCP
@@ -3142,7 +3142,7 @@ public OnPlayerLeaveDynamicRaceCP(playerid, checkpointid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerLeaveDynamicRaceCP],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerLeaveDynamicRaceCP],
 		ret = ALS_R_PlayerLeaveDynamicRaceCP;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S checkpointid
 		#emit PUSH.S playerid
@@ -3167,9 +3167,9 @@ public OnPlayerLeaveDynamicRaceCP(playerid, checkpointid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerLeaveDynamicRaceCP
 	#undef OnPlayerLeaveDynamicRaceCP
@@ -3186,7 +3186,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerEnterDynamicArea],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerEnterDynamicArea],
 		ret = ALS_R_PlayerEnterDynamicArea;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S areaid
 		#emit PUSH.S playerid
@@ -3211,9 +3211,9 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerEnterDynamicArea
 	#undef OnPlayerEnterDynamicArea
@@ -3230,7 +3230,7 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 		end   = _:YSI_g_sCallbackEnd[ALS_OnPlayerLeaveDynamicArea],
 		start = _:YSI_g_sCallbackStart[ALS_OnPlayerLeaveDynamicArea],
 		ret = ALS_R_PlayerLeaveDynamicArea;
-	while (start++ != end && ret >= 0)
+	while (start++ != end)
 	{
 		#emit PUSH.S areaid
 		#emit PUSH.S playerid
@@ -3255,9 +3255,9 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 		#emit POP.alt
 		#emit OR
 		#emit STOR.S.pri ret
+		if (ret < 0) return 0;
 	}
-	
-	return (ret == 1);
+	return ret;
 }
 #if defined _ALS_OnPlayerLeaveDynamicArea
 	#undef OnPlayerLeaveDynamicArea

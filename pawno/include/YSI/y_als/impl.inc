@@ -1,6 +1,11 @@
 // This is an include guard with a purpose - we need more control than the
 // standard include guards give.
 
+#include "internal\y_version"
+#include "y_utils"
+#include "y_scriptinit"
+#include "y_bit"
+#include "internal\y_shortfunc"
 
 enum ALS
 {
