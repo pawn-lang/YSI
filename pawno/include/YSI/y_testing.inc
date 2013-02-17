@@ -445,6 +445,8 @@ stock bool:Testing_Player(playerid, &idx, &tests, &fails, lastfail[33] = "", boo
 					buffer[32];
 				for ( ; ; )
 				{
+					new
+						fails = YSI_g_sFails;
 					// Get the last test (nicely fails for cellmax).
 					if ((YSI_g_sPlayer = AMX_GetPublicName(YSI_g_sPlayer, buffer, "Tezp_@")))
 					{
@@ -460,7 +462,7 @@ stock bool:Testing_Player(playerid, &idx, &tests, &fails, lastfail[33] = "", boo
 					if (AMX_GetPublicName(YSI_g_sPlayer, buffer, "Tezp_@"))
 					{
 						YSI_g_sAsked = false;
-						++YSI_g_sTests;
+						//++YSI_g_sTests;
 						strunpack(buffer, buffer);
 						// Call the setup function if there is one.
 						buffer[0] = 'I';
@@ -497,7 +499,10 @@ stock bool:Testing_Player(playerid, &idx, &tests, &fails, lastfail[33] = "", boo
 					{
 						break;
 					}
-					printf(TEST_PASSED);
+					else if (fails == YSI_g_sFails)
+					{
+						printf(TEST_PASSED);
+					}
 				}
 				//while (!YSI_g_sAsked);
 			}
@@ -506,6 +511,7 @@ stock bool:Testing_Player(playerid, &idx, &tests, &fails, lastfail[33] = "", boo
 			{
 				if (dialogid == Y_TESTING_DIALOG_ID)
 				{
+					++YSI_g_sTests;
 					if (response)
 					{
 						// Pass.
