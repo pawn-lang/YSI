@@ -276,7 +276,22 @@ hook OnScriptInit()
 		}
 		case 1:
 		{
-			if (!Player_CreateNewID())
+			if (Player_CreateNewID())
+			{
+				// Don't need upgrades.
+				if (ftouch(USER_FILE_PATH "y_users_v2_1.YSI") == -1)
+				{
+					P:E("Could not touch upgrade file 1.");
+					// Use "else" so we don't try do upgrade 2 without upgrade
+					// 1.  That would really mess up the files (that don't yet
+					// exist, but could do).
+				}
+				else if (ftouch(USER_FILE_PATH "y_users_v2_2.YSI") == -1)
+				{
+					P:E("Could not touch upgrade file 2.");
+				}
+			}
+			else
 			{
 				P:E(USER_FILE_PATH "index.YSI does not exist and couldn't be created.");
 			}
