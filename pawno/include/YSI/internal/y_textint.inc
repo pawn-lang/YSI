@@ -210,7 +210,7 @@ enum e_TEXT_ENTRY
 	#define MAX_SINGLE_TEXT_ITEM (1024)
 #endif
 
-#include "..\y_styles"
+#include "y_styles"
 #include "..\y_hooks"
 
 static stock
