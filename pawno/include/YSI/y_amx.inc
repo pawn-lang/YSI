@@ -438,21 +438,6 @@ stock AMX_GetEntry(E_AMX_TABLE:table, idx, &buffer, const pattern[] = "")
 	new
 		base,
 		count;
-	// Doesn't work if you have a complete match AFTER a partial match, so just
-	// remove this "optiisation" - its more trouble than it is worth!
-	/*if (table == AMX_TABLE_PUBLICS && idx == 0)
-	{
-		// Special case where we can use native functions.
-		idx = funcidx(pattern);
-		// "funcidx" assumes the whole name is passed, but you can just pass
-		// part of a name, which this won't pick up on.
-		if (idx != -1)
-		{
-			buffer = idx * 8 + AMX_HEADER_PUBLICS;
-			return idx + 1;
-		}
-		idx = 0;
-	}*/
 	AMX_GetBaseCount(table, base, count);
 	if (idx < count)
 	{
