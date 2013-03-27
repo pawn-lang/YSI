@@ -82,15 +82,15 @@ Changelog:
 #define MAX_RACE_WINNERS 3
 
 #if !defined MAX_RACES
-	#define MAX_RACES 8
+	#define MAX_RACES 16
 #endif
 
 #if !defined MAX_RACE_CHECKPOINTS
-	#define MAX_RACE_CHECKPOINTS 256
+	#define MAX_RACE_CHECKPOINTS 1024
 #endif
 
 #if !defined MAX_RACE_STARTS
-	#define MAX_RACE_STARTS MAX_PLAYERS
+	#define MAX_RACE_STARTS 32//MAX_PLAYERS
 #endif
 
 #define NO_RACE -1
@@ -115,6 +115,7 @@ enum E_RACE
 	e_RACE_FLAGS:E_RACE_FLAGS,
 	E_RACE_LAPS,
 	E_RACE_CHECKPOINTS,
+	E_RACE_CP_START,
 	E_RACE_RACER_COUNT,
 	E_RACE_RACER_MAX,
 	PlayerArray:E_RACE_RACERS<MAX_PLAYERS>,
@@ -155,11 +156,13 @@ enum E_RACE_POS
 	E_RACE_POS_POS
 }
 
-static stock
+_Y_RACES_STATIC stock
 	YSI_g_sRaceData[MAX_RACES][E_RACE],
-	Float:YSI_g_sRaceCheckpoints[MAX_RACES][MAX_RACE_CHECKPOINTS][3],
+	//Float:YSI_g_sRaceCheckpoints[MAX_RACES][MAX_RACE_CHECKPOINTS][3],
+	Float:YSI_g_sRaceCheckpoints[MAX_RACE_CHECKPOINTS][3],
 	YSI_g_sPlayerRace[MAX_PLAYERS][E_RACE_PLAYER],
 	Float:YSI_g_sRaceStarts[MAX_RACES][MAX_RACE_STARTS][4],
+	YSI_g_sCPIndex,
 	Iterator:YSI_g_sRacePeople[MAX_RACES]<MAX_PLAYERS>;
 
 //#if defined RACE_POSITION
@@ -171,7 +174,91 @@ forward Race_Timeout(playerid);
 
 loadtext core[ysi_race];
 
-//Text_RegisterTag(ysi_race);
+/*----------------------------------------------------------------------------*-
+Function:
+	RaceArray_IndexShift
+Params:
+	from - Which slot to start shifting up.
+	add - How to adjust the slots.
+Return:
+	-
+Notes:
+	Find all races whose checkpoint blocks start above the current index and
+	increment them.
+-*----------------------------------------------------------------------------*/
+
+_Y_RACES_STATIC stock RaceArray_IndexShift(from, add)
+{
+	for (new i = 0; i != MAX_RACES; ++i)
+	{
+		if (YSI_g_sRaceData[i][E_RACE_CP_START] >= from) YSI_g_sRaceData[i][E_RACE_CP_START] += add;
+	}
+}
+
+/*----------------------------------------------------------------------------*-
+Function:
+	RaceArray_Shift
+Params:
+	from - Which slot to start shifting up.
+	&end - Slot to end the shifting on.
+	to - Slot to shift to.
+Return:
+	-
+Notes:
+	Shifts checkpoints up in the main array to make room for new ones.
+-*----------------------------------------------------------------------------*/
+
+_Y_RACES_STATIC stock RaceArray_Shift(from, &end, to)
+{
+	// Basic version.
+	/*if (++to >= MAX_RACE_CHECKPOINTS)
+	{
+		--to;
+		return false;
+	}
+	for (new i = to; i != from; --i)
+	{
+		YSI_g_sRaceCheckpoints[0][i] = YSI_g_sRaceCheckpoints[0][i - 1];
+	}
+	return true;*/
+	// Fast version.
+	end -= from;
+	if (end + to >= MAX_RACE_CHECKPOINTS)
+	{
+		return false;
+	}
+	memcpy(_:YSI_g_sRaceCheckpoints[to], _:YSI_g_sRaceCheckpoints[from], 0, end * 4 * 3, end * 3);
+	//++to;
+	end += to;
+	return true;
+}
+
+/*----------------------------------------------------------------------------*-
+Function:
+	RaceArray_Add
+Params:
+	slot - Slot to add to.
+	Float:x - Position data.
+	Float:y - Position data.
+	Float:z - Position data.
+Return:
+	-
+Notes:
+	Adds a new checkpoint to the checkpoints array.
+-*----------------------------------------------------------------------------*/
+
+_Y_RACES_STATIC stock RaceArray_Add(slot, Float:x, Float:y, Float:z)
+{
+	if (slot < YSI_g_sCPIndex)
+	{
+		if (!RaceArray_Shift(slot, YSI_g_sCPIndex, slot + 1)) return false;
+		RaceArray_IndexShift(slot, 1);
+	}
+	YSI_g_sRaceCheckpoints[slot][0] = x;
+	YSI_g_sRaceCheckpoints[slot][1] = y;
+	YSI_g_sRaceCheckpoints[slot][2] = z;
+	return true;
+}
 
 /*----------------------------------------------------------------------------*-
 Function:
@@ -245,6 +332,7 @@ stock Race_Create(laps = 0, entry = 0, countdown = 3, bool:arial = false, bool:f
 	YSI_g_sRaceData[raceid][E_RACE_RACER_MAX] = 0;
 	PA_Init(YSI_g_sRaceData[raceid][E_RACE_RACERS]);
 	Iter_Clear(YSI_g_sRacePeople[raceid]);
+	YSI_g_sRaceData[raceid][E_RACE_CP_START] = YSI_g_sCPIndex;
 	return raceid;
 }
 
@@ -288,6 +376,11 @@ stock Race_Destroy(slot, bool:refund = false)
 		}
 		YSI_g_sRaceData[slot][E_RACE_RACER_COUNT] = 0;
 		YSI_g_sRaceData[slot][E_RACE_FLAGS] = e_RACE_FLAGS:0;
+		new
+			count = YSI_g_sRaceData[slot][E_RACE_CHECKPOINTS],
+			start = YSI_g_sRaceData[slot][E_RACE_CP_START];
+		RaceArray_Shift(start + count, YSI_g_sCPIndex, start);
+		RaceArray_IndexShift(start, -count);
 	}
 }
 
@@ -310,10 +403,11 @@ stock Race_AddCheckpoint(raceid, Float:x, Float:y, Float:z)
 	if (!Race_IsValid(raceid)) return RACE_NO_CHECKPOINT;
 	new
 		count = YSI_g_sRaceData[raceid][E_RACE_CHECKPOINTS];
-	if (count >= MAX_RACE_CHECKPOINTS) return RACE_NO_CHECKPOINT;
+	/*if (count >= MAX_RACE_CHECKPOINTS) return RACE_NO_CHECKPOINT;
 	YSI_g_sRaceCheckpoints[raceid][count][0] = x;
 	YSI_g_sRaceCheckpoints[raceid][count][1] = y;
-	YSI_g_sRaceCheckpoints[raceid][count][2] = z;
+	YSI_g_sRaceCheckpoints[raceid][count][2] = z;*/
+	RaceArray_Add(YSI_g_sRaceData[raceid][E_RACE_CP_START] + count, x, y, z);
 	YSI_g_sRaceData[raceid][E_RACE_CHECKPOINTS]++;
 	return count;
 }
@@ -419,7 +513,7 @@ Notes:
 	Activates the race for entry and use.
 -*----------------------------------------------------------------------------*/
 
-static stock Race_SetActive(raceid, set)
+_Y_RACES_STATIC stock Race_SetActive(raceid, set)
 {
 	if (!Race_IsValid(raceid)) return;
 	if (set) YSI_g_sRaceData[raceid][E_RACE_FLAGS] |= e_RACE_FLAGS_ACTIVE;
@@ -585,7 +679,7 @@ Notes:
 	Called when a player exits their vehicle.
 -*----------------------------------------------------------------------------*/
 
-static Race_Dropout(playerid)
+_Y_RACES_STATIC Race_Dropout(playerid)
 {
 	SetTimerEx("Race_Timeout", (YSI_g_sRaceData[(YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE])][E_RACE_FLAGS] & e_RACE_FLAGS_EXIT_TIME), 0, "i", playerid);
 	YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE] |= RACE_PLAYER_OUT;
@@ -604,7 +698,7 @@ Notes:
 	out..
 -*----------------------------------------------------------------------------*/
 
-static Race_Rejoin(playerid)
+_Y_RACES_STATIC Race_Rejoin(playerid)
 {
 	YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE] &= ~RACE_PLAYER_OUT;
 }
@@ -638,7 +732,7 @@ Notes:
 	Called when a player leaves a race prematurly.
 -*----------------------------------------------------------------------------*/
 
-static Race_Exit(playerid)
+_Y_RACES_STATIC Race_Exit(playerid)
 {
 	DisablePlayerRaceCheckpoint(playerid);
 	new
@@ -660,7 +754,7 @@ Notes:
 	number of remaining racers and if none ends the race.
 -*----------------------------------------------------------------------------*/
 
-static Race_CheckEnd(slot)
+_Y_RACES_STATIC Race_CheckEnd(slot)
 {
 	// This shouldn't be here...
 	//YSI_g_sRaceData[slot][E_RACE_RACER_COUNT]--;
@@ -675,6 +769,11 @@ static Race_CheckEnd(slot)
 		{
 			YSI_g_sRaceData[slot][E_RACE_FLAGS] &= ~e_RACE_FLAGS_STARTED;
 			YSI_g_sRaceData[slot][E_RACE_FINISHED] = 0;
+			new
+				count = YSI_g_sRaceData[slot][E_RACE_CHECKPOINTS],
+				start = YSI_g_sRaceData[slot][E_RACE_CP_START];
+			RaceArray_Shift(start + count, YSI_g_sCPIndex, start);
+			RaceArray_IndexShift(start, -count);
 		}
 	}
 }
@@ -692,7 +791,7 @@ Notes:
 	variables.
 -*----------------------------------------------------------------------------*/
 
-static Race_PlayerDone(playerid)
+_Y_RACES_STATIC Race_PlayerDone(playerid)
 {
 	new
 		race = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE];
@@ -812,7 +911,7 @@ Notes:
 	Called when a player completes a race.
 -*----------------------------------------------------------------------------*/
 
-static Race_Finish(playerid)
+_Y_RACES_STATIC Race_Finish(playerid)
 {
 	new
 		slot = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE],
@@ -865,8 +964,8 @@ stock Race_Start(race)
 					SetVehicleVirtualWorld(vehicleid, YSI_g_sRaceData[race][E_RACE_VW]);
 					SetPlayerInterior(i, YSI_g_sRaceData[race][E_RACE_INT]);
 					SetPlayerVirtualWorld(i, YSI_g_sRaceData[race][E_RACE_VW]);
-					SetVehiclePos(vehicleid, YSI_g_sRaceStarts[race][j][0], YSI_g_sRaceStarts[race][j][1], YSI_g_sRaceStarts[race][j][2]);
-					SetVehicleZAngle(vehicleid, YSI_g_sRaceStarts[race][j][3]);
+					SetVehiclePos(vehicleid, YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][0], YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][1], YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][2]);
+					SetVehicleZAngle(vehicleid, YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][3]);
 					TogglePlayerControllable(i, 0);
 					++j;
 				}
@@ -930,8 +1029,8 @@ public Race_Countdown(race, time)
 				{
 					TogglePlayerControllable(i, 1);
 					Race_DoEnterRaceCP(i);
-					SetVehiclePos(vehicleid, YSI_g_sRaceStarts[race][pos][0], YSI_g_sRaceStarts[race][pos][1], YSI_g_sRaceStarts[race][pos][2] + 5.0);
-					SetVehicleZAngle(vehicleid, YSI_g_sRaceStarts[race][pos][3]);
+					SetVehiclePos(vehicleid, YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][0], YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][1], YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][2] + 5.0);
+					SetVehicleZAngle(vehicleid, YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][3]);
 					YSI_g_sPlayerRace[i][E_RACE_PLAYER_TIME] = startTime;
 					pos++;
 				}
@@ -984,7 +1083,7 @@ hook OnPlayerEnterRaceCheckpoint(playerid)
 	return Race_DoEnterRaceCP(playerid);
 }
 
-static Race_DoEnterRaceCP(playerid)
+_Y_RACES_STATIC Race_DoEnterRaceCP(playerid)
 {
 	new
 		race = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE];
@@ -994,16 +1093,20 @@ static Race_DoEnterRaceCP(playerid)
 	{
 		DisablePlayerRaceCheckpoint(playerid);
 		new
+			start = YSI_g_sRaceData[race][E_RACE_CP_START],
 			check = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP],
-			lap = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP],
 			checks = YSI_g_sRaceData[race][E_RACE_CHECKPOINTS],
 			laps = YSI_g_sRaceData[race][E_RACE_LAPS],
 			type = _:(YSI_g_sRaceData[race][E_RACE_FLAGS] & e_RACE_FLAGS_ARIAL);
 		if (laps)
 		{
+			new
+				lap = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP];
 			if (lap == laps)
 			{
 				Race_Finish(playerid);
+				//++YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP];
+				return 1;
 			}
 			else
 			{
@@ -1011,22 +1114,32 @@ static Race_DoEnterRaceCP(playerid)
 				{
 					if (lap + 1 == laps)
 					{
-						SetPlayerRaceCheckpoint(playerid, type ? 4 : 1, YSI_g_sRaceCheckpoints[race][0][0], YSI_g_sRaceCheckpoints[race][0][1], YSI_g_sRaceCheckpoints[race][0][2], 0.0, 0.0, 0.0, 5.0);
+						SetPlayerRaceCheckpoint(playerid, type ? 4 : 1, YSI_g_sRaceCheckpoints[start][0], YSI_g_sRaceCheckpoints[start][1], YSI_g_sRaceCheckpoints[start][2], 0.0, 0.0, 0.0, 5.0);
 					}
 					else
 					{
-						SetPlayerRaceCheckpoint(playerid, type ? 3 : 0, YSI_g_sRaceCheckpoints[race][check][0], YSI_g_sRaceCheckpoints[race][check][1], YSI_g_sRaceCheckpoints[race][check][2], YSI_g_sRaceCheckpoints[race][0][0], YSI_g_sRaceCheckpoints[race][0][1], YSI_g_sRaceCheckpoints[race][0][2], 5.0);
+						check += start;
+						SetPlayerRaceCheckpoint(playerid, type ? 3 : 0, YSI_g_sRaceCheckpoints[check][0], YSI_g_sRaceCheckpoints[check][1], YSI_g_sRaceCheckpoints[check][2], YSI_g_sRaceCheckpoints[start][0], YSI_g_sRaceCheckpoints[start][1], YSI_g_sRaceCheckpoints[start][2], 5.0);
 					}
+					//check = start;
+					YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP] = 0;
+					++YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP];
+					return 1;
+					//++lap;
 				}
 				else
 				{
-					SetPlayerRaceCheckpoint(playerid, type ? 3 : 0, YSI_g_sRaceCheckpoints[race][check][0], YSI_g_sRaceCheckpoints[race][check][1], YSI_g_sRaceCheckpoints[race][check][2], YSI_g_sRaceCheckpoints[race][check + 1][0], YSI_g_sRaceCheckpoints[race][check + 1][1], YSI_g_sRaceCheckpoints[race][check + 1][2], 5.0);
+					check += start;
+					SetPlayerRaceCheckpoint(playerid, type ? 3 : 0, YSI_g_sRaceCheckpoints[check][0], YSI_g_sRaceCheckpoints[check][1], YSI_g_sRaceCheckpoints[check][2], YSI_g_sRaceCheckpoints[check + 1][0], YSI_g_sRaceCheckpoints[check + 1][1], YSI_g_sRaceCheckpoints[check + 1][2], 5.0);
+					//++check;
+					++YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP];
+					return 1;
 				}
-				if (++check == checks)
-				{
-					++lap;
-					check = 0;
-				}
+				//if (++check == checks)
+				//{
+				//	++lap;
+				//	check = 0;
+				//}
 			}
 		}
 		else
@@ -1039,17 +1152,20 @@ static Race_DoEnterRaceCP(playerid)
 				}
 				case 1:
 				{
-					SetPlayerRaceCheckpoint(playerid, type ? 4 : 1, YSI_g_sRaceCheckpoints[race][check][0], YSI_g_sRaceCheckpoints[race][check][1], YSI_g_sRaceCheckpoints[race][check][2], 0.0, 0.0, 0.0, 5.0);
+					check += start;
+					SetPlayerRaceCheckpoint(playerid, type ? 4 : 1, YSI_g_sRaceCheckpoints[check][0], YSI_g_sRaceCheckpoints[check][1], YSI_g_sRaceCheckpoints[check][2], 0.0, 0.0, 0.0, 5.0);
 				}
 				default:
 				{
-					SetPlayerRaceCheckpoint(playerid, type ? 3 : 0, YSI_g_sRaceCheckpoints[race][check][0], YSI_g_sRaceCheckpoints[race][check][1], YSI_g_sRaceCheckpoints[race][check][2], YSI_g_sRaceCheckpoints[race][check + 1][0], YSI_g_sRaceCheckpoints[race][check + 1][1], YSI_g_sRaceCheckpoints[race][check + 1][2], 5.0);
+					check += start;
+					SetPlayerRaceCheckpoint(playerid, type ? 3 : 0, YSI_g_sRaceCheckpoints[check][0], YSI_g_sRaceCheckpoints[check][1], YSI_g_sRaceCheckpoints[check][2], YSI_g_sRaceCheckpoints[check + 1][0], YSI_g_sRaceCheckpoints[check + 1][1], YSI_g_sRaceCheckpoints[check + 1][2], 5.0);
 				}
 			}
-			++check;
+			//++check;
+			++YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP];
+			//YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP] = lap;
+			return 1;
 		}
-		YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP] = check;
-		YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP] = lap;
 	}
 	return 1;
 }
@@ -1163,6 +1279,8 @@ task Race_Loop[40]()
 	//for (new race = 0; race != MAX_RACES; ++race) if (Race__IsActive(race))
 	if (Race__IsActive(race))
 	{
+		new
+			start = YSI_g_sRaceData[race][E_RACE_CP_START];
 		foreach (new playerid : YSI_g_sRacePeople[race])
 		{
 			new
@@ -1174,9 +1292,9 @@ task Race_Loop[40]()
 				Float:z;
 			GetPlayerPos(playerid, x, y, z);
 			// Get the player's (squared) distance to the next checkpoint.
-			x -= YSI_g_sRaceCheckpoints[race][cp][0];
-			y -= YSI_g_sRaceCheckpoints[race][cp][1];
-			z -= YSI_g_sRaceCheckpoints[race][cp][2];
+			x -= YSI_g_sRaceCheckpoints[start + cp][0];
+			y -= YSI_g_sRaceCheckpoints[start + cp][1];
+			z -= YSI_g_sRaceCheckpoints[start + cp][2];
 			new
 				Float:togo = ((x * x) + (y * y) + (z * z));
 			//racePos[playerid][E_RACE_POS_RACE] = race; // | RACE_POS_DONE;

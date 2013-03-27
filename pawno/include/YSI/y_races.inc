@@ -64,6 +64,15 @@ Changelog:
 	#error Did you do <YSI/y_races> instead of the required <YSI\y_races>?
 #endif
 
+#if !defined YSI_NO_RACE_POSITION && !defined RACE_POSITION
+	#define RACE_POSITION
+#endif
+
+#if defined YSI_TESTS
+	#define _Y_RACES_STATIC
+#else
+	#define _Y_RACES_STATIC static
+#endif
 #include "y_races/impl"
 #if defined YSI_TESTS
 	#include "y_testing"
