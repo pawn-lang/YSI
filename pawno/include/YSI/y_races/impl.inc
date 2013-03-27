@@ -118,7 +118,7 @@ enum E_RACE
 	E_RACE_CP_START,
 	E_RACE_RACER_COUNT,
 	E_RACE_RACER_MAX,
-	PlayerArray:E_RACE_RACERS<MAX_PLAYERS>,
+	//PlayerArray:E_RACE_RACERS<MAX_PLAYERS>,
 	E_RACE_COUNTDOWN,
 	E_RACE_FINISHED,
 	E_RACE_ENTRY,
@@ -157,6 +157,7 @@ enum E_RACE_POS
 }
 
 _Y_RACES_STATIC stock
+	PlayerArray:YSI_g_sRacers[MAX_RACES]<MAX_PLAYERS>,
 	YSI_g_sRaceData[MAX_RACES][E_RACE],
 	//Float:YSI_g_sRaceCheckpoints[MAX_RACES][MAX_RACE_CHECKPOINTS][3],
 	Float:YSI_g_sRaceCheckpoints[MAX_RACE_CHECKPOINTS][3],
@@ -330,7 +331,7 @@ stock Race_Create(laps = 0, entry = 0, countdown = 3, bool:arial = false, bool:f
 	YSI_g_sRaceData[raceid][E_RACE_RACER_COUNT] = 0;
 	YSI_g_sRaceData[raceid][E_RACE_FINISHED] = 0;
 	YSI_g_sRaceData[raceid][E_RACE_RACER_MAX] = 0;
-	PA_Init(YSI_g_sRaceData[raceid][E_RACE_RACERS]);
+	PA_Init(YSI_g_sRacers[raceid]);
 	Iter_Clear(YSI_g_sRacePeople[raceid]);
 	YSI_g_sRaceData[raceid][E_RACE_CP_START] = YSI_g_sCPIndex;
 	return raceid;
@@ -357,7 +358,7 @@ stock Race_Destroy(slot, bool:refund = false)
 		{
 			foreach (new i : Player)
 			{
-				if (PA_Get(YSI_g_sRaceData[slot][E_RACE_RACERS], i))
+				if (PA_Get(YSI_g_sRacers[slot], i))
 				{
 					DisablePlayerRaceCheckpoint(i);
 					Race_PlayerDone(i);
@@ -368,7 +369,7 @@ stock Race_Destroy(slot, bool:refund = false)
 		{
 			foreach (new i : Player)
 			{
-				if (PA_Get(YSI_g_sRaceData[slot][E_RACE_RACERS], i))
+				if (PA_Get(YSI_g_sRacers[slot], i))
 				{
 					Race_PlayerLeave(i, refund);
 				}
@@ -802,7 +803,7 @@ _Y_RACES_STATIC Race_PlayerDone(playerid)
 	#endif
 	if (Race_IsValid(race))
 	{
-		PA_Set(YSI_g_sRaceData[race][E_RACE_RACERS], playerid, false);
+		PA_Set(YSI_g_sRacers[race], playerid, false);
 		Iter_Remove(YSI_g_sRacePeople[race], playerid);
 		if (IsPlayerConnected(playerid))
 		{
@@ -865,7 +866,7 @@ stock Race_PlayerJoin(playerid, race)
 	YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE] = race;
 	YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP] = 0;
 	YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP] = 0;
-	PA_Set(YSI_g_sRaceData[race][E_RACE_RACERS], playerid, true);
+	PA_Set(YSI_g_sRacers[race], playerid, true);
 	++YSI_g_sRaceData[race][E_RACE_RACER_COUNT];
 	Iter_Add(YSI_g_sRacePeople[race], playerid);
 	#if defined RACE_POSITION
@@ -894,7 +895,7 @@ stock Race_PlayerLeave(playerid, bool:refund = false)
 	if (!Race_IsValid(race) || YSI_g_sRaceData[race][E_RACE_FLAGS] & e_RACE_FLAGS_STARTED) return 0;
 	if (refund) GivePlayerMoney(playerid, YSI_g_sRaceData[race][E_RACE_ENTRY]);
 	YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE] = NO_RACE;
-	PA_Set(YSI_g_sRaceData[race][E_RACE_RACERS], playerid, false);
+	PA_Set(YSI_g_sRacers[race], playerid, false);
 	--YSI_g_sRaceData[race][E_RACE_RACER_COUNT];
 	Iter_Remove(YSI_g_sRacePeople[race], playerid);
 	return 1;
@@ -948,7 +949,7 @@ stock Race_Start(race)
 		j;
 	foreach (new i : YSI_g_sRacePeople[race])
 	{
-		//if (PA_Get(YSI_g_sRaceData[race][E_RACE_RACERS], i))
+		//if (PA_Get(YSI_g_sRacers[race], i))
 		{
 			new
 				vehicleid;
@@ -1009,12 +1010,14 @@ public Race_Countdown(race, time)
 	if (!(YSI_g_sRaceData[race][E_RACE_FLAGS] & e_RACE_FLAGS_ACTIVE)) return;
 	if (time)
 	{
-		Text_Send(YSI_g_sRaceData[race][E_RACE_RACERS], $YSI_RACE_COUNTDOWN, time);
+		//printf("Text_Send");
+		//print(Bit_Display(YSI_g_sRacers[race][1]));
+		Text_Send(YSI_g_sRacers[race], $YSI_RACE_COUNTDOWN, time);
 		SetTimerEx("Race_Countdown", 1000, 0, "ii", race, time - 1);
 	}
 	else
 	{
-		Text_Send(YSI_g_sRaceData[race][E_RACE_RACERS], $YSI_RACE_GO);
+		Text_Send(YSI_g_sRacers[race], $YSI_RACE_GO);
 		new
 			startTime = GetTickCount(),
 			vehicleid,
@@ -1022,14 +1025,14 @@ public Race_Countdown(race, time)
 		//foreach (new i : Player)
 		foreach (new i : YSI_g_sRacePeople[race])
 		{
-			//if (Bit_Get(YSI_g_sRaceData[race][E_RACE_RACERS], i))
+			//if (Bit_Get(YSI_g_sRacers[race], i))
 			{
 				//if (IsPlayerConnected(i) && (vehicleid = GetPlayerVehicleID(i)))
 				if ((vehicleid = GetPlayerVehicleID(i)))
 				{
 					TogglePlayerControllable(i, 1);
 					Race_DoEnterRaceCP(i);
-					SetVehiclePos(vehicleid, YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][0], YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][1], YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][2] + 5.0);
+					SetVehiclePos(vehicleid, YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][0], YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][1], YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][2] + 0.1);
 					SetVehicleZAngle(vehicleid, YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][3]);
 					YSI_g_sPlayerRace[i][E_RACE_PLAYER_TIME] = startTime;
 					pos++;

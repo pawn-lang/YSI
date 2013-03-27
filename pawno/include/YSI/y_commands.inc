@@ -2526,6 +2526,7 @@ static stock Command_Process(playerid, cmdtext[], help)
 		}
 	}
 	P:5("Command_Process: Not found");
+	#pragma tabsize 4
 	return Command_UnknownReturn();
 }
 
