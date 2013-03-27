@@ -438,20 +438,21 @@ stock AMX_GetEntry(E_AMX_TABLE:table, idx, &buffer, const pattern[] = "")
 	new
 		base,
 		count;
-	if (table == AMX_TABLE_PUBLICS && idx == 0)
+	// Doesn't work if you have a complete match AFTER a partial match, so just
+	// remove this "optiisation" - its more trouble than it is worth!
+	/*if (table == AMX_TABLE_PUBLICS && idx == 0)
 	{
 		// Special case where we can use native functions.
 		idx = funcidx(pattern);
-		if (idx == -1)
-		{
-			idx = 0;
-		}
-		else
+		// "funcidx" assumes the whole name is passed, but you can just pass
+		// part of a name, which this won't pick up on.
+		if (idx != -1)
 		{
 			buffer = idx * 8 + AMX_HEADER_PUBLICS;
 			return idx + 1;
 		}
-	}
+		idx = 0;
+	}*/
 	AMX_GetBaseCount(table, base, count);
 	if (idx < count)
 	{
@@ -957,6 +958,14 @@ stock AMX_WriteString(addr, const str[], len = sizeof (str))
 		addr += 4;
 	}
 	while (++idx < len);
+}
+
+stock AMX_GetReturnAddress()
+{
+	// Get the return address of the PREVIOUS function.
+	P:5("AMX_GetReturnAddress called");
+	#emit RETN
+	return 0;
 }
 
 stock AMX_Read(addr)

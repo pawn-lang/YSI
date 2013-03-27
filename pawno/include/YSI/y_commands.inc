@@ -816,6 +816,7 @@ global bool:Command_GetDeniedDisplay()
 	-
 </returns>
 <remarks>
+
 native Command_GetName(funcid);
 
 </remarks>
@@ -1840,6 +1841,7 @@ global bool:Command_GetPlayerNamed(string:func[], playerid)
 	-
 </returns>
 <remarks>
+
 native Command_Remove(func);
 
 </remarks>
@@ -2264,7 +2266,8 @@ stock Command_Debug()
 <param name="playerid">Player who entered the command.</param>
 <param name="cmdtext[]">Text entered.</param>
 <returns>
-	true - success or hidden fail, false - fail.
+	true - success or hidden fail.
+	false - fail.
 </returns>
 <remarks>
 	Calls the Command_Process function if this is not a client.
@@ -2329,7 +2332,8 @@ stock Command_Debug()
 <param name="cmdtext[]">Text entered.</param>
 <param name="help">Called from the help commmand or OnPlayerCommandText.</param>
 <returns>
-	true - success or hidden fail, false - fail.
+	true - success or hidden fail.
+	false - fail.
 </returns>
 <remarks>
 	-
@@ -2350,7 +2354,8 @@ global Command_ReProcess(p,string:c[],h)
 <param name="cmdtext[]">Text entered.</param>
 <param name="help">Called from the help commmand or OnPlayerCommandText.</param>
 <returns>
-	true - success or hidden fail, false - fail.
+	true - success or hidden fail.
+	false - fail.
 </returns>
 <remarks>
 	-
