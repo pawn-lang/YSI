@@ -973,9 +973,9 @@ static Race_DoEnterRaceCP(playerid)
 	new
 		race = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE];
 	if (race & RACE_PLAYER_OUT) return 0;
-	DisablePlayerRaceCheckpoint(playerid);
-	if (Race_IsValid(race))
+	if (Race_IsValid(race) && YSI_g_sRaceData[race][E_RACE_FLAGS] & e_RACE_FLAGS_STARTED)
 	{
+		DisablePlayerRaceCheckpoint(playerid);
 		new
 			check = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP],
 			lap = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP],
@@ -990,7 +990,7 @@ static Race_DoEnterRaceCP(playerid)
 			}
 			else
 			{
-				if (check + 1  == checks)
+				if (check + 1 == checks)
 				{
 					if (lap + 1 == laps)
 					{
