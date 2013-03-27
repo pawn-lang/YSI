@@ -239,8 +239,51 @@ stock Race_Create(laps = 0, entry = 0, countdown = 3, bool:arial = false, bool:f
 	YSI_g_sRaceData[raceid][E_RACE_RACER_COUNT] = 0;
 	YSI_g_sRaceData[raceid][E_RACE_FINISHED] = 0;
 	YSI_g_sRaceData[raceid][E_RACE_RACER_MAX] = 0;
-	PA_Init(YSI_g_sRaceData[race][E_RACE_RACERS]);
+	PA_Init(YSI_g_sRaceData[raceid][E_RACE_RACERS]);
 	return raceid;
+}
+
+/*----------------------------------------------------------------------------*-
+Function:
+	Race_Destroy
+Params:
+	slot - Race to destroy.
+	refund - Should entrants get their money back?
+Return:
+	-
+Notes:
+	Called whenever a player leaves the race, checks the
+	number of remaining racers and if none ends the race.
+-*----------------------------------------------------------------------------*/
+
+stock Race_Destroy(slot, refund = 0)
+{
+	if (Race_IsValid(slot))
+	{
+		if (YSI_g_sRaceData[slot][E_RACE_FLAGS] & e_RACE_FLAGS_STARTED)
+		{
+			foreach (new i : Player)
+			{
+				if (PA_Get(YSI_g_sRaceData[slot][E_RACE_RACERS], i))
+				{
+					DisablePlayerRaceCheckpoint(i);
+					Race_PlayerDone(i);
+				}
+			}
+		}
+		else
+		{
+			foreach (new i : Player)
+			{
+				if (PA_Get(YSI_g_sRaceData[slot][E_RACE_RACERS], i))
+				{
+					Race_PlayerLeave(i, refund);
+				}
+			}
+		}
+		YSI_g_sRaceData[slot][E_RACE_RACER_COUNT] = 0;
+		YSI_g_sRaceData[slot][E_RACE_FLAGS] = e_RACE_FLAGS:0;
+	}
 }
 
 /*----------------------------------------------------------------------------*-
@@ -590,7 +633,7 @@ Notes:
 	Called when a player leaves a race prematurly.
 -*----------------------------------------------------------------------------*/
 
-Race_Exit(playerid)
+static Race_Exit(playerid)
 {
 	DisablePlayerRaceCheckpoint(playerid);
 	new
@@ -612,24 +655,22 @@ Notes:
 	number of remaining racers and if none ends the race.
 -*----------------------------------------------------------------------------*/
 
-Race_CheckEnd(slot)
+static Race_CheckEnd(slot)
 {
-	YSI_g_sRaceData[slot][E_RACE_RACER_COUNT]--;
-	if (!YSI_g_sRaceData[slot][E_RACE_RACER_COUNT])
+	// This shouldn't be here...
+	//YSI_g_sRaceData[slot][E_RACE_RACER_COUNT]--;
+	if (!(--YSI_g_sRaceData[slot][E_RACE_RACER_COUNT]))
 	{
+		CallRemoteFunction("OnRaceEnd", "i", slot);
 		if (!(YSI_g_sRaceData[slot][E_RACE_FLAGS] & e_RACE_FLAGS_RESTART))
 		{
 			YSI_g_sRaceData[slot][E_RACE_FLAGS] = e_RACE_FLAGS:0;
-			#if defined _YSI_GAMEMODE_LOADER
-				Loader_Unload(slot);
-			#endif
 		}
 		else
 		{
 			YSI_g_sRaceData[slot][E_RACE_FLAGS] &= ~e_RACE_FLAGS_STARTED;
 			YSI_g_sRaceData[slot][E_RACE_FINISHED] = 0;
 		}
-		CallRemoteFunction("OnRaceEnd", "i", slot);
 	}
 }
 
@@ -646,7 +687,7 @@ Notes:
 	variables.
 -*----------------------------------------------------------------------------*/
 
-Race_PlayerDone(playerid)
+static Race_PlayerDone(playerid)
 {
 	new
 		race = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE];
