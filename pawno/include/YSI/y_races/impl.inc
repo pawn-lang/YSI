@@ -152,8 +152,8 @@ enum E_RACE_POS
 	//E_RACE_POS_RACE,
 	E_RACE_POS_CP,
 	E_RACE_POS_LAP,
-	Float:E_RACE_POS_TOGO,
-	E_RACE_POS_POS
+	Float:E_RACE_POS_TOGO//,
+	//E_RACE_POS_POS
 }
 
 _Y_RACES_STATIC stock
@@ -1299,33 +1299,28 @@ task Race_Loop[500 / MAX_RACES]()
 			y -= YSI_g_sRaceCheckpoints[start + cp][1];
 			z -= YSI_g_sRaceCheckpoints[start + cp][2];
 			new
-				Float:togo = ((x * x) + (y * y) + (z * z));
+				Float:togo = ((x * x) + (y * y) + (z * z)),
+				pos = 1;
 			//racePos[playerid][E_RACE_POS_RACE] = race; // | RACE_POS_DONE;
 			racePos[playerid][E_RACE_POS_LAP] = lap;
 			racePos[playerid][E_RACE_POS_CP] = cp;
 			racePos[playerid][E_RACE_POS_TOGO] = togo;
-			racePos[playerid][E_RACE_POS_POS] = 1;
 			//foreach (new i : YSI_g_sRacePeople[race])
 			for (new i = Iter_Begin(YSI_g_sRacePeople[race]); (i = Iter_Next(YSI_g_sRacePeople[race], i)) != playerid; )
 			{
-				if (racePos[i][E_RACE_POS_LAP] > racePos[playerid][E_RACE_POS_LAP] ||
-				    racePos[i][E_RACE_POS_CP] > racePos[playerid][E_RACE_POS_CP] ||
-				    racePos[i][E_RACE_POS_TOGO] < racePos[playerid][E_RACE_POS_TOGO])
-				{
-					// The other player is on a higher lap, or on a higher
-					// checkpoint, or less distance from their next checkpoint.
-					++racePos[playerid][E_RACE_POS_POS];
-				}
-				else
-				{
-					++racePos[i][E_RACE_POS_POS];
-				}
+				if (racePos[i][E_RACE_POS_LAP] > lap ||
+				    racePos[i][E_RACE_POS_CP] > cp ||
+				    racePos[i][E_RACE_POS_TOGO] < togo) ++pos;
+				// This player is on a higher lap, or on a higher checkpoint,
+				// or less distance from their next checkpoint.
+				else ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION]; //racePos[i][E_RACE_POS_POS];
 			}
+			//racePos[playerid][E_RACE_POS_POS] = pos;
+			YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_POSITION] = pos; //racePos[playerid][E_RACE_POS_POS];
 		}
-		foreach (new playerid : YSI_g_sRacePeople[race])
-		{
-			YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_POSITION] = racePos[playerid][E_RACE_POS_POS];
-		}
+		//foreach (new playerid : YSI_g_sRacePeople[race])
+		//{
+		//}
 	}
 }
 
