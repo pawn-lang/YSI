@@ -130,9 +130,9 @@ static stock
 <summary>Group_FU</summary>
 <param name="playerid">Player to check.</param>
 <param name="el">Element to show or hide.</param>
-<param name="previous">The old state of affairs.</param>
-<param name="current">The new state of affairs.</param>
-<param name="reference">What to compare changes to.</param>
+<param name="previous">(p) The old state of affairs.</param>
+<param name="current">(c) The new state of affairs.</param>
+<param name="reference">(r) What to compare changes to.</param>
 <returns>
 	-
 </returns>
@@ -154,7 +154,7 @@ static stock
 </remarks>
 \**--------------------------------------------------------------------------**/
 
-static stock Group_FU(playerid, el, Bit:previous[], Bit:current[], Bit:reference[])
+static stock Group_FU(playerid, el, Bit:p[], Bit:c[], Bit:r[])
 {
 	// "_GROUPS_CHECK" is a macro that expands to a massive unrolled "if"
 	// statement checking up to 512 groups at once.  Any more than that and this
@@ -164,107 +164,15 @@ static stock Group_FU(playerid, el, Bit:previous[], Bit:current[], Bit:reference
 	// loops over all the groups in 32 group chunks.  When I say "loop", this
 	// could be in the form of a huge "if" statement with every iteration put in
 	// explicitly.
-	// nr = NOT REFERENCE
-	// ar = ALOW REFERENCE
-	// cur = NEW SETTINGS
-	// pre = PREVIOUS SETTINGS
-	/*if (Bit_Get(gNotDat, el))
-	{
-		if (Bit_Get(gAndDat, el))
-		{
-			_GROUPS_CHECK_IN(ar, cur)
-			{
-				_GROUPS_CHECK_NONE(nr, cur)
-				{
-					_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, true);
-					return;
-				}
-			}
-			// SHOULD IT BE REMOVED?
-			{
-				_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, false);
-				return;
-			}
-		}
-		else
-		{
-			_GROUPS_CHECK_ANY(ar, cur)
-			{
-				_GROUPS_CHECK_NONE(nr, cur)
-				{
-					_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, true);
-					return;
-				}
-			}
-			// SHOULD IT BE REMOVED?
-			{
-				_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, false);
-				return;
-			}
-		}
-	}
-	else
-	{
-		if (Bit_Get(gAndDat, el))
-		{
-			_GROUPS_CHECK_IN(ar, cur)
-			{
-				_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, true);
-				return;
-			}
-			// SHOULD IT BE REMOVED?
-			{
-				_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, false);
-				return;
-			}
-		}
-		else
-		{
-			_GROUPS_CHECK_ANY(ar, cur)
-			{
-				_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, true);
-				return;
-			}
-			// SHOULD IT BE REMOVED?
-			{
-				_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, false);
-				return;
-			}
-		}
-	}*/
-	/*_GROUPS_CHECK_ALL(nr, ar)
-	{
-		_GROUPS_CHECK_IN(ar, cur)
-		{
-			_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, true);
-			return;
-		}
-		_GROUPS_CHECK_IN(ar, pre)
-		{
-			_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, false);
-			return;
-		}
-		return;
-	}
-	_GROUPS_CHECK_ANY(ar, cur)
-	{
-		_GROUPS_CHECK_NONE(nr, cur)
-		{
-			_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, true);
-			return;
-		}
-	}
-	_GROUPS_CHECK_IN(ar, pre)
-	{
-		_GROUP_SET_PLAYER(_GROUP_MAKE_TAG:el, playerid, false);
-		return;
-	}*/
-	_GROUPS_CHECK_ANY(previous, reference)
+	// r = Reference (valid groups).
+	// c = Current (new groups).
+	// p = Previous (old groups).
+	_GROUPS_CHECK_ANY(p,r)
 	{
 		// Could previously see this thing.  The thing about this design is that
 		// it can (best case) take just 2 comparisons to end - and that should
 		// be the common case!
-		_GROUPS_CHECK_ANY(current, reference)
+		_GROUPS_CHECK_ANY(c,r)
 		{
 			// Still can.
 			return;
@@ -274,7 +182,7 @@ static stock Group_FU(playerid, el, Bit:previous[], Bit:current[], Bit:reference
 		return;
 	}
 	// Couldn't see it before.
-	_GROUPS_CHECK_ANY(current, reference)
+	_GROUPS_CHECK_ANY(c,r)
 	{
 		// They have whatever this thing is.  Note that this may be called
 		// MULTIPLE times for an element, without anything actually changing.

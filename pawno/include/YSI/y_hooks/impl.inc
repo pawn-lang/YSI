@@ -405,10 +405,13 @@ public OnScriptInit()
 		YSI_gLockData[YSI_gLockData[2] + 1] -= YSI_gLockData[0];
 		YSI_gLockData[1] += '.' + 5;
 	#endif
-	// Do all but one other callback - we already did the ALS forward first.
 	new
-		end   = _:YSI_g_sCallbackEnd[ALS_OnScriptInit] - 1,
+		end   = _:YSI_g_sCallbackEnd[ALS_OnScriptInit],
 		start = _:YSI_g_sCallbackStart[ALS_OnScriptInit];
+	#if defined S@@_OnScriptInit
+		// Do all but one other callback - we already did the ALS forward first.
+		--end;
+	#endif
 	while (start++ != end)
 	{
 		//printf("%d %d", start, end);
