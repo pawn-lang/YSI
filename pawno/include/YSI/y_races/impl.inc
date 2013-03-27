@@ -1270,7 +1270,7 @@ Notes:
 	higher position when you are infact behind them.
 -*----------------------------------------------------------------------------*/
 
-task Race_Loop[40]()
+task Race_Loop[500 / MAX_RACES]()
 {
 	static
 		race = -1;
