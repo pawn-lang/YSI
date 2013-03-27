@@ -793,7 +793,7 @@ static remotefunc void:_Group_FakePlayer(p,Bit:g[sizeof RG@],s)
 </remarks>
 \**--------------------------------------------------------------------------**/
 
-static remotefunc void:_Group_SetPlayer(p, Bit:g[sizeof RG@], s)
+remotefunc void:_Group_SetPlayer(p, Bit:g[sizeof RG@], s)
 {
 	#pragma unused s
 	#if !(YSIM_HAS_MASTER && (_YSIM_IS_STUB || _YSIM_IS_CLIENT))
