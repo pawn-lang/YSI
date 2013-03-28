@@ -826,8 +826,8 @@ _Y_RACES_STATIC Race_PlayerDone(playerid)
 		Iter_Remove(YSI_g_sRacePeople[race], playerid);
 		if (IsPlayerConnected(playerid))
 		{
-			SetPlayerPos(playerid, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_X], YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_Y], YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_Z]);
-			SetPlayerFacingAngle(playerid, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_A]);
+			//SetPlayerPos(playerid, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_X], YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_Y], YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_Z]);
+			//SetPlayerFacingAngle(playerid, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_A]);
 			new
 				vehicleid;
 			if ((vehicleid = GetPlayerVehicleID(playerid)))
@@ -836,6 +836,11 @@ _Y_RACES_STATIC Race_PlayerDone(playerid)
 				SetVehicleZAngle(vehicleid, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_A]);
 				LinkVehicleToInterior(vehicleid, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_INT]);
 				SetVehicleVirtualWorld(vehicleid, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_WORLD]);
+			}
+			else
+			{
+				SetPlayerPos(playerid, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_X], YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_Y], YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_Z]);
+				SetPlayerFacingAngle(playerid, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_A]);
 			}
 			SetPlayerInterior(playerid, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_INT]);
 			SetPlayerVirtualWorld(playerid, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_WORLD]);
@@ -990,6 +995,7 @@ global Race_Start(race)
 			SetPlayerVirtualWorld(i, YSI_g_sRaceData[race][E_RACE_VW]);
 			SetVehiclePos(vehicleid, YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][0], YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][1], YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][2]);
 			SetVehicleZAngle(vehicleid, YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][3]);
+			SetCameraBehindPlayer(i);
 			TogglePlayerControllable(i, 0);
 			++j;
 		}
@@ -1279,55 +1285,92 @@ Notes:
 	higher position when you are infact behind them.
 -*----------------------------------------------------------------------------*/
 
-task Race_Loop[500 / MAX_RACES]()
-{
-	static
-		race = -1;
-	// Process a different race every call.
-	race = (race + 1) % MAX_RACES;
-	static
-		racePos[MAX_PLAYERS][E_RACE_POS];
-	if (Race__IsActive(race))
+#if YSIM_HAS_MASTER && (_YSIM_IS_CLIENT || _YSIM_IS_STUB)
+	stock Race_Loop()
+#else
+	task Race_Loop[500 / MAX_RACES]()
+#endif
 	{
-		new
-			start = YSI_g_sRaceData[race][E_RACE_CP_START],
-			lap,
-			cp,
-			Float:togo,
-			pos;
-		foreach (new playerid : YSI_g_sRacePeople[race])
+		static
+			race = -1;
+		// Process a different race every call.
+		race = (race + 1) % MAX_RACES;
+		static
+			racePos[MAX_PLAYERS][E_RACE_POS];
+		if (Race__IsActive(race))
 		{
-			lap = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP],
-			cp = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP] + start;
-			static
-				Float:x,
-				Float:y,
-				Float:z;
-			GetPlayerPos(playerid, x, y, z);
-			// Get the player's (squared) distance to the next checkpoint.
-			x -= YSI_g_sRaceCheckpoints[cp][0];
-			y -= YSI_g_sRaceCheckpoints[cp][1];
-			z -= YSI_g_sRaceCheckpoints[cp][2];
-			togo = ((x * x) + (y * y) + (z * z)),
-			pos = 1;
-			racePos[playerid][E_RACE_POS_CP] = cp;
-			racePos[playerid][E_RACE_POS_TOGO] = togo;
-			for (new i = Iter_Begin(YSI_g_sRacePeople[race]); (i = Iter_Next(YSI_g_sRacePeople[race], i)) != playerid; )
+			new
+				start = YSI_g_sRaceData[race][E_RACE_CP_START],
+				lap,
+				cp = Iter_Count(YSI_g_sRacePeople[race]),
+				Float:togo,
+				pos;
+			if (!cp)
 			{
-				// This checks "checkpoint + start", but both players have that
-				// offset so it is fine.
-				if (YSI_g_sPlayerRace[i][E_RACE_PLAYER_LAP] > lap ||
-				   (YSI_g_sPlayerRace[i][E_RACE_PLAYER_LAP] == lap &&
-				       (racePos[i][E_RACE_POS_CP] > cp ||
-				       (racePos[i][E_RACE_POS_CP] == cp && racePos[i][E_RACE_POS_TOGO] < togo)))) ++pos;
-				// This player is on a higher lap, or on a higher checkpoint,
-				// or less distance from their next checkpoint.
-				else ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION];
+				return;
 			}
-			YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_POSITION] = pos;
+			foreach (new playerid : YSI_g_sRacePeople[race])
+			{
+				lap = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP],
+				cp = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP] + start;
+				static
+					Float:x,
+					Float:y,
+					Float:z;
+				GetPlayerPos(playerid, x, y, z);
+				// Get the player's (squared) distance to the next checkpoint.
+				x -= YSI_g_sRaceCheckpoints[cp][0];
+				y -= YSI_g_sRaceCheckpoints[cp][1];
+				z -= YSI_g_sRaceCheckpoints[cp][2];
+				togo = ((x * x) + (y * y) + (z * z)),
+				pos = 1;
+				racePos[playerid][E_RACE_POS_CP] = cp;
+				racePos[playerid][E_RACE_POS_TOGO] = togo;
+				for (new i = Iter_Begin(YSI_g_sRacePeople[race]); (i = Iter_Next(YSI_g_sRacePeople[race], i)) != playerid; )
+				{
+					// This checks "checkpoint + start", but both players have
+					// that offset so it is fine.
+					if (YSI_g_sPlayerRace[i][E_RACE_PLAYER_LAP] > lap ||
+					   (YSI_g_sPlayerRace[i][E_RACE_PLAYER_LAP] == lap &&
+						   (racePos[i][E_RACE_POS_CP] > cp ||
+						   (racePos[i][E_RACE_POS_CP] == cp && racePos[i][E_RACE_POS_TOGO] < togo)))) ++pos;
+					// This player is on a higher lap, or on a higher
+					// checkpoint, or less distance from their next checkpoint.
+					else ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION];
+				}
+				YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_POSITION] = pos;
+			}
+			#if defined RACE_SHOW_POS
+				// Race time.
+				lap = Race_GetPlayerRaceTime(Iter_First(YSI_g_sRacePeople[race])) / 1000;
+				// Racer count.
+				cp = Iter_Count(YSI_g_sRacePeople[race]);
+				new
+					time[8],
+					th[3];
+				format(time, sizeof (time), "%d:%02d", lap / 60, lap % 60);
+				foreach (new playerid : YSI_g_sRacePeople[race])
+				{
+					pos = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_POSITION];
+					switch (pos % 20)
+					{
+						case 1: th = "ST";
+						case 2: th = "ND";
+						case 3: th = "RD";
+						case 11: if (pos % 100 > 20) th = "TH"; else th = "ST";
+						case 12: if (pos % 100 > 20) th = "TH"; else th = "ND";
+						case 13: if (pos % 100 > 20) th = "TH"; else th = "RD";
+						default: th = "TH";
+					}
+					// Show the background.
+					// Show the position.
+					// Show the "th".
+					// Show the races count.
+					// Show the time.
+				}
+			#endif
 		}
 	}
-}
 
 /*----------------------------------------------------------------------------*-
 Function:

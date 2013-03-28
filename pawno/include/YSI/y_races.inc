@@ -118,17 +118,6 @@ foreign Race_GetPlayerRaceTime(playerid);
 foreign Race_GetPlayerRace(playerid);
 foreign Race_SetPlayer(race, playerid, bool:set);
 
-
-
-
-
-
-
-
-
-
-
-
 #include "y_races/impl"
 #if defined YSI_TESTS
 	#include "y_testing"

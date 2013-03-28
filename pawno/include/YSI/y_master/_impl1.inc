@@ -132,9 +132,9 @@ Natives:
 
 #if defined _YSIM_RESET_USER
 	#undef _YSIM_RESET_USER
-	#if !defined _YSIM_MANUAL_SET
-		#endinput
-	#endif
+	//#if !defined _YSIM_MANUAL_SET
+	//	#endinput
+	//#endif
 	//#define MASTER _YSIM_LAST_MANUAL
 	#define _YSIM_OVERRIDE _YSIM_LAST_MANUAL
 	#include "_override"

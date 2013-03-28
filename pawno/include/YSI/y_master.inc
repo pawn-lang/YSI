@@ -188,6 +188,10 @@ Natives:
 #endif
 //#error
 // Determine the current MASTER ID.
+#if defined _YSIM_RESET_USER && !defined _YSIM_MANUAL_SET
+	#endinput
+#endif
+
 #include "y_master\_impl1"
 #if defined _Y_MASTER_ONCE
 	// Been included at least once, clean up from before.
