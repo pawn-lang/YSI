@@ -151,7 +151,7 @@ enum E_RACE_POS
 {
 	//E_RACE_POS_RACE,
 	E_RACE_POS_CP,
-	E_RACE_POS_LAP,
+	//E_RACE_POS_LAP,
 	Float:E_RACE_POS_TOGO//,
 	//E_RACE_POS_POS
 }
@@ -1283,34 +1283,47 @@ task Race_Loop[500 / MAX_RACES]()
 	if (Race__IsActive(race))
 	{
 		new
-			start = YSI_g_sRaceData[race][E_RACE_CP_START];
+			start = YSI_g_sRaceData[race][E_RACE_CP_START],
+			lap,
+			cp,
+			Float:togo,
+			pos;//,
+			//opl, // Other player lap,
+			//opc; // Other player CP;
 		foreach (new playerid : YSI_g_sRacePeople[race])
 		{
-			new
-				lap = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP],
-				cp = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP];
+			lap = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP],
+			cp = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP] + start;
 			static
 				Float:x,
 				Float:y,
 				Float:z;
 			GetPlayerPos(playerid, x, y, z);
 			// Get the player's (squared) distance to the next checkpoint.
-			x -= YSI_g_sRaceCheckpoints[start + cp][0];
-			y -= YSI_g_sRaceCheckpoints[start + cp][1];
-			z -= YSI_g_sRaceCheckpoints[start + cp][2];
-			new
-				Float:togo = ((x * x) + (y * y) + (z * z)),
-				pos = 1;
+			x -= YSI_g_sRaceCheckpoints[cp][0];
+			y -= YSI_g_sRaceCheckpoints[cp][1];
+			z -= YSI_g_sRaceCheckpoints[cp][2];
+			togo = ((x * x) + (y * y) + (z * z)),
+			pos = 1;
 			//racePos[playerid][E_RACE_POS_RACE] = race; // | RACE_POS_DONE;
-			racePos[playerid][E_RACE_POS_LAP] = lap;
+			//racePos[playerid][E_RACE_POS_LAP] = lap;
 			racePos[playerid][E_RACE_POS_CP] = cp;
 			racePos[playerid][E_RACE_POS_TOGO] = togo;
 			//foreach (new i : YSI_g_sRacePeople[race])
 			for (new i = Iter_Begin(YSI_g_sRacePeople[race]); (i = Iter_Next(YSI_g_sRacePeople[race], i)) != playerid; )
 			{
-				if (racePos[i][E_RACE_POS_LAP] > lap ||
-				    racePos[i][E_RACE_POS_CP] > cp ||
-				    racePos[i][E_RACE_POS_TOGO] < togo) ++pos;
+				//opl = YSI_g_sPlayerRace[i][E_RACE_PLAYER_LAP];
+				//opc = racePos[i][E_RACE_POS_CP];
+				// This checks "checkpoint + start", but both players have that
+				// offset so it is fine.
+				if (YSI_g_sPlayerRace[i][E_RACE_PLAYER_LAP] > lap ||
+				   (YSI_g_sPlayerRace[i][E_RACE_PLAYER_LAP] == lap &&
+				       (racePos[i][E_RACE_POS_CP] > cp ||
+				       (racePos[i][E_RACE_POS_CP] == cp && racePos[i][E_RACE_POS_TOGO] < togo)))) ++pos;
+				//if (racePos[i][E_RACE_POS_LAP] > lap ||
+				//       (racePos[i][E_RACE_POS_LAP] == lap &&
+				//         (racePos[i][E_RACE_POS_CP] > cp ||
+				//            racePos[i][E_RACE_POS_TOGO] < togo))) ++pos;
 				// This player is on a higher lap, or on a higher checkpoint,
 				// or less distance from their next checkpoint.
 				else ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION]; //racePos[i][E_RACE_POS_POS];
@@ -1323,6 +1336,46 @@ task Race_Loop[500 / MAX_RACES]()
 		//}
 	}
 }
+//if (opl > lap || (opl == lap && (opc > cp || (opc == cp && racePos[i][E_RACE_POS_TOGO] < togo)))) ++pos;
+// switch (floatcmp(YSI_g_sPlayerRace[i][E_RACE_PLAYER_LAP], lap))
+// {
+	// case  1: ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION];
+	// case -1: ++pos; // This player better.
+	// default:
+	// {
+		// switch (floatcmp(racePos[i][E_RACE_POS_CP], cp))
+		// {
+			// case  1: ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION];
+			// case -1: ++pos;
+			// default:
+			// {
+				// // Backwards as bigger is now worse.
+				// switch (floatcmp(togo, racePos[i][E_RACE_POS_TOGO]))
+				// {
+					// case  1: ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION];
+					// case -1: ++pos;
+					// // Default do nothing (leave them in the same position).
+				// }
+			// }
+		// }
+	// }
+// }
+// switch (floatcmp(YSI_g_sPlayerRace[i][E_RACE_PLAYER_LAP], lap) * 3 + floatcmp(racePos[i][E_RACE_POS_CP], cp))
+// {
+	// //case  4: // Other player lap higher, CP higher.
+	// //case  3: // Other player lap higher, CP the same.
+	// //case  2: // Other player lap higher, CP lower.
+	// //case  1: // Laps the same, other player CP higher.
+	// //case  0: // Everything the same.
+	// //case -1: // Laps the same, this player CP higher.
+	// //case -2: // This player lap higher, CP lower.
+	// //case -3: // This player lap higher, CP the same.
+	// //case -4: // This player lap higher, CP higher.
+	// case 4, 3, 2, 1: ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION]; // Other player better.
+	// case 0: if (racePos[i][E_RACE_POS_TOGO] < togo) ++pos; else ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION];
+	// default: ++pos; // This player better.
+	// //case -1, -2, -3, -4: // This player better.
+// }
 
 /*----------------------------------------------------------------------------*-
 Function:
