@@ -162,7 +162,30 @@ Changelog:
 		#endinput
 	#endif
 #endif
-#if defined _YSI_ALLOW_INTERNAL_TEST
+#if defined _inc_y_races
+	#if !defined _YSI_GROUP_RACES_INCLUDED
+		// Although this is included before _GROUP_MAKE_NAME is set, it will
+		// still be the correct value eventually.
+		// Mark this library as existing.
+		#define _YSI_GROUP_RACES_INCLUDED
+		// These all need doing twice - once here and once below.
+		//#if defined _YSI_HAS_GROUP_SYSTEM
+		//	#include "internal\y_groupfirst"
+		//#endif
+		#undef _GROUP_MAKE_NAME
+		#undef _GROUP_MAKE_LIMIT
+		#define _GROUP_MAKE_NAME        _GROUP_MAKE_NAME_RACES
+		#define _GROUP_MAKE_LIMIT       _GROUP_MAKE_LIMIT_RACES
+		#if defined _YSI_HAS_GROUP_SYSTEM
+			#include "internal\y_groupsecond"
+			#include "y_races/groups"
+		#endif
+		#include "internal\y_groupsingle"
+		// End.
+		#endinput
+	#endif
+#endif
+/*#if defined _YSI_ALLOW_INTERNAL_TEST
 	#if defined _inc_y_inttest
 		#if !defined _YSI_GROUP_INTTEST_INCLUDED
 			// Mark this library as existing.
@@ -203,7 +226,7 @@ Changelog:
 			#endinput
 		#endif
 	#endif
-#endif
+#endif*/
 
 // ||                                                                         ||
 // =============================================================================
@@ -261,6 +284,20 @@ Changelog:
 		// Include the second half of the file for the methods.
 		#include "internal\y_groupsecond"
 	#endif
+	#if defined _YSI_GROUP_RACES_INCLUDED
+		// This only needs to be done if the library was previously included.
+		#define _YSIM_OVERRIDE          14
+		#include "y_master"
+		// Include the first half of the file for the call chain.
+		//#include "internal\y_groupfirst"
+		#undef _GROUP_MAKE_NAME
+		#undef _GROUP_MAKE_LIMIT
+		#define _GROUP_MAKE_NAME        _GROUP_MAKE_NAME_RACES
+		#define _GROUP_MAKE_LIMIT       _GROUP_MAKE_LIMIT_RACES
+		// Include the second half of the file for the methods.
+		#include "internal\y_groupsecond"
+		#include "y_races/groups"
+	#endif
 	#if defined _YSI_PLUGINS_STREAMER
 		#if defined _YCM_q@
 			#define _YSIM_OVERRIDE          16
@@ -277,7 +314,7 @@ Changelog:
 		#include "internal\y_incognitostreamer"
 	#endif
 	// Internal test library.
-	#if defined _YSI_ALLOW_INTERNAL_TEST
+	/*#if defined _YSI_ALLOW_INTERNAL_TEST
 		#if defined _YSI_GROUP_INTTEST_INCLUDED
 			#define _YSIM_OVERRIDE      9
 			#include "y_master"
@@ -298,7 +335,7 @@ Changelog:
 			#define _GROUP_MAKE_LIMIT   _GROUP_MAKE_LIMIT_INTTEST2
 			#include "internal\y_groupsecond"
 		#endif
-	#endif
+	#endif*/
 	// Recursive group functions to make groups of groups.  Make this code pure
 	// client code so that 90% of it is not included ever.
 	/*#define _YSIM_OVERRIDE      24

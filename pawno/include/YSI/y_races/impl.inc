@@ -70,20 +70,7 @@ Changelog:
 		First version.
 \**--------------------------------------------------------------------------**/
 
-#include "y_bit"
-#include "y_iterate"
-#include "y_playerarray"
-#include "y_text"
-#if defined RACE_POSITION
-	#include "y_timers"
-#endif
-#include "y_hooks"
-
 #define MAX_RACE_WINNERS 3
-
-#if !defined MAX_RACES
-	#define MAX_RACES 16
-#endif
 
 #if !defined MAX_RACE_CHECKPOINTS
 	#define MAX_RACE_CHECKPOINTS 1024
@@ -100,6 +87,7 @@ Changelog:
 
 enum e_RACE_FLAGS (<<= 1)
 {
+	e_RACE_FLAGS_NONE = 0,
 	e_RACE_FLAGS_EXIT_TIME = 0xFFFF,
 	e_RACE_FLAGS_ACTIVE = 0x10000,
 	e_RACE_FLAGS_ARIAL,
@@ -271,6 +259,25 @@ Notes:
 
 /*----------------------------------------------------------------------------*-
 Function:
+	Races_SetupGroups
+Params:
+	-
+Return:
+	-
+Notes:
+	Disables default group settings when groups are used.
+-*----------------------------------------------------------------------------*/
+
+stock Races_SetupGroups() <YSI_has_groups:n>
+{
+}
+
+stock Races_SetupGroups() <>
+{
+}
+
+/*----------------------------------------------------------------------------*-
+Function:
 	Race_Create
 Params:
 	laps - Number of laps to race for.
@@ -289,24 +296,50 @@ Notes:
 	parameters are optional and can be set separately aswell.
 -*----------------------------------------------------------------------------*/
 
+foreign _Race_Create(l,e,c,a,f,x,i,w,r);
+
 stock Race_Create(laps = 0, entry = 0, countdown = 3, bool:arial = false, bool:fixedPrize = true, exitTime = 0, interior = 0, world = 0, bool:restart = false)
+{
+	return _Race_Create(laps, entry, countdown, _:arial, _:fixedPrize, exitTime, interior, world, _:restart);
+}
+
+global _Race_Create(l,e,c,a,f,x,i,w,r)
 {
 	new
 		raceid;
 	for (raceid = 0; raceid < MAX_RACES; raceid++) if (!Race__IsActive(raceid)) break;
 	if (raceid == MAX_RACES) return NO_RACE;
-	YSI_g_sRaceData[raceid][E_RACE_FLAGS] = e_RACE_FLAGS_ACTIVE;
-	Race_SetLaps(raceid, laps);
-	Race_SetEntry(raceid, entry);
-	if (fixedPrize) for (new i = 1; i <= MAX_RACE_WINNERS; i++) Race_SetPrize(raceid, (MAX_RACE_WINNERS + 1) - i, entry * i);
-	Race_SetFixedWin(raceid, _:fixedPrize);
-	Race_SetArial(raceid, _:arial);
-	Race_SetActive(raceid, 1);
-	Race_SetCountdown(raceid, countdown);
-	Race_SetExitTime(raceid, exitTime);
-	Race_SetInterior(raceid, interior);
-	Race_SetWorld(raceid, world);
-	Race_SetRestart(raceid, _:restart);
+	YSI_g_sRaceData[raceid][E_RACE_FLAGS] = e_RACE_FLAGS_ACTIVE |
+		(f ? e_RACE_FLAGS_NONE    : e_RACE_FLAGS_REL_WIN) |
+		(a ? e_RACE_FLAGS_ARIAL   : e_RACE_FLAGS_NONE   ) |
+		(r ? e_RACE_FLAGS_RESTART : e_RACE_FLAGS_NONE   ) |
+		(e_RACE_FLAGS:x & e_RACE_FLAGS_EXIT_TIME);
+	// 
+	// Old functions.
+	// 
+	//Race_SetLaps(raceid, l);
+	YSI_g_sRaceData[raceid][E_RACE_LAPS] = l;
+	//Race_SetEntry(raceid, e);
+	YSI_g_sRaceData[raceid][E_RACE_ENTRY] = e;
+	if (f)
+	{
+		//for (new p = 1; p <= MAX_RACE_WINNERS; p++) Race_SetPrize(raceid, (MAX_RACE_WINNERS + 1) - p, e * p);
+		for (new p = 1; p <= MAX_RACE_WINNERS; p++) YSI_g_sRaceData[raceid][E_RACE_PRIZES][MAX_RACE_WINNERS - p] = e * p;
+		//Race_SetFixedWin(raceid, _:f);
+	}
+	//Race_SetArial(raceid, _:a);
+	//Race_SetActive(raceid, 1);
+	//Race_SetCountdown(raceid, c);
+	YSI_g_sRaceData[raceid][E_RACE_COUNTDOWN] = c;
+	//Race_SetExitTime(raceid, x);
+	//Race_SetInterior(raceid, i);
+	YSI_g_sRaceData[raceid][E_RACE_INT] = i;
+	//Race_SetWorld(raceid, w);
+	YSI_g_sRaceData[raceid][E_RACE_VW] = w;
+	//Race_SetRestart(raceid, _:r);
+	// 
+	// Remainder.
+	// 
 	YSI_g_sRaceData[raceid][E_RACE_CHECKPOINTS] = 0;
 	YSI_g_sRaceData[raceid][E_RACE_RACER_COUNT] = 0;
 	YSI_g_sRaceData[raceid][E_RACE_FINISHED] = 0;
@@ -314,6 +347,7 @@ stock Race_Create(laps = 0, entry = 0, countdown = 3, bool:arial = false, bool:f
 	PA_Init(YSI_g_sRacers[raceid]);
 	Iter_Clear(YSI_g_sRacePeople[raceid]);
 	YSI_g_sRaceData[raceid][E_RACE_CP_START] = YSI_g_sCPIndex;
+	NO_GROUPS(raceid) {}
 	return raceid;
 }
 
@@ -330,7 +364,14 @@ Notes:
 	number of remaining racers and if none ends the race.
 -*----------------------------------------------------------------------------*/
 
+foreign void:_Race_Destroy(slot, refund);
+
 stock Race_Destroy(slot, bool:refund = false)
+{
+	_Race_Destroy(slot, _:refund);
+}
+
+global void:_Race_Destroy(slot, refund)
 {
 	if (Race_IsValid(slot))
 	{
@@ -351,7 +392,7 @@ stock Race_Destroy(slot, bool:refund = false)
 			{
 				if (PA_Get(YSI_g_sRacers[slot], i))
 				{
-					Race_PlayerLeave(i, refund);
+					_Race_PlayerLeave(i, refund);
 				}
 			}
 		}
@@ -379,7 +420,7 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-stock Race_AddCheckpoint(raceid, Float:x, Float:y, Float:z)
+global Race_AddCheckpoint(raceid, Float:x, Float:y, Float:z)
 {
 	if (!Race_IsValid(raceid)) return RACE_NO_CHECKPOINT;
 	new
@@ -405,7 +446,7 @@ Notes:
 	number of racers for the race.
 -*----------------------------------------------------------------------------*/
 
-stock Race_AddStart(raceid, Float:x, Float:y, Float:z, Float:a)
+global Race_AddStart(raceid, Float:x, Float:y, Float:z, Float:a)
 {
 	if (!Race_IsValid(raceid)) return RACE_NO_CHECKPOINT;
 	new
@@ -433,7 +474,7 @@ Notes:
 	based on the number of entrants and the entry fee.
 -*----------------------------------------------------------------------------*/
 
-stock Race_SetFixedWin(raceid, set)
+global void:Race_SetFixedWin(raceid, set)
 {
 	if (!Race_IsValid(raceid)) return;
 	if (set) YSI_g_sRaceData[raceid][E_RACE_FLAGS] &= ~e_RACE_FLAGS_REL_WIN;
@@ -452,7 +493,7 @@ Notes:
 	Sets wether or not a race is destroyed after completion.
 -*----------------------------------------------------------------------------*/
 
-stock Race_SetRestart(raceid, set)
+global void:Race_SetRestart(raceid, set)
 {
 	if (!Race_IsValid(raceid)) return;
 	if (set) YSI_g_sRaceData[raceid][E_RACE_FLAGS] |= e_RACE_FLAGS_RESTART;
@@ -471,7 +512,7 @@ Notes:
 	Toggles the use of arial checkpoints.
 -*----------------------------------------------------------------------------*/
 
-stock Race_SetArial(raceid, set)
+global void:Race_SetArial(raceid, set)
 {
 	if (!Race_IsValid(raceid)) return;
 	if (set) YSI_g_sRaceData[raceid][E_RACE_FLAGS] |= e_RACE_FLAGS_ARIAL;
@@ -509,7 +550,7 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-stock Race_SetCountdown(raceid, countdown)
+global void:Race_SetCountdown(raceid, countdown)
 {
 	if (!Race_IsValid(raceid)) return;
 	YSI_g_sRaceData[raceid][E_RACE_COUNTDOWN] = countdown;
@@ -528,7 +569,7 @@ Notes:
 	checkpoints must be located in the same interior.
 -*----------------------------------------------------------------------------*/
 
-stock Race_SetInterior(raceid, interior)
+global void:Race_SetInterior(raceid, interior)
 {
 	if (!Race_IsValid(raceid)) return;
 	YSI_g_sRaceData[raceid][E_RACE_INT] = interior;
@@ -546,7 +587,7 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-stock Race_SetWorld(raceid, world)
+global void:Race_SetWorld(raceid, world)
 {
 	if (!Race_IsValid(raceid)) return;
 	YSI_g_sRaceData[raceid][E_RACE_VW] = world;
@@ -566,10 +607,10 @@ Notes:
 	write prizes set by relative winnings.
 -*----------------------------------------------------------------------------*/
 
-stock Race_SetPrize(raceid, position, amount)
+global void:Race_SetPrize(raceid, position, amount)
 {
 	if (!Race_IsValid(raceid) || position >= MAX_RACE_WINNERS) return;
-	YSI_g_sRaceData[raceid][E_RACE_PRIZES][position] = amount;
+	YSI_g_sRaceData[raceid][E_RACE_PRIZES][position - 1] = amount;
 }
 
 /*----------------------------------------------------------------------------*-
@@ -587,7 +628,7 @@ Notes:
 	Useful for long races where cars may well be destroyed.
 -*----------------------------------------------------------------------------*/
 
-stock Race_SetExitTime(raceid, time)
+global void:Race_SetExitTime(raceid, time)
 {
 	if (!Race_IsValid(raceid)) return;
 	YSI_g_sRaceData[raceid][E_RACE_FLAGS] = (YSI_g_sRaceData[raceid][E_RACE_FLAGS] & (~e_RACE_FLAGS_EXIT_TIME)) | (e_RACE_FLAGS:time & e_RACE_FLAGS_EXIT_TIME);
@@ -604,7 +645,7 @@ Notes:
 	Wrapper for Race_IsValid.
 -*----------------------------------------------------------------------------*/
 
-stock Race_IsActive(raceid)
+global Race_IsActive(raceid)
 {
 	return Race_IsValid(raceid);
 }
@@ -621,7 +662,7 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-stock Race_SetLaps(raceid, laps)
+global void:Race_SetLaps(raceid, laps)
 {
 	if (!Race_IsValid(raceid)) return;
 	YSI_g_sRaceData[raceid][E_RACE_LAPS] = laps;
@@ -639,7 +680,7 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-stock Race_SetEntry(raceid, cost)
+global void:Race_SetEntry(raceid, cost)
 {
 	if (!Race_IsValid(raceid)) return;
 	YSI_g_sRaceData[raceid][E_RACE_ENTRY] = cost;
@@ -738,11 +779,7 @@ _Y_RACES_STATIC Race_CheckEnd(slot)
 	if (!(--YSI_g_sRaceData[slot][E_RACE_RACER_COUNT]))
 	{
 		CallRemoteFunction("OnRaceEnd", "i", slot);
-		if (!(YSI_g_sRaceData[slot][E_RACE_FLAGS] & e_RACE_FLAGS_RESTART))
-		{
-			YSI_g_sRaceData[slot][E_RACE_FLAGS] = e_RACE_FLAGS:0;
-		}
-		else
+		if (YSI_g_sRaceData[slot][E_RACE_FLAGS] & e_RACE_FLAGS_RESTART)
 		{
 			YSI_g_sRaceData[slot][E_RACE_FLAGS] &= ~e_RACE_FLAGS_STARTED;
 			YSI_g_sRaceData[slot][E_RACE_FINISHED] = 0;
@@ -751,6 +788,12 @@ _Y_RACES_STATIC Race_CheckEnd(slot)
 				start = YSI_g_sRaceData[slot][E_RACE_CP_START];
 			RaceArray_Shift(start + count, YSI_g_sCPIndex, start);
 			RaceArray_IndexShift(start, -count);
+			// Reset groups.
+			NO_GROUPS(slot) {}
+		}
+		else
+		{
+			YSI_g_sRaceData[slot][E_RACE_FLAGS] = e_RACE_FLAGS:0;
 		}
 	}
 }
@@ -811,7 +854,7 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-stock Race_GetPlayerExitedTime(playerid)
+global Race_GetPlayerExitedTime(playerid)
 {
 	return GetTickCount() - YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_TOUT];
 }
@@ -829,7 +872,7 @@ Notes:
 	is valid to be joined to and if so adds them to it.
 -*----------------------------------------------------------------------------*/
 
-stock Race_PlayerJoin(playerid, race)
+global Race_PlayerJoin(playerid, race)
 {
 	if (YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE] != NO_RACE ||
 		!Race_IsValid(race)) return 0;
@@ -864,7 +907,14 @@ Notes:
 	started.
 -*----------------------------------------------------------------------------*/
 
+foreign _Race_PlayerLeave(playerid, refund);
+
 stock Race_PlayerLeave(playerid, bool:refund = false)
+{
+	return _Race_PlayerLeave(playerid, _:refund);
+}
+
+global _Race_PlayerLeave(playerid, refund)
 {
 	new
 		race = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE];
@@ -918,10 +968,11 @@ Notes:
 	fee.
 -*----------------------------------------------------------------------------*/
 
-stock Race_Start(race)
+global Race_Start(race)
 {
 	if (!Race_IsValid(race)) return 0;
 	new
+		bool:exited = true,
 		j;
 	foreach (new i : YSI_g_sRacePeople[race])
 	{
@@ -942,7 +993,11 @@ stock Race_Start(race)
 			TogglePlayerControllable(i, 0);
 			++j;
 		}
-		else Race_Exit(i);
+		else
+		{
+			exited = false;
+			Race_Exit(i);
+		}
 	}
 	if (j)
 	{
@@ -959,6 +1014,12 @@ stock Race_Start(race)
 			for (new i = 0; i < MAX_RACE_WINNERS; i++) YSI_g_sRaceData[race][E_RACE_PRIZES][i] = (MAX_RACE_WINNERS - i) * count;
 		}
 		return 1;
+	}
+	else if (exited)
+	{
+		// No players were in to begin with.
+		YSI_g_sRaceData[race][E_RACE_RACER_COUNT] = 1;
+		Race_CheckEnd(race);
 	}
 	return 0;
 }
@@ -1017,13 +1078,14 @@ Notes:
 	Sets up important variables
 -*----------------------------------------------------------------------------*/
 
-hook OnScriptInit()
+mhook OnScriptInit()
 {
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		YSI_g_sPlayerRace[i][E_RACE_PLAYER_RACE] = NO_RACE;
 	}
 	Iter_Init(YSI_g_sRacePeople);
+	Races_SetupGroups();
 	return 1;
 }
 
@@ -1039,7 +1101,7 @@ Notes:
 	corresponding next checkpoint or calls Race_Finish.
 -*----------------------------------------------------------------------------*/
 
-hook OnPlayerEnterRaceCheckpoint(playerid)
+mhook OnPlayerEnterRaceCheckpoint(playerid)
 {
 	return Race_DoEnterRaceCP(playerid);
 }
@@ -1134,7 +1196,7 @@ Notes:
 	calls the relevant functions.
 -*----------------------------------------------------------------------------*/
 
-hook OnPlayerStateChange(playerid, newstate, oldstate)
+mhook OnPlayerStateChange(playerid, newstate, oldstate)
 {
 	new
 		race = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE];
@@ -1163,7 +1225,7 @@ Notes:
 	anymore.
 -*----------------------------------------------------------------------------*/
 
-hook OnPlayerDisconnect(playerid, reason)
+mhook OnPlayerDisconnect(playerid, reason)
 {
 	new
 		race = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE];
@@ -1191,7 +1253,7 @@ Notes:
 	Just a fix for IsPlayerInRaceCheckpoint.
 -*----------------------------------------------------------------------------*/
 
-hook OnPlayerConnect(playerid)
+mhook OnPlayerConnect(playerid)
 {
 	DisablePlayerRaceCheckpoint(playerid);
 	return 1;
@@ -1278,7 +1340,7 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-stock Race_GetPlayerPosition(playerid)
+global Race_GetPlayerPosition(playerid)
 {
 	return YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_POSITION];
 }
@@ -1296,7 +1358,7 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-stock Race_GetPlayerRaceTime(playerid)
+global Race_GetPlayerRaceTime(playerid)
 {
 	return GetTickCount() - YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_TIME];
 }
@@ -1312,8 +1374,49 @@ Notes:
 	-
 -*----------------------------------------------------------------------------*/
 
-stock Race_GetPlayerRace(playerid)
+global Race_GetPlayerRace(playerid)
 {
-	if (playerid >= 0 && playerid < MAX_PLAYERS) return YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE];
+	if (0 <= playerid < MAX_PLAYERS) return YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE];
 	return NO_RACE;
+}
+
+/*----------------------------------------------------------------------------*-
+Function:
+	Race_SetPlayer
+Params:
+	race - Which race to add them to.
+	playerid - Player to set in the race.
+	bool:set - Add or remove them.
+Return:
+	-
+Notes:
+	-
+-*----------------------------------------------------------------------------*/
+
+global Race_SetPlayer(race, playerid, bool:set)
+{
+	if (Race_IsValid(race))
+	{
+		if (set)
+		{
+			if (!(YSI_g_sRaceData[race][E_RACE_FLAGS] & e_RACE_FLAGS_STARTED))
+			{
+				Race_PlayerJoin(playerid, race);
+				return 1;
+			}
+		}
+		else if (race == YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE])
+		{
+			if (YSI_g_sRaceData[race][E_RACE_FLAGS] & e_RACE_FLAGS_STARTED)
+			{
+				Race_Exit(playerid);
+			}
+			else
+			{
+				Race_PlayerLeave(playerid);
+			}
+			return 1;
+		}
+	}
+	return 0;
 }
