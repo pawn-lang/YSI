@@ -90,7 +90,7 @@ Changelog:
 #endif
 
 #if !defined MAX_RACE_STARTS
-	#define MAX_RACE_STARTS 32//MAX_PLAYERS
+	#define MAX_RACE_STARTS 32
 #endif
 
 #define NO_RACE -1
@@ -118,7 +118,6 @@ enum E_RACE
 	E_RACE_CP_START,
 	E_RACE_RACER_COUNT,
 	E_RACE_RACER_MAX,
-	//PlayerArray:E_RACE_RACERS<MAX_PLAYERS>,
 	E_RACE_COUNTDOWN,
 	E_RACE_FINISHED,
 	E_RACE_ENTRY,
@@ -149,26 +148,18 @@ enum E_RACE_PLAYER
 
 enum E_RACE_POS
 {
-	//E_RACE_POS_RACE,
 	E_RACE_POS_CP,
-	//E_RACE_POS_LAP,
-	Float:E_RACE_POS_TOGO//,
-	//E_RACE_POS_POS
+	Float:E_RACE_POS_TOGO
 }
 
 _Y_RACES_STATIC stock
 	PlayerArray:YSI_g_sRacers[MAX_RACES]<MAX_PLAYERS>,
 	YSI_g_sRaceData[MAX_RACES][E_RACE],
-	//Float:YSI_g_sRaceCheckpoints[MAX_RACES][MAX_RACE_CHECKPOINTS][3],
 	Float:YSI_g_sRaceCheckpoints[MAX_RACE_CHECKPOINTS][3],
 	YSI_g_sPlayerRace[MAX_PLAYERS][E_RACE_PLAYER],
 	Float:YSI_g_sRaceStarts[MAX_RACES][MAX_RACE_STARTS][4],
 	YSI_g_sCPIndex,
 	Iterator:YSI_g_sRacePeople[MAX_RACES]<MAX_PLAYERS>;
-
-//#if defined RACE_POSITION
-//	forward Race_Loop();
-//#endif
 
 forward Race_Countdown(race, time);
 forward Race_Timeout(playerid);
@@ -211,17 +202,6 @@ Notes:
 
 _Y_RACES_STATIC stock RaceArray_Shift(from, &end, to)
 {
-	// Basic version.
-	/*if (++to >= MAX_RACE_CHECKPOINTS)
-	{
-		--to;
-		return false;
-	}
-	for (new i = to; i != from; --i)
-	{
-		YSI_g_sRaceCheckpoints[0][i] = YSI_g_sRaceCheckpoints[0][i - 1];
-	}
-	return true;*/
 	// Fast version.
 	end -= from;
 	if (end + to >= MAX_RACE_CHECKPOINTS)
@@ -404,10 +384,6 @@ stock Race_AddCheckpoint(raceid, Float:x, Float:y, Float:z)
 	if (!Race_IsValid(raceid)) return RACE_NO_CHECKPOINT;
 	new
 		count = YSI_g_sRaceData[raceid][E_RACE_CHECKPOINTS];
-	/*if (count >= MAX_RACE_CHECKPOINTS) return RACE_NO_CHECKPOINT;
-	YSI_g_sRaceCheckpoints[raceid][count][0] = x;
-	YSI_g_sRaceCheckpoints[raceid][count][1] = y;
-	YSI_g_sRaceCheckpoints[raceid][count][2] = z;*/
 	RaceArray_Add(YSI_g_sRaceData[raceid][E_RACE_CP_START] + count, x, y, z);
 	YSI_g_sRaceData[raceid][E_RACE_CHECKPOINTS]++;
 	return count;
@@ -949,30 +925,24 @@ stock Race_Start(race)
 		j;
 	foreach (new i : YSI_g_sRacePeople[race])
 	{
-		//if (PA_Get(YSI_g_sRacers[race], i))
+		new
+			vehicleid;
+		GetPlayerPos(i, YSI_g_sPlayerRace[i][E_RACE_PLAYER_X], YSI_g_sPlayerRace[i][E_RACE_PLAYER_Y], YSI_g_sPlayerRace[i][E_RACE_PLAYER_Z]);
+		if ((vehicleid = GetPlayerVehicleID(i)))
 		{
-			new
-				vehicleid;
-			//if (IsPlayerConnected(i))
-			{
-				GetPlayerPos(i, YSI_g_sPlayerRace[i][E_RACE_PLAYER_X], YSI_g_sPlayerRace[i][E_RACE_PLAYER_Y], YSI_g_sPlayerRace[i][E_RACE_PLAYER_Z]);
-				if ((vehicleid = GetPlayerVehicleID(i)))
-				{
-					GetPlayerFacingAngle(i, YSI_g_sPlayerRace[i][E_RACE_PLAYER_A]);
-					YSI_g_sPlayerRace[i][E_RACE_PLAYER_INT] = GetPlayerInterior(i);
-					YSI_g_sPlayerRace[i][E_RACE_PLAYER_WORLD] = GetPlayerVirtualWorld(i);
-					LinkVehicleToInterior(vehicleid, YSI_g_sRaceData[race][E_RACE_INT]);
-					SetVehicleVirtualWorld(vehicleid, YSI_g_sRaceData[race][E_RACE_VW]);
-					SetPlayerInterior(i, YSI_g_sRaceData[race][E_RACE_INT]);
-					SetPlayerVirtualWorld(i, YSI_g_sRaceData[race][E_RACE_VW]);
-					SetVehiclePos(vehicleid, YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][0], YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][1], YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][2]);
-					SetVehicleZAngle(vehicleid, YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][3]);
-					TogglePlayerControllable(i, 0);
-					++j;
-				}
-				else Race_Exit(i);
-			}
+			GetPlayerFacingAngle(i, YSI_g_sPlayerRace[i][E_RACE_PLAYER_A]);
+			YSI_g_sPlayerRace[i][E_RACE_PLAYER_INT] = GetPlayerInterior(i);
+			YSI_g_sPlayerRace[i][E_RACE_PLAYER_WORLD] = GetPlayerVirtualWorld(i);
+			LinkVehicleToInterior(vehicleid, YSI_g_sRaceData[race][E_RACE_INT]);
+			SetVehicleVirtualWorld(vehicleid, YSI_g_sRaceData[race][E_RACE_VW]);
+			SetPlayerInterior(i, YSI_g_sRaceData[race][E_RACE_INT]);
+			SetPlayerVirtualWorld(i, YSI_g_sRaceData[race][E_RACE_VW]);
+			SetVehiclePos(vehicleid, YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][0], YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][1], YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][2]);
+			SetVehicleZAngle(vehicleid, YSI_g_sRaceStarts[race][j % MAX_RACE_STARTS][3]);
+			TogglePlayerControllable(i, 0);
+			++j;
 		}
+		else Race_Exit(i);
 	}
 	if (j)
 	{
@@ -1010,8 +980,6 @@ public Race_Countdown(race, time)
 	if (!(YSI_g_sRaceData[race][E_RACE_FLAGS] & e_RACE_FLAGS_ACTIVE)) return;
 	if (time)
 	{
-		//printf("Text_Send");
-		//print(Bit_Display(YSI_g_sRacers[race][1]));
 		Text_Send(YSI_g_sRacers[race], $YSI_RACE_COUNTDOWN, time);
 		SetTimerEx("Race_Countdown", 1000, 0, "ii", race, time - 1);
 	}
@@ -1022,23 +990,18 @@ public Race_Countdown(race, time)
 			startTime = GetTickCount(),
 			vehicleid,
 			pos;
-		//foreach (new i : Player)
 		foreach (new i : YSI_g_sRacePeople[race])
 		{
-			//if (Bit_Get(YSI_g_sRacers[race], i))
+			if ((vehicleid = GetPlayerVehicleID(i)))
 			{
-				//if (IsPlayerConnected(i) && (vehicleid = GetPlayerVehicleID(i)))
-				if ((vehicleid = GetPlayerVehicleID(i)))
-				{
-					TogglePlayerControllable(i, 1);
-					Race_DoEnterRaceCP(i);
-					SetVehiclePos(vehicleid, YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][0], YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][1], YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][2] + 0.1);
-					SetVehicleZAngle(vehicleid, YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][3]);
-					YSI_g_sPlayerRace[i][E_RACE_PLAYER_TIME] = startTime;
-					pos++;
-				}
-				else Race_Exit(i);
+				TogglePlayerControllable(i, 1);
+				Race_DoEnterRaceCP(i);
+				SetVehiclePos(vehicleid, YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][0], YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][1], YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][2] + 0.1);
+				SetVehicleZAngle(vehicleid, YSI_g_sRaceStarts[race][pos % MAX_RACE_STARTS][3]);
+				YSI_g_sPlayerRace[i][E_RACE_PLAYER_TIME] = startTime;
+				pos++;
 			}
+			else Race_Exit(i);
 		}
 	}
 }
@@ -1056,9 +1019,6 @@ Notes:
 
 hook OnScriptInit()
 {
-	//#if defined RACE_POSITION
-	//	Timer_Add("Race_Loop", RACE_LOOP_GRANULARITY);
-	//#endif
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
 		YSI_g_sPlayerRace[i][E_RACE_PLAYER_RACE] = NO_RACE;
@@ -1078,8 +1038,6 @@ Notes:
 	Checks a players position in the race and displays the
 	corresponding next checkpoint or calls Race_Finish.
 -*----------------------------------------------------------------------------*/
-
-//#define Race_OnPlayerEnterRaceCheckpoint Race_OnPlayerEnterRaceCP
 
 hook OnPlayerEnterRaceCheckpoint(playerid)
 {
@@ -1108,7 +1066,6 @@ _Y_RACES_STATIC Race_DoEnterRaceCP(playerid)
 			if (lap == laps)
 			{
 				Race_Finish(playerid);
-				//++YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP];
 				return 1;
 			}
 			else
@@ -1124,25 +1081,17 @@ _Y_RACES_STATIC Race_DoEnterRaceCP(playerid)
 						check += start;
 						SetPlayerRaceCheckpoint(playerid, type ? 3 : 0, YSI_g_sRaceCheckpoints[check][0], YSI_g_sRaceCheckpoints[check][1], YSI_g_sRaceCheckpoints[check][2], YSI_g_sRaceCheckpoints[start][0], YSI_g_sRaceCheckpoints[start][1], YSI_g_sRaceCheckpoints[start][2], 5.0);
 					}
-					//check = start;
 					YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP] = 0;
 					++YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP];
 					return 1;
-					//++lap;
 				}
 				else
 				{
 					check += start;
 					SetPlayerRaceCheckpoint(playerid, type ? 3 : 0, YSI_g_sRaceCheckpoints[check][0], YSI_g_sRaceCheckpoints[check][1], YSI_g_sRaceCheckpoints[check][2], YSI_g_sRaceCheckpoints[check + 1][0], YSI_g_sRaceCheckpoints[check + 1][1], YSI_g_sRaceCheckpoints[check + 1][2], 5.0);
-					//++check;
 					++YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP];
 					return 1;
 				}
-				//if (++check == checks)
-				//{
-				//	++lap;
-				//	check = 0;
-				//}
 			}
 		}
 		else
@@ -1164,9 +1113,7 @@ _Y_RACES_STATIC Race_DoEnterRaceCP(playerid)
 					SetPlayerRaceCheckpoint(playerid, type ? 3 : 0, YSI_g_sRaceCheckpoints[check][0], YSI_g_sRaceCheckpoints[check][1], YSI_g_sRaceCheckpoints[check][2], YSI_g_sRaceCheckpoints[check + 1][0], YSI_g_sRaceCheckpoints[check + 1][1], YSI_g_sRaceCheckpoints[check + 1][2], 5.0);
 				}
 			}
-			//++check;
 			++YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP];
-			//YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP] = lap;
 			return 1;
 		}
 	}
@@ -1278,8 +1225,6 @@ task Race_Loop[500 / MAX_RACES]()
 	race = (race + 1) % MAX_RACES;
 	static
 		racePos[MAX_PLAYERS][E_RACE_POS];
-	//foreach (new playerid : Player)
-	//for (new race = 0; race != MAX_RACES; ++race) if (Race__IsActive(race))
 	if (Race__IsActive(race))
 	{
 		new
@@ -1287,9 +1232,7 @@ task Race_Loop[500 / MAX_RACES]()
 			lap,
 			cp,
 			Float:togo,
-			pos;//,
-			//opl, // Other player lap,
-			//opc; // Other player CP;
+			pos;
 		foreach (new playerid : YSI_g_sRacePeople[race])
 		{
 			lap = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP],
@@ -1305,77 +1248,24 @@ task Race_Loop[500 / MAX_RACES]()
 			z -= YSI_g_sRaceCheckpoints[cp][2];
 			togo = ((x * x) + (y * y) + (z * z)),
 			pos = 1;
-			//racePos[playerid][E_RACE_POS_RACE] = race; // | RACE_POS_DONE;
-			//racePos[playerid][E_RACE_POS_LAP] = lap;
 			racePos[playerid][E_RACE_POS_CP] = cp;
 			racePos[playerid][E_RACE_POS_TOGO] = togo;
-			//foreach (new i : YSI_g_sRacePeople[race])
 			for (new i = Iter_Begin(YSI_g_sRacePeople[race]); (i = Iter_Next(YSI_g_sRacePeople[race], i)) != playerid; )
 			{
-				//opl = YSI_g_sPlayerRace[i][E_RACE_PLAYER_LAP];
-				//opc = racePos[i][E_RACE_POS_CP];
 				// This checks "checkpoint + start", but both players have that
 				// offset so it is fine.
 				if (YSI_g_sPlayerRace[i][E_RACE_PLAYER_LAP] > lap ||
 				   (YSI_g_sPlayerRace[i][E_RACE_PLAYER_LAP] == lap &&
 				       (racePos[i][E_RACE_POS_CP] > cp ||
 				       (racePos[i][E_RACE_POS_CP] == cp && racePos[i][E_RACE_POS_TOGO] < togo)))) ++pos;
-				//if (racePos[i][E_RACE_POS_LAP] > lap ||
-				//       (racePos[i][E_RACE_POS_LAP] == lap &&
-				//         (racePos[i][E_RACE_POS_CP] > cp ||
-				//            racePos[i][E_RACE_POS_TOGO] < togo))) ++pos;
 				// This player is on a higher lap, or on a higher checkpoint,
 				// or less distance from their next checkpoint.
-				else ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION]; //racePos[i][E_RACE_POS_POS];
+				else ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION];
 			}
-			//racePos[playerid][E_RACE_POS_POS] = pos;
-			YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_POSITION] = pos; //racePos[playerid][E_RACE_POS_POS];
+			YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_POSITION] = pos;
 		}
-		//foreach (new playerid : YSI_g_sRacePeople[race])
-		//{
-		//}
 	}
 }
-//if (opl > lap || (opl == lap && (opc > cp || (opc == cp && racePos[i][E_RACE_POS_TOGO] < togo)))) ++pos;
-// switch (floatcmp(YSI_g_sPlayerRace[i][E_RACE_PLAYER_LAP], lap))
-// {
-	// case  1: ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION];
-	// case -1: ++pos; // This player better.
-	// default:
-	// {
-		// switch (floatcmp(racePos[i][E_RACE_POS_CP], cp))
-		// {
-			// case  1: ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION];
-			// case -1: ++pos;
-			// default:
-			// {
-				// // Backwards as bigger is now worse.
-				// switch (floatcmp(togo, racePos[i][E_RACE_POS_TOGO]))
-				// {
-					// case  1: ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION];
-					// case -1: ++pos;
-					// // Default do nothing (leave them in the same position).
-				// }
-			// }
-		// }
-	// }
-// }
-// switch (floatcmp(YSI_g_sPlayerRace[i][E_RACE_PLAYER_LAP], lap) * 3 + floatcmp(racePos[i][E_RACE_POS_CP], cp))
-// {
-	// //case  4: // Other player lap higher, CP higher.
-	// //case  3: // Other player lap higher, CP the same.
-	// //case  2: // Other player lap higher, CP lower.
-	// //case  1: // Laps the same, other player CP higher.
-	// //case  0: // Everything the same.
-	// //case -1: // Laps the same, this player CP higher.
-	// //case -2: // This player lap higher, CP lower.
-	// //case -3: // This player lap higher, CP the same.
-	// //case -4: // This player lap higher, CP higher.
-	// case 4, 3, 2, 1: ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION]; // Other player better.
-	// case 0: if (racePos[i][E_RACE_POS_TOGO] < togo) ++pos; else ++YSI_g_sPlayerRace[i][E_RACE_PLAYER_POSITION];
-	// default: ++pos; // This player better.
-	// //case -1, -2, -3, -4: // This player better.
-// }
 
 /*----------------------------------------------------------------------------*-
 Function:
