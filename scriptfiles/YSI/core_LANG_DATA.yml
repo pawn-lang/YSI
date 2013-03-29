@@ -57,8 +57,8 @@
     <entry colour="X11_RED" style="client" name="YSI_TEXT_NOT_FOUND" />
   </group>
   <group name="ysi_race">
-    <entry colour="X11_RED" style="client" name="YSI_RACE_GO" />
-    <entry colour="X11_RED" style="client" name="YSI_RACE_COUNTDOWN" />
+    <entry colour="X11_RED" style="6" time="3000" name="YSI_RACE_GO" />
+    <entry colour="X11_RED" style="6" time="2000" name="YSI_RACE_COUNTDOWN" />
   </group>
   <group name="ysi_properties">
     <entry colour="X11_RED" style="client" name="YSI_LIST_NONE" />
