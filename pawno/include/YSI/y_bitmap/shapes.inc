@@ -65,6 +65,17 @@ Variables:
 		-
 \**--------------------------------------------------------------------------**/
 
-stock Bitmap_DrawRectangle(Bitmap:ctx, minX, minY, maxX, maxY, lineColour, fillColour = 0, linePattern = PATTERN_SOLID, fillPattern = PATTERN_SOLID)
+#endinput
+
+// End the input above because all this code is being written with no testing
+// or compiling until I am home again.  So in the interests of leaving the code
+// stable, this is all ignored.
+stock Bitmap_DrawRectangle(Bitmap:ctx, minX, minY, maxX, maxY, fillColour, lineColour = 0, linePattern = PATTERN_SOLID, fillPattern = PATTERN_SOLID)
 {
+	// Basic version (uses the existing pixel code).
+	// The patterns code doesn't exist yet.
+	if (fillPattern != PATTERN_SOLID)
+	{
+		P:W("fillPattern is currently ignored in Bitmap_DrawRectangle.");
+	}
 }
