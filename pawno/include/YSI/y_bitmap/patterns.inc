@@ -65,20 +65,39 @@ Variables:
 		-
 \**--------------------------------------------------------------------------**/
 
-#define _PATTERN_FLAGS     (0xFF000000)
-#define _PATTERN_FADE_EDGE (0x80000000)
+#define _PATTERN_FLAGS     (0x01010000)
+#define _PATTERN_FADE_EDGE (0x01000000)
+
+#define _PATTERN_WIDTH     (0xFE000000)
+#define _PATTERN_PADDING   (0x00FE0000)
+
+#define _PATTERN_MASK      (0x0000FFFF)
 
 // Pre-defined patterns.
+// ---------
 #define PATTERN_SOLID    (0b1)
-// ........
-#define PATTERN_DOTTED   (0b10)
-// -----
-#define PATTERN_DASHED   (0b110)
-// .-.-.-.-.-
-#define PATTERN_DOT_DASH (0b10110)
 // - - - - -
+#define PATTERN_DOTTED   (0b10)
+// -- -- -- 
+#define PATTERN_DASHED   (0b110)
+// - -- - --
+#define PATTERN_DOT_DASH (0b10110)
+// --  --  --
 #define PATTERN_WIDE_DASH (0b1100)
-// ..-..-..-
+// - - -- - - --
 #define PATTERN_DOT_DOT_DASH (0b1010110)
-// .-..-...-..-
+// - -- --- --
 #define PATTERN_O_A_O_O_A_O_O_O_A_O_O_A (0b101101110110)
+
+#endinput
+
+#define PATTERN(%0) (_:_MK_PAT(0,%0@)&0xFFFF)
+#define _MK_PAT(%1,%0) _yPd:_yPD:_yPS:(%1,%0)
+// Dot.
+#define _yPd:%9(%1,.%0) _MK_PAT((%1)*2|1,%0)
+// Space.
+#define _yPD:%9(%1,-%0) _MK_PAT((%1)*2,%0)
+#define _yPS:%9(%1,)   (%1)
+//#define _yPN:%9(%1,_%0)  _MK_PAT((%1)*2%0)
+
+
