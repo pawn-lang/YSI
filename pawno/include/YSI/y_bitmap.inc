@@ -63,8 +63,10 @@ Variables:
 		-
 \**--------------------------------------------------------------------------**/
 
-#include "y_malloc"
+#include "internal\y_version"
+#include "y_bit"
 #include "y_utils"
+#include "y_malloc"
 // Because having colours is always good...
 #include "y_colours"
 

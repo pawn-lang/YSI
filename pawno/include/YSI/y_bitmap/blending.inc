@@ -66,7 +66,7 @@ Variables:
 		-
 \**--------------------------------------------------------------------------**/
 
-stock Bitmap_WritePixel(Bitmap:ctx, x, y, colour)
+stock Bitmap_WritePixel(Bitmap:ctx, const x, const y, const colour)
 {
 	new
 		a = colour & 0xFF;
@@ -94,7 +94,7 @@ stock Bitmap_WritePixel(Bitmap:ctx, x, y, colour)
 				0xFF;
 			Bitmap_WriteCtx(ctx, x, y, colour);*/
 			// Blend them.
-			new
+			/*new
 				oc = Bitmap_ReadCtx(ctx, x, y),
 				sr = (colour >>> 24) * a,
 				sg = (colour >>> 16 & 0xFF) * a,
@@ -104,7 +104,21 @@ stock Bitmap_WritePixel(Bitmap:ctx, x, y, colour)
 				| (((sr + ((oc >>> 24) * a)) / 256) << 24)
 				| (((sg + ((oc >>> 16 & 0xFF) * a)) / 256) << 16 & 0x00FF0000)
 				| (((sb + ((oc >>>  8 & 0xFF) * a)) / 256) <<  8 & 0x0000FF00);
-			Bitmap_WriteCtx(ctx, x, y, colour);
+			Bitmap_WriteCtx(ctx, x, y, colour);*/
+			new
+				// 256 - alpha.
+				//n = 256 - a,
+				// Colour components.
+				r = ((colour & 0xFF000000) >>> 8) * a,
+				g = ((colour & 0x00FF0000) >>> 8) * a,
+				b = ((colour & 0x0000FF00) >>> 8) * a,
+				oc = Bitmap_ReadCtx(ctx, x, y);
+			a = 256 - a;
+			oc =
+				((((oc & 0xFF000000) >>> 8) * a + r) & 0xFF000000) |
+				((((oc & 0x00FF0000) >>> 8) * a + g) & 0x00FF0000) |
+				((((oc & 0x0000FF00) >>> 8) * a + b) & 0x0000FF00) ;
+			Bitmap_WriteCtx(ctx, x, y, oc);
 		}
 	}
 }

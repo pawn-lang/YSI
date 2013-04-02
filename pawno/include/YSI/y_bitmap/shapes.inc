@@ -65,17 +65,86 @@ Variables:
 		-
 \**--------------------------------------------------------------------------**/
 
-#endinput
-
 // End the input above because all this code is being written with no testing
 // or compiling until I am home again.  So in the interests of leaving the code
 // stable, this is all ignored.
-stock Bitmap_DrawRectangle(Bitmap:ctx, minX, minY, maxX, maxY, fillColour, lineColour = 0, linePattern = PATTERN_SOLID, fillPattern = PATTERN_SOLID)
+stock Bitmap_DrawRectangle(Bitmap:ctx, const minX, const minY, const maxX, const maxY, fillColour, lineColour = 0, linePattern[] = "SOLID", fillPattern[] = "SOLID")
+{
+	if (fillColour)
+	{
+		_Bitmap_DoRectangle(ctx, minX, minY, maxX, maxY, fillColour, fillPattern);
+	}
+	if (lineColour)
+	{
+		// Do the borders.
+		if (strcmp(linePattern, "DOTTED", true, 6))
+		{
+			new
+				border = _Bitmap_Param(linePattern, "border");
+			if (border == cellmin) border = 8;
+			//printf("1");
+			_Bitmap_DoRectangle(ctx, minX - border, minY - border, maxX + border, minY, lineColour, linePattern);
+			//printf("1");
+			_Bitmap_DoRectangle(ctx, minX - border, minY, minX, maxY, lineColour, linePattern);
+			//printf("1");
+			_Bitmap_DoRectangle(ctx, minX - border, maxY, maxX + border, maxY + border, lineColour, linePattern);
+			//printf("1");
+			_Bitmap_DoRectangle(ctx, maxX, minY, maxX + border, maxY, lineColour, linePattern);
+			//printf("1");
+		}
+		else
+		{
+			new
+				border = _Bitmap_Param(linePattern, "border"),
+				pat[128] = "STRIPED";
+			strcat(pat, linePattern[6]);
+			if (border == cellmin) border = 8;
+			_Bitmap_DoRectangle(ctx, minX - border, minY - border, maxX + border, minY, lineColour, pat);
+			_Bitmap_DoRectangle(ctx, minX - border, maxY, maxX + border, maxY + border, lineColour, pat);
+			strcat(pat, ",HORIZONTAL");
+			_Bitmap_DoRectangle(ctx, minX - border, minY, minX, maxY, lineColour, pat);
+			_Bitmap_DoRectangle(ctx, maxX, minY, maxX + border, maxY, lineColour, pat);
+		}
+	}
+}
+
+static stock _Bitmap_DoRectangle(Bitmap:ctx, const minX, const minY, const maxX, const maxY, colour, pattern[])
 {
 	// Basic version (uses the existing pixel code).
 	// The patterns code doesn't exist yet.
-	if (fillPattern != PATTERN_SOLID)
+	new
+		xx = maxX - minX,
+		yy = maxY - minY;
+	if (xx > PATTERN_MASK_X || yy > PATTERN_MASK_Y)
 	{
-		P:W("fillPattern is currently ignored in Bitmap_DrawRectangle.");
+		P:E("Large rectangles are currently not supported in Bitmap_DrawRectangle.");
+		return;
+	}
+	// Reset the bit pattern array.
+	_Bitmap_ResetPattern();
+	// Set all the bits in the map.
+	new
+		ss,
+		bm = Bit_Slot(xx);
+	while (ss != bm)
+	{
+		YSI_gBitmapAlpha[0][ss++] = Bit:-1;
+	}
+	bm = _:Bit_Mask(xx);
+	while ((bm >>>= 1))
+	{
+		YSI_gBitmapAlpha[0][ss] |= Bit:bm;
+	}
+	// Now copy for the other parts of the rectangle (easy and fast).
+	_Bitmap_RectangleRecopy(yy, YSI_gBitmapAlpha[0]);
+	_Bitmap_DrawPattern(pattern, ctx, minX, minY, colour, 0, 0, 0);
+	//_Bitmap_DrawPattern@SOLID(ctx, minX, minY, fillColour, 0, 0, 0, 0);
+}
+
+static stock _Bitmap_RectangleRecopy(n, BitArray:pattern<PATTERN_MASK_X>)
+{
+	for (new y = 1; y != n; ++y)
+	{
+		YSI_gBitmapAlpha[y] = pattern;
 	}
 }

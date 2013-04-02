@@ -65,7 +65,7 @@ Variables:
 		-
 \**--------------------------------------------------------------------------**/
 
-#define _PATTERN_FLAGS     (0x01010000)
+/*#define _PATTERN_FLAGS     (0x01010000)
 #define _PATTERN_FADE_EDGE (0x01000000)
 
 #define _PATTERN_WIDTH     (0xFE000000)
@@ -87,17 +87,448 @@ Variables:
 // - - -- - - --
 #define PATTERN_DOT_DOT_DASH (0b1010110)
 // - -- --- --
-#define PATTERN_O_A_O_O_A_O_O_O_A_O_O_A (0b101101110110)
+#define PATTERN_O_A_O_O_A_O_O_O_A_O_O_A (0b101101110110)*/
 
-#endinput
+/*stock const
+	PATTERN_SOLID = "PATTERN_SOLID",
+	PATTERN_DOTTED = "PATTERN_DOTTED",
+	PATTERN_SOLID = "PATTERN_SOLID";*/
 
-#define PATTERN(%0) (_:_MK_PAT(0,%0@)&0xFFFF)
+/*#define PATTERN(%0) (_:_MK_PAT(0,%0@)&0xFFFF)
 #define _MK_PAT(%1,%0) _yPd:_yPD:_yPS:(%1,%0)
 // Dot.
 #define _yPd:%9(%1,.%0) _MK_PAT((%1)*2|1,%0)
 // Space.
 #define _yPD:%9(%1,-%0) _MK_PAT((%1)*2,%0)
 #define _yPS:%9(%1,)   (%1)
-//#define _yPN:%9(%1,_%0)  _MK_PAT((%1)*2%0)
+//#define _yPN:%9(%1,_%0)  _MK_PAT((%1)*2%0)*/
 
+#define PATTERN_MASK_X (256)
+#define PATTERN_MASK_Y (256)
 
+stock
+	// 8Kb
+	BitArray:YSI_gBitmapAlpha[PATTERN_MASK_Y]<PATTERN_MASK_X>;
+
+stock const
+	BitArray:YSI_gBitmapBlank[PATTERN_MASK_Y]<PATTERN_MASK_X>;// = {Bit:0, ...};
+
+//stock Bitmap_ResetPattern()
+//{
+//	YSI_gBitmapAlpha = YSI_gBitmapBlank;
+//}
+
+#define _Bitmap_ResetPattern() (YSI_gBitmapAlpha=YSI_gBitmapBlank)
+
+#define PATTERN(%0) (_:_PATTERN:(#%0))
+#define _PATTERN:(%0,%1) _PATTERN:(%0"\x2c;"#%1)
+
+stock _Bitmap_DrawPattern(const pattern[], Bitmap:ctx, const posX, const posY, const colour0, const colour1, const offsetX, const offsetY)
+{
+	static
+		func[32] = "_BMP_PAT@";
+	new
+		pos = strfind(pattern, ",");
+	func[9] = '\0';
+	strcat(func, pattern);
+	if (pos == -1)
+	{
+		if (funcidx(func) == -1) func = "_BMP_PAT@SOLID";
+		CallLocalFunction(func, "iiiiiiis", _:ctx, posX, posY, colour0, colour1, offsetX, offsetY, NULL);
+	}
+	else
+	{
+		func[pos + 9] = '\0';
+		if (funcidx(func) == -1) func = "_BMP_PAT@SOLID";
+		CallLocalFunction(func, "iiiiiiis", _:ctx, posX, posY, colour0, colour1, offsetX, offsetY, pattern[pos]);
+	}
+}
+
+stock _Bitmap_Param(const str[], const find[])
+{
+	new
+		pos = strfind(str, find, true),
+		len = strlen(str),
+		ch;
+	if (0 < pos)
+	{
+		ch = str[pos - 1];
+		if (ch == ' ' || ch == ',')
+		{
+			new
+				p = pos;
+			while (p != len)
+			{
+				ch = str[p];
+				if (ch == '=')
+				{
+					return strval(str[++p]);
+				}
+				else if (ch == ',')
+				{
+					// There, but no value.
+					return 0;
+				}
+				++p;
+			}
+			return 0;
+		}
+	}
+	return cellmin;
+}
+
+forward _BMP_PAT@SOLID(Bitmap:ctx, const posX, const posY, const colour0, const colour1, const offsetX, const offsetY, const flags[]);
+
+public _BMP_PAT@SOLID(Bitmap:ctx, const posX, const posY, const colour0, const colour1, const offsetX, const offsetY, const flags[])
+{
+	#pragma unused colour1
+	// "offsetX" and "offsetY" are used when the main mask doesn't cover the
+	// whole pattern.
+	new
+		width = Bitmap_Width(ctx),
+		bmpX = min(posX + offsetX + PATTERN_MASK_X, width),
+		bmpY = min(posY + offsetY + PATTERN_MASK_Y, Bitmap_Height(ctx));
+	P:5("_Bitmap_DrawPattern@SOLID: %d, %d = %d; %d, %d = %d", posX + offsetX + PATTERN_MASK_X, width, bmpX, posY + offsetY + PATTERN_MASK_Y, Bitmap_Height(ctx), bmpY);
+	// Calculate the colour information.
+	new
+		// Alpha.
+		a = colour0 & 0xFF;
+	switch (a)
+	{
+		case 0x00: return; // Stupid!
+		case 0xFF:
+		{
+			for (new y = posY + offsetY, sx = posX + offsetX, yr = 0; y != bmpY; ++y, ++yr)
+			{
+				new
+					read = Bitmap_IndexInt(ctx, sx, width, y);
+				for (new x = sx, slot = 0, mask = 1; x != bmpX; ++x)
+				{
+					if (YSI_gBitmapAlpha[yr][slot] & Bit:mask)
+					{
+						YSI_gMallocMemory[read] = colour0;
+					}
+					if (!(mask <<= 1))
+					{
+						mask = 1;
+						++slot;
+					}
+					++read;
+				}
+			}
+		}
+		default  :
+		{
+			new
+				// 256 - alpha.
+				//n = 256 - a,
+				// Colour components.
+				r = ((colour0 & 0xFF000000) >>> 8) * a,
+				g = ((colour0 & 0x00FF0000) >>> 8) * a,
+				b = ((colour0 & 0x0000FF00) >>> 8) * a,
+				orig;
+			a = 256 - a;
+			for (new y = posY + offsetY, sx = posX + offsetX, yr = 0; y != bmpY; ++y, ++yr)
+			{
+				new
+					read = Bitmap_IndexInt(ctx, sx, width, y);
+				for (new x = sx, slot = 0, mask = 1; x != bmpX; ++x)
+				{
+					if (YSI_gBitmapAlpha[yr][slot] & Bit:mask)
+					{
+						// Want this pixel in the final image.
+						orig = YSI_gMallocMemory[read];
+						YSI_gMallocMemory[read] =
+							((((orig & 0xFF000000) >>> 8) * a + r) & 0xFF000000) |
+							((((orig & 0x00FF0000) >>> 8) * a + g) & 0x00FF0000) |
+							((((orig & 0x0000FF00) >>> 8) * a + b) & 0x0000FF00) ;
+					}
+					if (!(mask <<= 1))
+					{
+						mask = 1;
+						++slot;
+					}
+					++read;
+				}
+			}
+		}
+	}
+}
+
+forward _BMP_PAT@DIAGONAL(Bitmap:ctx, const posX, const posY, const colour0, const colour1, const offsetX, const offsetY, const flags[]);
+
+public _BMP_PAT@DIAGONAL(Bitmap:ctx, const posX, const posY, const colour0, const colour1, const offsetX, const offsetY, const flags[])
+{
+	#pragma unused colour1
+	// "offsetX" and "offsetY" are used when the main mask doesn't cover the
+	// whole pattern.
+	new
+		width = Bitmap_Width(ctx),
+		bmpX = min(posX + offsetX + PATTERN_MASK_X, width),
+		bmpY = min(posY + offsetY + PATTERN_MASK_Y, Bitmap_Height(ctx));
+	P:5("_Bitmap_DrawPattern@DIAGONAL: %d, %d = %d; %d, %d = %d", posX + offsetX + PATTERN_MASK_X, width, bmpX, posY + offsetY + PATTERN_MASK_Y, Bitmap_Height(ctx), bmpY);
+	// Calculate the colour information.
+	new
+		// Alpha.
+		stripe1 = _Bitmap_Param(flags, "stripe1"),
+		stripe2 = _Bitmap_Param(flags, "stripe2"),
+		left = _Bitmap_Param(flags, "right"),
+		a = colour0 & 0xFF;
+	if (stripe1 == cellmin) stripe1 = 8;
+	if (stripe2 == cellmin) stripe2 = stripe1;
+	new
+		stripes = stripe1 + stripe2;
+	switch (a)
+	{
+		case 0x00: return; // Stupid!
+		case 0xFF:
+		{
+			if (left)
+			{
+				for (new y = posY + offsetY, sx = posX + offsetX, yr = 0; y != bmpY; ++y, ++yr)
+				{
+					new
+						read = Bitmap_IndexInt(ctx, sx, width, y);
+					for (new x = sx, slot = 0, mask = 1; x != bmpX; ++x)
+					{
+						if (YSI_gBitmapAlpha[yr][slot] & Bit:mask && (x - y) % stripes < stripe1)
+						{
+							YSI_gMallocMemory[read] = colour0;
+						}
+						if (!(mask <<= 1))
+						{
+							mask = 1;
+							++slot;
+						}
+						++read;
+					}
+				}
+			}
+			else
+			{
+				for (new y = posY + offsetY, sx = posX + offsetX, yr = 0; y != bmpY; ++y, ++yr)
+				{
+					new
+						wy = width - y,
+						read = Bitmap_IndexInt(ctx, sx, width, y);
+					for (new x = sx, slot = 0, mask = 1; x != bmpX; ++x)
+					{
+						if (YSI_gBitmapAlpha[yr][slot] & Bit:mask && (wy - x) % stripes < stripe1)
+						{
+							YSI_gMallocMemory[read] = colour0;
+						}
+						if (!(mask <<= 1))
+						{
+							mask = 1;
+							++slot;
+						}
+						++read;
+					}
+				}
+			}
+		}
+		default  :
+		{
+			new
+				// 256 - alpha.
+				//n = 256 - a,
+				// Colour components.
+				r = ((colour0 & 0xFF000000) >>> 8) * a,
+				g = ((colour0 & 0x00FF0000) >>> 8) * a,
+				b = ((colour0 & 0x0000FF00) >>> 8) * a,
+				orig;
+			a = 256 - a;
+			if (left)
+			{
+				for (new y = posY + offsetY, sx = posX + offsetX, yr = 0; y != bmpY; ++y, ++yr)
+				{
+					new
+						read = Bitmap_IndexInt(ctx, sx, width, y);
+					for (new x = sx, slot = 0, mask = 1; x != bmpX; ++x)
+					{
+						if (YSI_gBitmapAlpha[yr][slot] & Bit:mask && (x - y) % stripes < stripe1)
+						{
+							// Want this pixel in the final image.
+							orig = YSI_gMallocMemory[read];
+							YSI_gMallocMemory[read] =
+								((((orig & 0xFF000000) >>> 8) * a + r) & 0xFF000000) |
+								((((orig & 0x00FF0000) >>> 8) * a + g) & 0x00FF0000) |
+								((((orig & 0x0000FF00) >>> 8) * a + b) & 0x0000FF00) ;
+						}
+						if (!(mask <<= 1))
+						{
+							mask = 1;
+							++slot;
+						}
+						++read;
+					}
+				}
+			}
+			else
+			{
+				for (new y = posY + offsetY, sx = posX + offsetX, yr = 0; y != bmpY; ++y, ++yr)
+				{
+					new
+						wy = width - y,
+						read = Bitmap_IndexInt(ctx, sx, width, y);
+					for (new x = sx, slot = 0, mask = 1; x != bmpX; ++x)
+					{
+						if (YSI_gBitmapAlpha[yr][slot] & Bit:mask && (wy - x) % stripes < stripe1)
+						{
+							// Want this pixel in the final image.
+							orig = YSI_gMallocMemory[read];
+							YSI_gMallocMemory[read] =
+								((((orig & 0xFF000000) >>> 8) * a + r) & 0xFF000000) |
+								((((orig & 0x00FF0000) >>> 8) * a + g) & 0x00FF0000) |
+								((((orig & 0x0000FF00) >>> 8) * a + b) & 0x0000FF00) ;
+						}
+						if (!(mask <<= 1))
+						{
+							mask = 1;
+							++slot;
+						}
+						++read;
+					}
+				}
+			}
+		}
+	}
+}
+
+forward _BMP_PAT@STRIPED(Bitmap:ctx, const posX, const posY, const colour0, const colour1, const offsetX, const offsetY, const flags[]);
+
+public _BMP_PAT@STRIPED(Bitmap:ctx, const posX, const posY, const colour0, const colour1, const offsetX, const offsetY, const flags[])
+{
+	#pragma unused colour1
+	// "offsetX" and "offsetY" are used when the main mask doesn't cover the
+	// whole pattern.
+	new
+		width = Bitmap_Width(ctx),
+		bmpX = min(posX + offsetX + PATTERN_MASK_X, width),
+		bmpY = min(posY + offsetY + PATTERN_MASK_Y, Bitmap_Height(ctx));
+	P:5("_Bitmap_DrawPattern@STRIPED: %d, %d = %d; %d, %d = %d", posX + offsetX + PATTERN_MASK_X, width, bmpX, posY + offsetY + PATTERN_MASK_Y, Bitmap_Height(ctx), bmpY);
+	// Calculate the colour information.
+	new
+		// Alpha.
+		stripe1 = _Bitmap_Param(flags, "stripe1"),
+		stripe2 = _Bitmap_Param(flags, "stripe2"),
+		vert = _Bitmap_Param(flags, "horizontal"),
+		a = colour0 & 0xFF;
+	if (stripe1 == cellmin) stripe1 = 8;
+	if (stripe2 == cellmin) stripe2 = stripe1;
+	new
+		stripes = stripe1 + stripe2;
+	switch (a)
+	{
+		case 0x00: return; // Stupid!
+		case 0xFF:
+		{
+			if (vert)
+			{
+				for (new y = posY + offsetY, sx = posX + offsetX, yr = 0; y != bmpY; ++y, ++yr)
+				{
+					new
+						read = Bitmap_IndexInt(ctx, sx, width, y);
+					for (new x = sx, slot = 0, mask = 1; x != bmpX; ++x)
+					{
+						if (YSI_gBitmapAlpha[yr][slot] & Bit:mask && x % stripes < stripe1)
+						{
+							YSI_gMallocMemory[read] = colour0;
+						}
+						if (!(mask <<= 1))
+						{
+							mask = 1;
+							++slot;
+						}
+						++read;
+					}
+				}
+			}
+			else
+			{
+				for (new y = posY + offsetY, sx = posX + offsetX, yr = 0; y != bmpY; ++y, ++yr)
+				{
+					new
+						read = Bitmap_IndexInt(ctx, sx, width, y);
+					for (new x = sx, slot = 0, mask = 1; x != bmpX; ++x)
+					{
+						if (YSI_gBitmapAlpha[yr][slot] & Bit:mask && y % stripes < stripe1)
+						{
+							YSI_gMallocMemory[read] = colour0;
+						}
+						if (!(mask <<= 1))
+						{
+							mask = 1;
+							++slot;
+						}
+						++read;
+					}
+				}
+			}
+		}
+		default  :
+		{
+			new
+				// 256 - alpha.
+				//n = 256 - a,
+				// Colour components.
+				r = ((colour0 & 0xFF000000) >>> 8) * a,
+				g = ((colour0 & 0x00FF0000) >>> 8) * a,
+				b = ((colour0 & 0x0000FF00) >>> 8) * a,
+				orig;
+			a = 256 - a;
+			if (vert)
+			{
+				for (new y = posY + offsetY, sx = posX + offsetX, yr = 0; y != bmpY; ++y, ++yr)
+				{
+					new
+						read = Bitmap_IndexInt(ctx, sx, width, y);
+					for (new x = sx, slot = 0, mask = 1; x != bmpX; ++x)
+					{
+						if (YSI_gBitmapAlpha[yr][slot] & Bit:mask && x % stripes < stripe1)
+						{
+							// Want this pixel in the final image.
+							orig = YSI_gMallocMemory[read];
+							YSI_gMallocMemory[read] =
+								((((orig & 0xFF000000) >>> 8) * a + r) & 0xFF000000) |
+								((((orig & 0x00FF0000) >>> 8) * a + g) & 0x00FF0000) |
+								((((orig & 0x0000FF00) >>> 8) * a + b) & 0x0000FF00) ;
+						}
+						if (!(mask <<= 1))
+						{
+							mask = 1;
+							++slot;
+						}
+						++read;
+					}
+				}
+			}
+			else
+			{
+				for (new y = posY + offsetY, sx = posX + offsetX, yr = 0; y != bmpY; ++y, ++yr)
+				{
+					new
+						read = Bitmap_IndexInt(ctx, sx, width, y);
+					for (new x = sx, slot = 0, mask = 1; x != bmpX; ++x)
+					{
+						if (YSI_gBitmapAlpha[yr][slot] & Bit:mask && y % stripes < stripe1)
+						{
+							// Want this pixel in the final image.
+							orig = YSI_gMallocMemory[read];
+							YSI_gMallocMemory[read] =
+								((((orig & 0xFF000000) >>> 8) * a + r) & 0xFF000000) |
+								((((orig & 0x00FF0000) >>> 8) * a + g) & 0x00FF0000) |
+								((((orig & 0x0000FF00) >>> 8) * a + b) & 0x0000FF00) ;
+						}
+						if (!(mask <<= 1))
+						{
+							mask = 1;
+							++slot;
+						}
+						++read;
+					}
+				}
+			}
+		}
+	}
+}
