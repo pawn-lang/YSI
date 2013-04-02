@@ -133,7 +133,7 @@ stock _Bitmap_MakePattern(const pattern[], const posX, const posY, const offsetX
 		func[32] = "_BMP_PAT@";
 	new
 		pos = strfind(pattern, ",");
-	func[9] = '\0';
+	func[9] = '\0',
 	strcat(func, pattern);
 	if (pos == -1)
 	{
@@ -186,8 +186,8 @@ forward _BMP_PAT@SOLID(const posX, const posY, const offsetX, const offsetY, con
 public _BMP_PAT@SOLID(const posX, const posY, const offsetX, const offsetY, const flags[])
 {
 	#pragma unused posX, posY, offsetX, offsetY, flags
-	YSI_gBitmapAlpha[0]{0} = 255;
-	YSI_gBitmapAlphaX = 1;
+	YSI_gBitmapAlpha[0]{0} = 255,
+	YSI_gBitmapAlphaX = 1,
 	YSI_gBitmapAlphaY = 1;
 }
 
@@ -206,36 +206,26 @@ public _BMP_PAT@DIAGONAL(const posX, const posY, const offsetX, const offsetY, c
 	// The stripes are the widths of the lines.  Calculate the width of the
 	// diagonal line horizontally.
 	new
-		Float:l1w = stripe1,
-		Float:l1x = floatsqroot(l1w * l1w / 2.0),
+		Float:l1x = stripe1;
+	l1x = floatsqroot(l1x * l1x / 2.0);
+	new
 		// The number of actual pixels across the first line.
-		//s1x = floatround(l1x * 2.0),
 		Float:l2w = stripe2,
-		//Float:l2x = floatsqroot(l2w * l2w / 2.0),
-		// The number of actual pixels across the second line.
-		//s2x = floatround(l2x * 2.0),
-		// The total width of the pattern.
-		//Float:lw = l1w + l2w,
-		Float:lx = l1x + floatsqroot(l2w * l2w / 2.0),
-		stripes = floatround(lx * 2.0);
+		stripes = floatround((l1x + floatsqroot(l2w * l2w / 2.0)) * 2.0);
 	// For 45 degrees there are only two types of partial pixels.
-	new
-		floor = floatround(l1x, floatround_floor),
-		Float:part = (l1x - floor),
-		px0 = floatround(part * part / 2.0 * 255.0);
-	//printf("part = %f", part);
-	part = 1.0 - part;
-	new
-		px1 = floatround((1.0 - part * part / 2.0) * 255.0);
-	//printf("px0 = %d, px1 = %d", px0, px1);
-	// px0 is now the minor alpha, px1 is the major alpha.
+	stripe2 = floatround(l1x, floatround_floor);
 	// Start pos.
-	//l1x = -l1x;
 	new
-		pw = floor / 2, // INTEGER division.
+		pw = stripe2 / 2, // INTEGER division.
 		mw = floatround(-l1x, floatround_floor),
 		mp = mw - 1,
 		pp = pw + 1;
+	// Get the alpha parts.
+	l2w = (l1x - stripe2),
+	stripe2 = floatround(l2w * l2w / 2.0 * 255.0),
+	l2w = 1.0 - l2w,
+	stripe1 = floatround((1.0 - l2w * l2w / 2.0) * 255.0);
+	// stripe2 is now the minor alpha, stripe1 is the major alpha.
 	for (new y = 0; y != stripes; ++y)
 	{
 		for (new x = 0; x != stripes; ++x)
@@ -245,9 +235,9 @@ public _BMP_PAT@DIAGONAL(const posX, const posY, const offsetX, const offsetY, c
 			if (mw < xp < pw)
 				YSI_gBitmapAlpha[y]{x} = 0xFF;
 			else if (xp == mw || xp == pw)
-				YSI_gBitmapAlpha[y]{x} = px1;
+				YSI_gBitmapAlpha[y]{x} = stripe1;
 			else if (xp == mp || xp == pp)
-				YSI_gBitmapAlpha[y]{x} = px0;
+				YSI_gBitmapAlpha[y]{x} = stripe2;
 			else
 				YSI_gBitmapAlpha[y]{x} = 0;
 		}
@@ -266,7 +256,7 @@ public _BMP_PAT@DIAGONAL(const posX, const posY, const offsetX, const offsetY, c
 			--pp;
 		}
 	}
-	YSI_gBitmapAlphaX = stripes;
+	YSI_gBitmapAlphaX = stripes,
 	YSI_gBitmapAlphaY = stripes;
 }
 
@@ -280,38 +270,37 @@ public _BMP_PAT@STRIPED(const posX, const posY, const offsetX, const offsetY, co
 		// Alpha.
 		stripe1 = _Bitmap_Param(flags, "stripe1"),
 		stripe2 = _Bitmap_Param(flags, "stripe2"),
-		vert = _Bitmap_Param(flags, "horizontal"),
-		stripes = stripe1 + stripe2;
-	if (vert)
+		stripes = _Bitmap_Param(flags, "horizontal");
+	if (stripe1 == cellmin) stripe1 = 8;
+	if (stripe2 == cellmin) stripe2 = stripe1;
+	if (stripes)
 	{
+		stripes = stripe1 + stripe2,
 		stripe2 = 0;
 		while (stripe2 != stripe1)
 		{
-			YSI_gBitmapAlpha[0]{stripe2} = 255;
-			++stripe2;
+			YSI_gBitmapAlpha[0]{stripe2++} = 255;
 		}
 		while (stripe2 != stripes)
 		{
-			YSI_gBitmapAlpha[0]{stripe2} = 0;
-			++stripe2;
+			YSI_gBitmapAlpha[0]{stripe2++} = 0;
 		}
-		YSI_gBitmapAlphaX = stripes;
+		YSI_gBitmapAlphaX = stripes,
 		YSI_gBitmapAlphaY = 1;
 	}
 	else
 	{
+		stripes = stripe1 + stripe2,
 		stripe2 = 0;
 		while (stripe2 != stripe1)
 		{
-			YSI_gBitmapAlpha[stripe2]{0} = 255;
-			++stripe2;
+			YSI_gBitmapAlpha[stripe2++]{0} = 255;
 		}
 		while (stripe2 != stripes)
 		{
-			YSI_gBitmapAlpha[stripe2]{0} = 0;
-			++stripe2;
+			YSI_gBitmapAlpha[stripe2++]{0} = 0;
 		}
-		YSI_gBitmapAlphaX = 1;
+		YSI_gBitmapAlphaX = 1,
 		YSI_gBitmapAlphaY = stripes;
 	}
 }

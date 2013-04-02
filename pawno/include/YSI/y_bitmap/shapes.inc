@@ -105,11 +105,11 @@ stock Bitmap_DrawRectangle(Bitmap:ctx, const minX, const minY, const maxX, const
 				border = _Bitmap_Param(linePattern, "border");
 			if (border == cellmin) border = 8;
 			//printf("1");
-			_Bitmap_DoRectangle(ctx, minX - border, minY - border, maxX + border, minY, lineColour, linePattern);
+			_Bitmap_DoRectangle(ctx, minX - border, minY - border, maxX + border, minY, lineColour, linePattern),
 			//printf("1");
-			_Bitmap_DoRectangle(ctx, minX - border, minY, minX, maxY, lineColour, linePattern);
+			_Bitmap_DoRectangle(ctx, minX - border, minY, minX, maxY, lineColour, linePattern),
 			//printf("1");
-			_Bitmap_DoRectangle(ctx, minX - border, maxY, maxX + border, maxY + border, lineColour, linePattern);
+			_Bitmap_DoRectangle(ctx, minX - border, maxY, maxX + border, maxY + border, lineColour, linePattern),
 			//printf("1");
 			_Bitmap_DoRectangle(ctx, maxX, minY, maxX + border, maxY, lineColour, linePattern);
 			//printf("1");
@@ -121,10 +121,10 @@ stock Bitmap_DrawRectangle(Bitmap:ctx, const minX, const minY, const maxX, const
 				pat[128] = "STRIPED";
 			strcat(pat, linePattern[6]);
 			if (border == cellmin) border = 8;
-			_Bitmap_DoRectangle(ctx, minX - border, minY - border, maxX + border, minY, lineColour, pat);
-			_Bitmap_DoRectangle(ctx, minX - border, maxY, maxX + border, maxY + border, lineColour, pat);
-			strcat(pat, ",HORIZONTAL");
-			_Bitmap_DoRectangle(ctx, minX - border, minY, minX, maxY, lineColour, pat);
+			_Bitmap_DoRectangle(ctx, minX - border, minY - border, maxX + border, minY, lineColour, pat),
+			_Bitmap_DoRectangle(ctx, minX - border, maxY, maxX + border, maxY + border, lineColour, pat),
+			strcat(pat, ",HORIZONTAL"),
+			_Bitmap_DoRectangle(ctx, minX - border, minY, minX, maxY, lineColour, pat),
 			_Bitmap_DoRectangle(ctx, maxX, minY, maxX + border, maxY, lineColour, pat);
 		}
 	}
@@ -134,10 +134,10 @@ static stock _Bitmap_DoRectangle(Bitmap:ctx, minX, minY, maxX, maxY, colour, pat
 {
 	new
 		width = Bitmap_Width(ctx);
-	minY = max(0, minY);
-	maxY = min(maxY, Bitmap_Height(ctx));
-	minX = max(0, minX);
-	maxX = min(maxX, width);
+	minY = max(0, minY),
+	maxY = min(maxY, Bitmap_Height(ctx)),
+	minX = max(0, minX),
+	maxX = min(maxX, width),
 	_Bitmap_MakePattern(pattern, minX, minY, 0, 0);
 	new
 		ya,
@@ -151,7 +151,7 @@ static stock _Bitmap_DoRectangle(Bitmap:ctx, minX, minY, maxX, maxY, colour, pat
 		orig;
 	for (new y = minY; y != maxY; ++y)
 	{
-		read = Bitmap_IndexInt(ctx, minX, width, y);
+		read = Bitmap_IndexInt(ctx, minX, width, y),
 		ya = y % YSI_gBitmapAlphaY;
 		for (new x = minX; x != maxX; ++x)
 		{
@@ -163,9 +163,9 @@ static stock _Bitmap_DoRectangle(Bitmap:ctx, minX, minY, maxX, maxY, colour, pat
 			else if (suba >= 256)
 			{
 				// This is where we compensate for the odd shifts.
-				na = 0xFF00 - suba;
+				na = 0xFF00 - suba,
 				// Want this pixel in the final image.
-				orig = YSI_gMallocMemory[read];
+				orig = YSI_gMallocMemory[read],
 				YSI_gMallocMemory[read] = 0xFF |
 					((((orig & 0xFF000000) >>> 16) * na + r * suba) & 0xFF000000) |
 					((((orig & 0x00FF0000) >>> 16) * na + g * suba) & 0x00FF0000) |
