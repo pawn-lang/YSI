@@ -76,35 +76,6 @@ stock Bitmap_WritePixel(Bitmap:ctx, const x, const y, const colour)
 		case 0xFF: Bitmap_WriteCtx(ctx, x, y, colour);
 		default:
 		{
-			/*// Blend them.
-			new
-				sr = (colour >>> 24) * a,
-				sg = (colour >>> 16 & 0xFF) * a,
-				sb = (colour >>>  8 & 0xFF) * a;
-			a = 256 - a;
-			new
-				oc = Bitmap_ReadCtx(ctx, x, y),
-				dr = (oc >>> 24) * a,
-				dg = (oc >>> 16 & 0xFF) * a,
-				db = (oc >>>  8 & 0xFF) * a;
-			colour =
-				(((sr + dr) / 256) << 24) |
-				(((sg + dg) / 256) << 16 & 0x00FF0000) |
-				(((sb + db) / 256) <<  8 & 0x0000FF00) |
-				0xFF;
-			Bitmap_WriteCtx(ctx, x, y, colour);*/
-			// Blend them.
-			/*new
-				oc = Bitmap_ReadCtx(ctx, x, y),
-				sr = (colour >>> 24) * a,
-				sg = (colour >>> 16 & 0xFF) * a,
-				sb = (colour >>>  8 & 0xFF) * a;
-			a = 256 - a;
-			colour = 0xFF
-				| (((sr + ((oc >>> 24) * a)) / 256) << 24)
-				| (((sg + ((oc >>> 16 & 0xFF) * a)) / 256) << 16 & 0x00FF0000)
-				| (((sb + ((oc >>>  8 & 0xFF) * a)) / 256) <<  8 & 0x0000FF00);
-			Bitmap_WriteCtx(ctx, x, y, colour);*/
 			new
 				// 256 - alpha.
 				//n = 256 - a,
@@ -122,3 +93,5 @@ stock Bitmap_WritePixel(Bitmap:ctx, const x, const y, const colour)
 		}
 	}
 }
+
+//stock _Bitmap_BlendAlpha

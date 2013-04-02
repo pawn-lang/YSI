@@ -81,6 +81,118 @@ Test:y_bitmap_FadeRect1()
 	Bitmap_Destroy(ctx);
 }
 
+Test:y_bitmap_Diagonal1()
+{
+	new
+		Bitmap:ctx;
+	ctx = Bitmap_Create(256, 256);
+	_BMP_PAT@DIAGONAL(0, 0, 0, 0, PATTERN(DIAGONAL, STRIPE1 = 4, STRIPE2 = 4));
+	for (new y = 0; y != 256; ++y)
+	{
+		for (new x = 0; x != 256; ++x)
+		{
+			//Bitmap_WritePixel(ctx, x, y, Y_GREEN | (YSI_gBitmapAlpha[y % YSI_gBitmapAlphaY]{x % YSI_gBitmapAlphaX}));
+			new
+				alpha = YSI_gBitmapAlpha[y % YSI_gBitmapAlphaY]{x % YSI_gBitmapAlphaX};
+			if (alpha == 255)
+				Bitmap_WritePixel(ctx, x, y, X11_RED);
+			else if (alpha == 0)
+				Bitmap_WritePixel(ctx, x, y, X11_WHITE);
+			else if (alpha > 127)
+				Bitmap_WritePixel(ctx, x, y, X11_GREEN);
+			else
+				Bitmap_WritePixel(ctx, x, y, X11_BLUE);
+		}
+	}
+	Bitmap_Write(ctx, "y_bitmap_Diagonal1.bmp");
+	Bitmap_Destroy(ctx);
+}
+
+Test:y_bitmap_Diagonal2()
+{
+	new
+		Bitmap:ctx;
+	ctx = Bitmap_Create(256, 256);
+	_BMP_PAT@DIAGONAL(0, 0, 0, 0, PATTERN(DIAGONAL, STRIPE1 = 2, STRIPE2 = 2));
+	for (new y = 0; y != 256; ++y)
+	{
+		for (new x = 0; x != 256; ++x)
+		{
+			Bitmap_WritePixel(ctx, x, y, Y_GREEN | (YSI_gBitmapAlpha[y % YSI_gBitmapAlphaY]{x % YSI_gBitmapAlphaX}));
+		}
+	}
+	Bitmap_Write(ctx, "y_bitmap_Diagonal2.bmp");
+	Bitmap_Destroy(ctx);
+}
+
+Test:y_bitmap_Diagonal3()
+{
+	new
+		Bitmap:ctx;
+	ctx = Bitmap_Create(256, 256);
+	_BMP_PAT@DIAGONAL(0, 0, 0, 0, PATTERN(DIAGONAL, STRIPE1 = 3, STRIPE2 = 3));
+	for (new y = 0; y != 256; ++y)
+	{
+		for (new x = 0; x != 256; ++x)
+		{
+			Bitmap_WritePixel(ctx, x, y, Y_GREEN | (YSI_gBitmapAlpha[y % YSI_gBitmapAlphaY]{x % YSI_gBitmapAlphaX}));
+		}
+	}
+	Bitmap_Write(ctx, "y_bitmap_Diagonal3.bmp");
+	Bitmap_Destroy(ctx);
+}
+
+Test:y_bitmap_Diagonal4()
+{
+	new
+		Bitmap:ctx;
+	ctx = Bitmap_Create(256, 256);
+	_BMP_PAT@DIAGONAL(0, 0, 0, 0, PATTERN(DIAGONAL, STRIPE1 = 2, STRIPE2 = 4));
+	for (new y = 0; y != 256; ++y)
+	{
+		for (new x = 0; x != 256; ++x)
+		{
+			Bitmap_WritePixel(ctx, x, y, Y_GREEN | (YSI_gBitmapAlpha[y % YSI_gBitmapAlphaY]{x % YSI_gBitmapAlphaX}));
+		}
+	}
+	Bitmap_Write(ctx, "y_bitmap_Diagonal4.bmp");
+	Bitmap_Destroy(ctx);
+}
+
+Test:y_bitmap_Diagonal5()
+{
+	new
+		Bitmap:ctx;
+	ctx = Bitmap_Create(256, 256);
+	_BMP_PAT@DIAGONAL(0, 0, 0, 0, PATTERN(DIAGONAL, STRIPE1 = 4, STRIPE2 = 2));
+	for (new y = 0; y != 256; ++y)
+	{
+		for (new x = 0; x != 256; ++x)
+		{
+			Bitmap_WritePixel(ctx, x, y, Y_GREEN | (YSI_gBitmapAlpha[y % YSI_gBitmapAlphaY]{x % YSI_gBitmapAlphaX}));
+		}
+	}
+	Bitmap_Write(ctx, "y_bitmap_Diagonal5.bmp");
+	Bitmap_Destroy(ctx);
+}
+
+Test:y_bitmap_Diagonal6()
+{
+	new
+		Bitmap:ctx;
+	ctx = Bitmap_Create(256, 256);
+	_BMP_PAT@DIAGONAL(0, 0, 0, 0, PATTERN(DIAGONAL));
+	for (new y = 0; y != 256; ++y)
+	{
+		for (new x = 0; x != 256; ++x)
+		{
+			Bitmap_WritePixel(ctx, x, y, Y_GREEN | (YSI_gBitmapAlpha[y % YSI_gBitmapAlphaY]{x % YSI_gBitmapAlphaX}));
+		}
+	}
+	Bitmap_Write(ctx, "y_bitmap_Diagonal6.bmp");
+	Bitmap_Destroy(ctx);
+}
+
 Test:y_bitmap_Pattern1()
 {
 	new

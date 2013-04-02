@@ -65,6 +65,28 @@ Variables:
 		-
 \**--------------------------------------------------------------------------**/
 
+/**--------------------------------------------------------------------------**\
+<summary>Bitmap_DrawRectangle</summary>
+<param name="Bitmap:ctx">The bitmap to modify.</param>
+<param name="const minX">The left of the array.</param>
+<param name="const minY">The top of the array.</param>
+<param name="const maxX">The right of the array.</param>
+<param name="const maxY">The bottom of the array.</param>
+<param name="fillColour">The colour of the inside of the rectangle.</param>
+<param name="lineColour = 0">The colour of the rectangle border.</param>
+<param name="linePattern[] = \"SOLID\"">How to draw the inside.</param>
+<param name="fillPattern[] = \"SOLID\"">How to draw the border.</param>
+<returns>
+	-
+</returns>
+<remarks>
+	This function draws a rectangle between two given co-ordinates.  It can also
+	draw a border around the rectangle OUTSIDE the specified area of the
+	rectangle.  If you want the border within the area specified you need to use
+	a smaller area.
+</remarks>
+\**--------------------------------------------------------------------------**/
+
 // End the input above because all this code is being written with no testing
 // or compiling until I am home again.  So in the interests of leaving the code
 // stable, this is all ignored.
@@ -108,109 +130,49 @@ stock Bitmap_DrawRectangle(Bitmap:ctx, const minX, const minY, const maxX, const
 	}
 }
 
-static stock _Bitmap_DoRectangle(Bitmap:ctx, const minX, const minY, const maxX, const maxY, colour, pattern[])
+static stock _Bitmap_DoRectangle(Bitmap:ctx, minX, minY, maxX, maxY, colour, pattern[])
 {
 	new
-		xx = maxX - minX,
-		yy = maxY - minY;
-	// Basic version (uses the existing pixel code).
-	// The patterns code doesn't exist yet.
-	if (xx > PATTERN_MASK_X || yy > PATTERN_MASK_Y)
+		width = Bitmap_Width(ctx);
+	minY = max(0, minY);
+	maxY = min(maxY, Bitmap_Height(ctx));
+	minX = max(0, minX);
+	maxX = min(maxX, width);
+	_Bitmap_MakePattern(pattern, minX, minY, 0, 0);
+	new
+		ya,
+		read,
+		a = (colour & 0xFF) + 1,
+		na,
+		suba,
+		r = ((colour & 0xFF000000) >>> 16),
+		g = ((colour & 0x00FF0000) >>> 16),
+		b = ((colour & 0x0000FF00) >>>  8),
+		orig;
+	for (new y = minY; y != maxY; ++y)
 	{
-		//P:E("Large rectangles are currently not supported in Bitmap_DrawRectangle.");
-		//return;
-		new
-			tx = maxX - PATTERN_MASK_X,
-			ty = maxY - PATTERN_MASK_Y,
-			cy = minY;
-		for ( ; cy < ty; cy += PATTERN_MASK_Y)
+		read = Bitmap_IndexInt(ctx, minX, width, y);
+		ya = y % YSI_gBitmapAlphaY;
+		for (new x = minX; x != maxX; ++x)
 		{
-			new
-				cx = minX;
-			Bit_SetAll(YSI_gBitmapAlpha[0], true);
-			if (cx < tx)
+			suba = YSI_gBitmapAlpha[ya]{x % YSI_gBitmapAlphaX} * a;
+			if (suba == 0xFF00)
 			{
-				_Bitmap_RectangleRecopy(PATTERN_MASK_Y, YSI_gBitmapAlpha[0]);
-				do
-				{
-					_Bitmap_DrawPattern(pattern, ctx, cx, cy, colour, 0, 0, 0);
-				}
-				while ((cx += PATTERN_MASK_X) <= tx);
+				YSI_gMallocMemory[read] = colour;
 			}
-			if (cx == maxX) continue;
-			// Since they were all 1, blank out bits.
-			tx = maxX - cx;
-			new
-				ss = bits<PATTERN_MASK_X>,
-				bm = Bit_Slot(tx) + 1;
-			while (ss-- != bm)
+			else if (suba >= 256)
 			{
-				YSI_gBitmapAlpha[0][ss] = Bit:0;
+				// This is where we compensate for the odd shifts.
+				na = 0xFF00 - suba;
+				// Want this pixel in the final image.
+				orig = YSI_gMallocMemory[read];
+				YSI_gMallocMemory[read] = 0xFF |
+					((((orig & 0xFF000000) >>> 16) * na + r * suba) & 0xFF000000) |
+					((((orig & 0x00FF0000) >>> 16) * na + g * suba) & 0x00FF0000) |
+					(((((orig & 0x0000FF00) >>> 8) * na + b * suba) & 0x00FF0000) >>> 8) ;
 			}
-			bm = _:Bit_Mask(tx);
-			do
-			{
-				YSI_gBitmapAlpha[0][ss] &= ~Bit:bm;
-			}
-			while ((bm <<= 1));
-			_Bitmap_RectangleRecopy(PATTERN_MASK_Y, YSI_gBitmapAlpha[0]);
-			_Bitmap_DrawPattern(pattern, ctx, cx, cy, colour, 0, 0, 0);
+			++read;
 		}
-		//cy = maxY - cy;
-		_Bitmap_ResetPattern();
-		tx = maxX - PATTERN_MASK_X;
-		new
-			cx = minX;
-		Bit_SetAll(YSI_gBitmapAlpha[0], true);
-		if (cx < tx)
-		{
-			_Bitmap_RectangleRecopy(maxY - cy, YSI_gBitmapAlpha[0]);
-			do
-			{
-				_Bitmap_DrawPattern(pattern, ctx, cx, cy, colour, 0, 0, 0);
-			}
-			while ((cx += PATTERN_MASK_X) <= tx);
-		}
-		if (cx == maxX) return;
-		// Since they were all 1, blank out bits.
-		tx = maxX - cx;
-		new
-			ss = bits<PATTERN_MASK_X>,
-			bm = Bit_Slot(tx) + 1;
-		while (ss-- != bm)
-		{
-			YSI_gBitmapAlpha[0][ss] = Bit:0;
-		}
-		bm = _:Bit_Mask(tx);
-		do
-		{
-			YSI_gBitmapAlpha[0][ss] &= ~Bit:bm;
-		}
-		while ((bm <<= 1));
-		_Bitmap_RectangleRecopy(maxY - cy, YSI_gBitmapAlpha[0]);
-		_Bitmap_DrawPattern(pattern, ctx, cx, cy, colour, 0, 0, 0);
-	}
-	else
-	{
-		// Reset the bit pattern array.
-		_Bitmap_ResetPattern();
-		// Set all the bits in the map.
-		new
-			ss,
-			bm = Bit_Slot(xx);
-		while (ss != bm)
-		{
-			YSI_gBitmapAlpha[0][ss++] = Bit:-1;
-		}
-		bm = _:Bit_Mask(xx);
-		while ((bm >>>= 1))
-		{
-			YSI_gBitmapAlpha[0][ss] |= Bit:bm;
-		}
-		// Now copy for the other parts of the rectangle (easy and fast).
-		_Bitmap_RectangleRecopy(yy, YSI_gBitmapAlpha[0]);
-		_Bitmap_DrawPattern(pattern, ctx, minX, minY, colour, 0, 0, 0);
-		//_Bitmap_DrawPattern@SOLID(ctx, minX, minY, fillColour, 0, 0, 0, 0);
 	}
 }
 
