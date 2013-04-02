@@ -36,6 +36,7 @@ Legal:
 		yom - French translation.
 		50p - Polish translation.
 		Zamaroht - Spanish translation.
+		Los - Portuguese translation.
 		Dracoblue, sintax, mabako, Xtreme, other coders - Producing other modes
 			for me to strive to better.
 		Pixels^ - Running XScripters where the idea was born.
