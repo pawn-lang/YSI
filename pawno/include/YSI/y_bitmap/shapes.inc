@@ -110,35 +110,108 @@ stock Bitmap_DrawRectangle(Bitmap:ctx, const minX, const minY, const maxX, const
 
 static stock _Bitmap_DoRectangle(Bitmap:ctx, const minX, const minY, const maxX, const maxY, colour, pattern[])
 {
-	// Basic version (uses the existing pixel code).
-	// The patterns code doesn't exist yet.
 	new
 		xx = maxX - minX,
 		yy = maxY - minY;
+	// Basic version (uses the existing pixel code).
+	// The patterns code doesn't exist yet.
 	if (xx > PATTERN_MASK_X || yy > PATTERN_MASK_Y)
 	{
-		P:E("Large rectangles are currently not supported in Bitmap_DrawRectangle.");
-		return;
+		//P:E("Large rectangles are currently not supported in Bitmap_DrawRectangle.");
+		//return;
+		new
+			tx = maxX - PATTERN_MASK_X,
+			ty = maxY - PATTERN_MASK_Y,
+			cy = minY;
+		for ( ; cy < ty; cy += PATTERN_MASK_Y)
+		{
+			new
+				cx = minX;
+			Bit_SetAll(YSI_gBitmapAlpha[0], true);
+			if (cx < tx)
+			{
+				_Bitmap_RectangleRecopy(PATTERN_MASK_Y, YSI_gBitmapAlpha[0]);
+				do
+				{
+					_Bitmap_DrawPattern(pattern, ctx, cx, cy, colour, 0, 0, 0);
+				}
+				while ((cx += PATTERN_MASK_X) <= tx);
+			}
+			if (cx == maxX) continue;
+			// Since they were all 1, blank out bits.
+			tx = maxX - cx;
+			new
+				ss = bits<PATTERN_MASK_X>,
+				bm = Bit_Slot(tx) + 1;
+			while (ss-- != bm)
+			{
+				YSI_gBitmapAlpha[0][ss] = Bit:0;
+			}
+			bm = _:Bit_Mask(tx);
+			do
+			{
+				YSI_gBitmapAlpha[0][ss] &= ~Bit:bm;
+			}
+			while ((bm <<= 1));
+			_Bitmap_RectangleRecopy(PATTERN_MASK_Y, YSI_gBitmapAlpha[0]);
+			_Bitmap_DrawPattern(pattern, ctx, cx, cy, colour, 0, 0, 0);
+		}
+		//cy = maxY - cy;
+		_Bitmap_ResetPattern();
+		tx = maxX - PATTERN_MASK_X;
+		new
+			cx = minX;
+		Bit_SetAll(YSI_gBitmapAlpha[0], true);
+		if (cx < tx)
+		{
+			_Bitmap_RectangleRecopy(maxY - cy, YSI_gBitmapAlpha[0]);
+			do
+			{
+				_Bitmap_DrawPattern(pattern, ctx, cx, cy, colour, 0, 0, 0);
+			}
+			while ((cx += PATTERN_MASK_X) <= tx);
+		}
+		if (cx == maxX) return;
+		// Since they were all 1, blank out bits.
+		tx = maxX - cx;
+		new
+			ss = bits<PATTERN_MASK_X>,
+			bm = Bit_Slot(tx) + 1;
+		while (ss-- != bm)
+		{
+			YSI_gBitmapAlpha[0][ss] = Bit:0;
+		}
+		bm = _:Bit_Mask(tx);
+		do
+		{
+			YSI_gBitmapAlpha[0][ss] &= ~Bit:bm;
+		}
+		while ((bm <<= 1));
+		_Bitmap_RectangleRecopy(maxY - cy, YSI_gBitmapAlpha[0]);
+		_Bitmap_DrawPattern(pattern, ctx, cx, cy, colour, 0, 0, 0);
 	}
-	// Reset the bit pattern array.
-	_Bitmap_ResetPattern();
-	// Set all the bits in the map.
-	new
-		ss,
-		bm = Bit_Slot(xx);
-	while (ss != bm)
+	else
 	{
-		YSI_gBitmapAlpha[0][ss++] = Bit:-1;
+		// Reset the bit pattern array.
+		_Bitmap_ResetPattern();
+		// Set all the bits in the map.
+		new
+			ss,
+			bm = Bit_Slot(xx);
+		while (ss != bm)
+		{
+			YSI_gBitmapAlpha[0][ss++] = Bit:-1;
+		}
+		bm = _:Bit_Mask(xx);
+		while ((bm >>>= 1))
+		{
+			YSI_gBitmapAlpha[0][ss] |= Bit:bm;
+		}
+		// Now copy for the other parts of the rectangle (easy and fast).
+		_Bitmap_RectangleRecopy(yy, YSI_gBitmapAlpha[0]);
+		_Bitmap_DrawPattern(pattern, ctx, minX, minY, colour, 0, 0, 0);
+		//_Bitmap_DrawPattern@SOLID(ctx, minX, minY, fillColour, 0, 0, 0, 0);
 	}
-	bm = _:Bit_Mask(xx);
-	while ((bm >>>= 1))
-	{
-		YSI_gBitmapAlpha[0][ss] |= Bit:bm;
-	}
-	// Now copy for the other parts of the rectangle (easy and fast).
-	_Bitmap_RectangleRecopy(yy, YSI_gBitmapAlpha[0]);
-	_Bitmap_DrawPattern(pattern, ctx, minX, minY, colour, 0, 0, 0);
-	//_Bitmap_DrawPattern@SOLID(ctx, minX, minY, fillColour, 0, 0, 0, 0);
 }
 
 static stock _Bitmap_RectangleRecopy(n, BitArray:pattern<PATTERN_MASK_X>)

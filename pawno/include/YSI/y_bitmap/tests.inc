@@ -284,3 +284,63 @@ Test:y_bitmap_Border6()
 	Bitmap_Write(ctx, "y_bitmap_Border6.bmp");
 	Bitmap_Destroy(ctx);
 }
+
+Test:y_bitmap_Large1()
+{
+	new
+		Bitmap:ctx;
+	ctx = Bitmap_Create(512, 512);
+	Bitmap_DrawRectangle(ctx, 64, 64, 192, 192, Y_LAVENDER | 0xFF);
+	Bitmap_Write(ctx, "y_bitmap_Large1.bmp");
+	Bitmap_Destroy(ctx);
+}
+
+Test:y_bitmap_Large2()
+{
+	new
+		Bitmap:ctx;
+	ctx = Bitmap_Create(512, 512);
+	Bitmap_DrawRectangle(ctx, 0, 0, 256, 256, Y_LAVENDER | 0xFF);
+	Bitmap_Write(ctx, "y_bitmap_Large2.bmp");
+	Bitmap_Destroy(ctx);
+}
+
+Test:y_bitmap_Large3()
+{
+	new
+		Bitmap:ctx;
+	ctx = Bitmap_Create(512, 512);
+	Bitmap_DrawRectangle(ctx, 64, 64, 512, 512, Y_LAVENDER | 0xFF);
+	Bitmap_Write(ctx, "y_bitmap_Large3.bmp");
+	Bitmap_Destroy(ctx);
+}
+
+Test:y_bitmap_Large4()
+{
+	new
+		Bitmap:ctx;
+	ctx = Bitmap_Create(512, 512);
+	Bitmap_DrawRectangle(ctx, 64, 64, 70, 500, Y_LAVENDER | 0xFF);
+	Bitmap_Write(ctx, "y_bitmap_Large4.bmp");
+	Bitmap_Destroy(ctx);
+}
+
+Test:y_bitmap_Large5()
+{
+	new
+		Bitmap:ctx;
+	ctx = Bitmap_Create(512, 512);
+	Bitmap_DrawRectangle(ctx, 64, 64, 500, 70, Y_LAVENDER | 0xFF);
+	Bitmap_Write(ctx, "y_bitmap_Large5.bmp");
+	Bitmap_Destroy(ctx);
+}
+
+Test:y_bitmap_VLarge1()
+{
+	new
+		Bitmap:ctx;
+	ctx = Bitmap_Create(1024, 1024);
+	Bitmap_DrawRectangle(ctx, 256, 256, 768, 768, Y_MINTCREAM | 0xFF);
+	Bitmap_Write(ctx, "y_bitmap_VLarge1.bmp");
+	Bitmap_Destroy(ctx);
+}
