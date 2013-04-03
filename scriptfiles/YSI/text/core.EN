@@ -228,5 +228,6 @@ DIALOG_REMOVE = Remove
 DIALOG_QUIT = Quit
 DIALOG_NONE =
 
-
+[ysi_zonenames]
+YSI_ZONE_NAME = %s%s
 

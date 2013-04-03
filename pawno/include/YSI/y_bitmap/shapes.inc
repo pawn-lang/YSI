@@ -104,6 +104,7 @@ stock Bitmap_DrawRectangle(Bitmap:ctx, const minX, const minY, const maxX, const
 			new
 				border = _Bitmap_Param(linePattern, "border");
 			if (border == cellmin) border = 8;
+			//printf("border = %d", border);
 			//printf("1");
 			_Bitmap_DoRectangle(ctx, minX - border, minY - border, maxX + border, minY, lineColour, linePattern),
 			//printf("1");

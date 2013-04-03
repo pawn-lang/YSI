@@ -166,3 +166,6 @@ YSI_LOGIN_FAILED = Identificacion rechazada.
 YSI_ADDU_INDER1 = Añade error al archivo de usuario 1.
 YSI_ADDU_INDER2 = Añade error al archivo de usuario 2.
 YSI_ADDU_SUCC = Registrado satisfactoriamente.
+
+[ysi_zonenames]
+YSI_ZONE_NAME = %s

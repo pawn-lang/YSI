@@ -1463,3 +1463,12 @@ global Race_SetPlayer(race, playerid, bool:set)
 	}
 	return 0;
 }
+
+// Called when a player finishes the race.
+forward OnPlayerFinishRace(playerid, race, position, prize, time);
+
+// Called when a player drops out of the race.
+forward OnPlayerExitRace(playerid, race);
+
+// Called when the race is over.
+forward OnRaceEnd(race);

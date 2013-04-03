@@ -210,3 +210,6 @@ DIALOG_FORWARD = Seguente
 DIALOG_PREVIOUS = Precedente
 DIALOG_NEXT = Prossimo
 DIALOG_NONE =
+
+[ysi_zonenames]
+YSI_ZONE_NAME = %s

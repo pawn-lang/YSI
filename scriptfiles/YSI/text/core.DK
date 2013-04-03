@@ -154,3 +154,6 @@ YSI_LOGIN_FAILED = Login nægtet.
 YSI_ADDU_INDER1 = Tilføj bruger fil fejl 1.
 YSI_ADDU_INDER2 = Tilføj bruger fil fejl 2.
 YSI_ADDU_SUCC = Registrering lykkedes.
+
+[ysi_zonenames]
+YSI_ZONE_NAME = %s

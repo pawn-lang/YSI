@@ -162,3 +162,6 @@ YSI_LOGIN_FAILED = Login fehlgeschlagen.
 YSI_ADDU_INDER1 = Fehler beim Hinzufügen des Benutzers 1.
 YSI_ADDU_INDER2 = Fehler beim Hinzufügen des Benutzers 2.
 YSI_ADDU_SUCC = Erfolgreich registriert.
+
+[ysi_zonenames]
+YSI_ZONE_NAME = %s

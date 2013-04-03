@@ -166,3 +166,6 @@ YSI_LOGIN_FAILED = Login afgewezen.
 YSI_ADDU_INDER1 = Fout 1 bij het toevoegen van een gebruikers-bestand.
 YSI_ADDU_INDER2 = Fout 2 bij het toevoegen van een gebruikers-bestand.
 YSI_ADDU_SUCC = Succesvol geregistreerd.
+
+[ysi_zonenames]
+YSI_ZONE_NAME = %s

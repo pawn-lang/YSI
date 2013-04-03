@@ -53,6 +53,9 @@
     <entry colour="X11_RED" style="client" name="YSI_COMM_LIST" />
     <entry colour="X11_RED" style="client" name="YSI_COMM_BLEVEL" />
   </group>
+  <group name="ysi_zonenames">
+    <entry colour="X11_WHITE" style="client" name="YSI_ZONE_NAME" />
+  </group>
   <group name="ysi_text">
     <entry colour="X11_RED" style="client" name="YSI_TEXT_NOT_FOUND" />
   </group>

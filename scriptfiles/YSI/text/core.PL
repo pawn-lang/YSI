@@ -172,3 +172,6 @@ YSI_LOGIN_FAILED = Zalogowanie odmówione.
 YSI_ADDU_INDER1 = Dodanie pliku u¿ytkownika b³¹d 1.
 YSI_ADDU_INDER2 = Dodanie pliku u¿ytkownika b³¹d 2.
 YSI_ADDU_SUCC = Rejestracja zakoñczona sukcesem.
+
+[ysi_zonenames]
+YSI_ZONE_NAME = %s

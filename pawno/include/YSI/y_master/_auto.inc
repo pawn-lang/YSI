@@ -221,6 +221,12 @@ Natives:
 		#endinput
 	#endif
 #endif
+#if defined _inc_y_zonenames
+	#if !defined _YCM_n@ // o is letter 14
+		#define MASTER                  13
+		#endinput
+	#endif
+#endif
 
 // The help system is set as master number 29
 /*#if defined _inc_y_help

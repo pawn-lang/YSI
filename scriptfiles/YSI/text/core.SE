@@ -166,3 +166,6 @@ YSI_ADDU_INDER2 = Adda användare fíl fel 2.
 YSI_ADDU_SUCC = Registreringen lyckades.
 YSI_LOGIN_ENTER = Du måste skriva ett lösenord
 YSI_LOGIN_LENGTH = Ditt lösenord måste vara minst 6 tecken långt
+
+[ysi_zonenames]
+YSI_ZONE_NAME = %s

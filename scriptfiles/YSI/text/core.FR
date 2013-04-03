@@ -165,3 +165,6 @@ YSI_LOGIN_FAILED = Login refusé.
 YSI_ADDU_INDER1 = Ajout du fichier d'utilisateur (erreur 1).
 YSI_ADDU_INDER2 = Ajout du fichier d'utilisateur (erreur 2).
 YSI_ADDU_SUCC = Enregistré avec succès!
+
+[ysi_zonenames]
+YSI_ZONE_NAME = %s
