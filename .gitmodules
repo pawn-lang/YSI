@@ -1,3 +1,6 @@
 [submodule "pawno/include/amx"]
 	path = pawno/include/amx
 	url = git@github.com:Y-Less/amx_assembly.git
+[submodule "pawno/include/YSI"]
+	path = pawno/include/YSI
+	url = git@github.com:Y-Less/YSI-Includes.git
