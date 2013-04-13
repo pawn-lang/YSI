@@ -1,0 +1,53 @@
+[comms]
+
+COMM_KILL_HELP_1 = Usage: "/%n"\n
+COMM_KILL_HELP_2 = Kill yourself after five seconds.
+
+COMM_COMM_HELP_1 = Usage: "/%n"\n
+COMM_COMM_HELP_2 = Lists all the commands available to you.
+
+COMM_HELP_HELP_1 = Usage: "/%n <command>"\n
+COMM_HELP_HELP_2 = Displays help on the named command.
+
+COMM_HELP_INFO_1 = Welcome to my mode!\n
+COMM_HELP_INFO_2 = Type "/%n <command>" for information on a specific command,\n
+COMM_HELP_INFO_3 = or "/%n" for a full list of commands.
+
+COMM_COMM_LIST = %s
+
+; Admin commands.
+
+; Player dialogs.
+COMM_NO_PLAYER = No Player Specified!
+COMM_NOT_FOUND = Could Not Find Player!
+COMM_ENTER_PLAYER = Please enter a player name or ID:
+
+; Reason dialogs.
+COMM_NO_REASON = No Reason Given!
+COMM_BAN_REASON = Please enter a ban reason:
+COMM_KICK_REASON = You must enter a kick reason:
+
+COMM_CONFIRM = Are You Sure?
+
+COMM_BAN_CONFIRM = Are you sure you want to ban %s (%d), for reason:\n"%s"?
+COMM_KICK_CONFIRM = Are you sure you want to kick %s (%d), for reason:\n"%s"?
+COMM_TIMEOUT_CONFIRM = Are you sure you want to timeout %s (%d)?
+
+COMM_KICK_WHY = You have been kicked for: %s
+COMM_KICK_NONE = You have been kicked
+
+COMM_BAN_HELP_1 = Usage: "/%n <playerid/name> <reason>"\n
+COMM_BAN_HELP_2 = Bans the given player for the given reason.\n
+COMM_BAN_HELP_3 = For temporary bans use "/%n".
+
+COMM_KICK_HELP_1 = Usage: "/%n <playerid/name> [reason]"\n
+COMM_KICK_HELP_2 = Kicks the given player for the given reason.\n
+COMM_KICK_HELP_3 = For speed, higher level admins may kick with no reason.
+
+COMM_TIMEOUT_HELP_1 = Usage: "/%n <playerid/name>"\n
+COMM_TIMEOUT_HELP_2 = Times the player out to force a reconnect.
+
+COMM_PROMOTE_HELP_1 = Usage: "/%n <2-5>"\n
+COMM_PROMOTE_HELP_2 = Promote yourself to the given admin level.
+
+COMM_TIMEOUT_FAIL = Invalid level (not 1 - 5).

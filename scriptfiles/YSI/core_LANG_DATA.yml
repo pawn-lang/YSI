@@ -54,7 +54,23 @@
     <entry colour="X11_RED" style="client" name="YSI_COMM_BLEVEL" />
   </group>
   <group name="ysi_zonenames">
-    <entry colour="X11_WHITE" style="client" name="YSI_ZONE_NAME" />
+    <entry colour="X11_WHITE" style="td" name="YSI_ZONE_NAME">
+		<textdraw>
+			<name>YSI_ZONE_NAME</name>
+			<x>608.00</x>
+			<y>383.00</y>
+			<letterx>1.30</letterx>
+			<lettery>4.15</lettery>
+			<textx>-150.00</textx>
+			<texty>-50.00</texty>
+			<alignment>right</alignment>
+			<shadow>0</shadow>
+			<font>0</font>
+			<proportional>true</proportional>
+			<outline>true</outline>
+			<background>51</background>
+		</textdraw>
+	</entry>
   </group>
   <group name="ysi_text">
     <entry colour="X11_RED" style="client" name="YSI_TEXT_NOT_FOUND" />
