@@ -21,7 +21,9 @@ native WP_Hash(target[], len, text[]);
 #include <YSI\y_timers>
 #include <YSI\y_svar>*/
 
-#include <YSI>
+#include <YSI\y_groups>
+
+//#include <YSI>
 #include <YSI\y_hooks>
 #include <YSI\y_als>
 #include <YSI\y_va>
@@ -33,6 +35,8 @@ native WP_Hash(target[], len, text[]);
 #include <YSI\y_uvar>
 #include <YSI\y_races>
 
+//#include <YSI\y_groups>
+
 uvar gggx[MAX_PLAYERS][22];
 
 public OnGameModeInit()
@@ -41,6 +45,8 @@ public OnGameModeInit()
 	Langs_Add("EN", "English");
 	Langs_Add("NL", "Nederlands");
 	AddPlayerClass(0, 0.0, 0.0, 4.0, 0.0, 0, 0, 0, 0, 0, 0);
+	Group_SetRace(Group:0, 0, true);
 	return 1;
 }
+//#assert !defined _Group_AddInternal
 
