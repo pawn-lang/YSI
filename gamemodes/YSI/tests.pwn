@@ -4,6 +4,8 @@
 
 native WP_Hash(target[], len, text[]);
 
+//#define _DEBUG 6
+
 //#define YSI_DO_USER_UPGRADE
 #define YSI_NO_X11
 #define YSI_TESTS
@@ -21,7 +23,7 @@ native WP_Hash(target[], len, text[]);
 #include <YSI\y_timers>
 #include <YSI\y_svar>*/
 
-#include <YSI\y_groups>
+//#include <YSI\y_groups>
 
 //#include <YSI>
 #include <YSI\y_hooks>
@@ -35,7 +37,7 @@ native WP_Hash(target[], len, text[]);
 #include <YSI\y_uvar>
 #include <YSI\y_races>
 
-//#include <YSI\y_groups>
+#include <YSI\y_groups>
 
 uvar gggx[MAX_PLAYERS][22];
 
@@ -45,7 +47,7 @@ public OnGameModeInit()
 	Langs_Add("EN", "English");
 	Langs_Add("NL", "Nederlands");
 	AddPlayerClass(0, 0.0, 0.0, 4.0, 0.0, 0, 0, 0, 0, 0, 0);
-	Group_SetRace(Group:0, 0, true);
+	//Group_SetRace(Group:0, 0, true);
 	return 1;
 }
 //#assert !defined _Group_AddInternal
