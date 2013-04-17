@@ -52,7 +52,6 @@ Version:
 Changelog:
 	29/11/10:
 		First version
-</remarks>
 \**--------------------------------------------------------------------------**/
 
 // This file defines functions which are called if the group system is not used.

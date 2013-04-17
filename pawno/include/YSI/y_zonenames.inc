@@ -78,31 +78,97 @@ static stock const
 			!"Red County",               !"Flint County",            !"Whetstone"
 		};
 
-mhook OnPlayerEnterArea(playerid, areaid)
+static stock
+	YSI_g_sZNShow[MAX_PLAYERS],
+	YSI_g_sZNTD[MAX_PLAYERS] = {INVALID_TEXT_DRAW, ...},
+	YSI_g_sZNCur[MAX_PLAYERS] = {cellmax, ...};
+
+mhook OnPlayerDisconnect(playerid, reason)
 {
+	#pragma unused reason
+	YSI_g_sZNShow[playerid] = 0,
+	YSI_g_sZNCur[playerid] = cellmax,
+	YSI_g_sZNTD[playerid] = INVALID_TEXT_DRAW;
+	return 1;
+}
+
+mhook OnPlayerSpawn(playerid)
+{
+	YSI_g_sZNShow[playerid] = 1;
+	return 1;
+}
+
+mhook OnPlayerDeath(playerid, killerid, reason)
+{
+	#pragma unused killerid, reason
+	YSI_g_sZNShow[playerid] = 0;
+	return 1;
+}
+
+forward ZoneNames_Hide(playerid);
+
+public ZoneNames_Hide(playerid)
+{
+	new
+		td = YSI_g_sZNTD[playerid];
+	if (td != INVALID_TEXT_DRAW)
+	{
+		TD_HideForPlayer(playerid, Text:td);
+		YSI_g_sZNTD[playerid] = INVALID_TEXT_DRAW;
+	}
+}
+
+stock ZoneNames_Show(playerid, id)
+{
+	//TD_HideForPlayer(playerid, Text:YSI_g_sZNTD[playerid]);
 	static
 		name[32];
+	ZoneNames_Hide(playerid);
+	YSI_g_sZNCur[playerid] = id,
+	strunpack(name, YSI_g_scZoneNames[id]),
+	Text_Send(playerid, $YSI_ZONE_NAME, "", name),
 	new
-		id = YSI_g_sZoneIDs[areaid];
-	if (id != -1)
+		td = Text_GetLastID();
+	if (td != -1)
 	{
-		strunpack(name, YSI_g_scZoneNames[id]),
-		Text_Send(playerid, $YSI_ZONE_NAME, "", name);
+		SetTimerEx("ZoneNames_Hide", 3000, 0, "i", playerid),
+		YSI_g_sZNTD[playerid] = td;
+	}
+}
+
+mhook OnPlayerEnterArea(playerid, areaid)
+{
+	if (YSI_g_sZNShow[playerid])
+	{
+		new
+			id = YSI_g_sZoneIDs[areaid];
+		if (id != -1 && id < YSI_g_sZNCur[playerid])
+		{
+			ZoneNames_Show(playerid, id);
+		}
 	}
 	return 1;
 }
 
 mhook OnPlayerLeaveArea(playerid, areaid)
 {
-	static
-		name[32];
-	for (new idx = 0, id; (areaid = Area_GetPlayerAreas(playerid, idx)) != NO_AREA; ++idx)
+	if (areaid != YSI_g_sZNCur[playerid])
 	{
-		if ((id = YSI_g_sZoneIDs[areaid]) != -1)
+		return 1;
+	}
+	YSI_g_sZNCur[playerid] = cellmax;
+	if (YSI_g_sZNShow[playerid])
+	{
+		for (new idx = 0, id; (id = Area_GetPlayerAreas(playerid, idx)) != NO_AREA; ++idx)
 		{
-			strunpack(name, YSI_g_scZoneNames[id]),
-			Text_Send(playerid, $YSI_ZONE_NAME, "", name);
-			return 1;
+			if ((id = YSI_g_sZoneIDs[id]) != -1)
+			{
+				if (id < YSI_g_sZNCur[playerid])
+				{
+					ZoneNames_Show(playerid, id);
+				}
+				return 1;
+			}
 		}
 	}
 	return 1;
@@ -875,5 +941,6 @@ mhook OnScriptInit()
 	
 	#undef SAZ_AddCuboid
 	#undef SAZ_AddPoly
+	assert(idx == sizeof (YSI_g_scZoneNames));
 	return 1;
 }

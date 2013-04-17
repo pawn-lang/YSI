@@ -47,6 +47,11 @@ Legal:
 		Kye/Kalcor - SA:MP.
 		SA:MP Team past, present and future - SA:MP.
 	
+	Optional plugins:
+		Gamer_Z - GPS.
+		Incognito - Streamer.
+		Me - sscanf2, fixes2, Whirlpool.
+	
 Version:
 	0.1.3
 Changelog:

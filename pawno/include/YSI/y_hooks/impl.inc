@@ -674,6 +674,11 @@ public OnPlayerDisconnect(playerid, reason)
 		#emit PUSH.pri
 		#emit MOVE.pri
 		#emit SCTRL      6
+		// alt = f()
+		// pri = 0xFFFFFFFE
+		// push (f() & 0xFFFFFFFE)
+		// pri = ret & f()
+		// ret = (f() & 0xFFFFFFFE) | (ret & f())
 		#emit MOVE.alt
 		#emit CONST.pri  0xFFFFFFFE
 		#emit AND
