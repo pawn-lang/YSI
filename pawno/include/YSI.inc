@@ -927,7 +927,7 @@ native isnumeric(str[]);
 native hexstr(string[]);
 native bool:boolstr(string[]);
 native binstr(string[]);
-native memset(dest[], size = sizeof (dest), val = 0, blocksize = 8);
+native memset(dest[], val = 0, size = sizeof (dest));
 native ReturnPlayerName(playerid);
 native ftouch(const filename[]);
 native 
