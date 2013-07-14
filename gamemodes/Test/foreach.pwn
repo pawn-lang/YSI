@@ -29,6 +29,7 @@ main()
 	}
 	new
 		Iterator:test2[1]<10>;
+	Iter_Init(test2);
 	Iter_Add(test2[0], 3);
 	Iter_Add(test2[0], 55);
 	foreach (new i : test2[0])
