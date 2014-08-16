@@ -438,13 +438,15 @@ public TD_Textdraw()
 			}
 			else if (!strcmp(name, "box", true))
 			{
-				new
-					box = strval(val);
-				if (box)
-				{
-					bits |= e_TD_BITS_BOX;
-					YSI_g_sTDData[i][E_TD_DATA_BOX] = box;
-				}
+				#if defined _inc_sscanf2 || defined unformat
+                			new box;
+                			if (!unformat(val, "n", colour)) YSI_g_sTDData[i][E_TD_DATA_BOX] = box;
+            			#else
+                			if (ishex(val)) YSI_g_sTDData[i][E_TD_DATA_BOX] = hexstr(val);
+                			else if (isnumeric(val)) YSI_g_sTDData[i][E_TD_DATA_BOX] = strval(val);
+            			#endif
+                		else YSI_g_sTDData[i][E_TD_DATA_BOX] = GetColour(val);
+                		bits |= e_TD_BITS_BOX;
 			}
 			else if (!strcmp(name, "shadow", true))
 			{
