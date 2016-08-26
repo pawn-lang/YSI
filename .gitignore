@@ -1,0 +1,15 @@
+/announce.exe
+/samp-npc.exe
+/samp-server.exe
+/server.cfg
+/scriptfiles/DANGEROUS_SERVER_ROOT
+/pawno/pawnc.dll
+/pawno/pawncc.exe
+/plugins/Whirlpool.dll
+/plugins/crashdetect.dll
+/plugins/crashdetect.pdb
+/plugins/iTD.dll
+/plugins/sql.dll
+/plugins/sscanf.dll
+/server.cfg.real
+/server.cfg.test

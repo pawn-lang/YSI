@@ -1,0 +1,67 @@
+[size=5][color=red][b][u][color=green]Introduction[/color][/u][/b][/color][/size]
+
+This is a very simple tool which provides access to the server's root directory via "fopen".  By default that function is constrained to just items within "scriptfiles/", this slightly relaxes that restriction by adding a "symbolic link" - basically a pointer within "scriptfiles/" to the root directory.
+
+[size=5][color=red][b][u][color=green]Installation[/color][/u][/b][/color][/size]
+
+To use the tool simply place the script in your server's root directory (i.e. the directory where "samp_server" is) and run it.  On Windows this is done simply by double clicking on the ".bat" file or calling the following on the command line:
+
+[code]links.bat[/code]
+
+On Linux, this is done by running the following on the command line (to mark the file as "runnable", then run it):
+
+[code]chmod 700 links.sh && ./links.sh[/code]
+
+Once you have done this once, that's it - you can delete this tool again as you have set up a permanent link usable to open files.
+
+[size=5][color=red][b][u][color=green]Use[/color][/u][/b][/color][/size]
+
+Within PAWN itself, you use fopen as normal, but adding "DANGEROUS_SERVER_ROOT" to the start to get access to the server root.  I used this prefix to highlight just how dangerous escaping the PAWN "scriptfiles/" sandbox can be.  There is a slightly less dangerous version of the tool, but that still uses the same prefix for consistency.
+
+[pawn]
+#include <a_samp>
+
+main()
+{
+	print(" Print out the contents of \"barron.pwn\":");
+	// Try open the file.
+	new File:f = fopen("DANGEROUS_SERVER_ROOT/gamemodes/barron.pwn", io_read);
+	if (!f) return printf("fopen failed");
+	// Read the whole thing and print it.
+	new str[128];
+	while (fread(f, str)) print(str);
+	// Close the file and end.
+	fclose(f);
+	return 1;
+}
+[/pawn]
+
+[size=5][color=red][b][u][color=green]Download[/color][/u][/b][/color][/size]
+
+[url=http://www.y-less.com/uploads/links.rar]DOWNLOAD ALL VERSIONS[/url]
+
+[list][*][size=2][color=red][b][u][color=green]Version 1:[/color][/u][/b][/color][/size][/list]
+
+This version gives you direct and unrestricted access to the server root.  If you want to load the "samp_server" executable you can, you can also do anything else you want including deleting important files you shouldn't delete.
+
+[url=http://www.y-less.com/uploads/links/version1/links.bat]DOWNLOAD FOR WINDOWS[/url]
+[url=http://www.y-less.com/uploads/links/version1/links.sh]DOWNLOAD FOR LINUX[/url]
+
+[list][*][size=2][color=red][b][u][color=green]Version 2:[/color][/u][/b][/color][/size][/list]
+
+This version is better for server hosts who don't want people playing about in the server root, but who still want to provide people with access to some extra parts of the server.  Using this one you can read from (and write to) the "gamemodes/", "filterscripts/" and "npcmodes/" directories; as well as read and write "server.cfg", but not DELETE it!
+
+Note: The ability to write to "server.cfg" depends on user permissions.  If the server doesn't actually have permission to write to that file then it will fail.  A good way (for server hosts) to ensure consistency of this file is to change the owner to some different user associated with their settings management software, and restrict the permissions of other groups to read-only.
+
+Warning: Changing server.cfg dynamically may corrupt it and make your server fail to start in the future.
+
+[url=http://www.y-less.com/uploads/links/version2/links.bat]DOWNLOAD FOR WINDOWS[/url]
+[url=http://www.y-less.com/uploads/links/version2/links.sh]DOWNLOAD FOR LINUX[/url]
+
+[list][*][size=2][color=red][b][u][color=green]Version 3:[/color][/u][/b][/color][/size][/list]
+
+This version ONLY gives you access to the "gamemodes/", "filterscripts/" and "npcmodes/" directories.  This is obviously the most restrictive of the three systems, based on what some hosts allow direct access to anyway.
+
+[url=http://www.y-less.com/uploads/links/version3/links.bat]DOWNLOAD FOR WINDOWS[/url]
+[url=http://www.y-less.com/uploads/links/version3/links.sh]DOWNLOAD FOR LINUX[/url]
+
