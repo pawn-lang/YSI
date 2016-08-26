@@ -1,0 +1,6 @@
+This repository now references more up-to-date include versions.  This is all of the extra YSI stuff (example modes, language files, etc), while the code itself resides elsewhere.  If you just want the code, use the YSI-Includes repository.  If you want everything, use this one.
+
+When checking out and updating, make sure to use the "recursive" option, to pull in dependencies, and their dependencies.  When downloading as a zip/tar file directly from github, sadly you can't do that...
+
+I've moved many old files to only live in the "UnportedCode" branch.  If they are needed for reference or to port, look there.  That is just currently a snapshot of this repository as it was right before the improved submodules update.
+
