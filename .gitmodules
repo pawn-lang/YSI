@@ -1,0 +1,3 @@
+[submodule "YSI-Includes"]
+	path = pawno/include
+	url = git@github.com:Misiur/YSI-Includes.git
