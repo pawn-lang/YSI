@@ -86,11 +86,11 @@ public OnGameModeInit()
 #include <YSI_Coding\y_stringhash>
 #include <YSI_Coding\y_timers>
 #include <YSI_Coding\y_va>
+#include <YSI_Coding\y_functional>
 
 #include <YSI_Core\y_als>
 #include <YSI_Core\y_cell>
 #include <YSI_Core\y_debug>
-#include <YSI_Core\y_functional>
 #include <YSI_Core\y_master>
 #include <YSI_Core\y_testing>
 #include <YSI_Core\y_utils>
@@ -107,8 +107,8 @@ public OnGameModeInit()
 	#include <YSI_Players\y_groups>
 #endif
 #include <YSI_Players\y_languages>
-#include <YSI_Players\y_text>
-#include <YSI_Players\y_users>
+//#include <YSI_Players\y_text>
+//#include <YSI_Players\y_users>
 
 #include <YSI_Server\y_colours>
 #include <YSI_Server\y_flooding>
@@ -129,8 +129,8 @@ public OnGameModeInit()
 #include <YSI_Visual\y_commands>
 #include <YSI_Visual\y_dialog>
 //#include <YSI_Visual\y_properties>
-#include <YSI_Visual\y_races>
-#include <YSI_Visual\y_zonenames>
+//#include <YSI_Visual\y_races>
+//#include <YSI_Visual\y_zonenames>
 #include <YSI_Visual\y_zonepulse>
 
 #if GTYPE == 2
@@ -158,7 +158,7 @@ public OnScriptInit()
 	return 1;
 }
 
-public OnTestsComplete(tests, fails)
+public OnTestsComplete(tests, checks, fails)
 {
 	print("\n------------------------------");
 	print("|                            |");
