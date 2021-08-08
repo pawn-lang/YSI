@@ -1,3 +1,5 @@
+#define _DEBUG 1
+
 #if !defined _DEBUG
 	#define _DEBUG -1
 #endif
@@ -34,6 +36,7 @@
 #define YSI_HASHMAP_TESTS
 #define Y_COMMANDS_NO_IPC
 #define YSI_TESTS
+#define JUST_TEST INI_ReadRegression
 
 native WP_Hash(buffer[], len, const str[]);
 
