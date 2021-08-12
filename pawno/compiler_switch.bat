@@ -22,9 +22,11 @@ rem Check that we are going in a legitimate direction
 if exist "pawncc.exe.%FROM%" (
 	goto :eof
 )
-if not exist "pawncc.exe.%TO%" (
-	goto :eof
-)
+rem We need to ignore this check for the initial setup
+rem In a new compiler setup run this once to backup the old compiler
+::if not exist "pawncc.exe.%TO%" (
+::	goto :eof
+::)
 
 call :switch_all %FROM% %TO%
 
@@ -36,6 +38,8 @@ goto :eof
 	call :switch_one %1 %2 "libpawnc.dll"
 	call :switch_one %1 %2 "pawnc.pdb"
 	call :switch_one %1 %2 "pawncc.pdb"
+	call :switch_one %1 %2 "pawndisasm.exe"
+	call :switch_one %1 %2 "pawndisasm.pdb"
 	goto :eof
 
 :switch_one
