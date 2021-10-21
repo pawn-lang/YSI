@@ -1,3 +1,4 @@
+//#pragma option -R
 #define _DEBUG 1
 
 #if !defined _DEBUG
@@ -9,6 +10,8 @@
 #if !defined COMPILE_FLAGS
 	#define COMPILE_FLAGS "Pawno"
 #endif
+
+#define MTYPE 2
 
 // Currently "MTYPE 2" with "GTYPE 2" gives the most horrendous crash when the
 // mode ends, that I've ever seen!
