@@ -1,5 +1,5 @@
 //#pragma option -R
-#define _DEBUG 1
+//#define _DEBUG 7
 
 #if !defined _DEBUG
 	#define _DEBUG -1
@@ -39,7 +39,7 @@
 #define YSI_HASHMAP_TESTS
 #define Y_COMMANDS_NO_IPC
 #define YSI_TESTS
-#define JUST_TEST INI_ReadRegression
+//#define JUST_TEST y_groups_SetBalancedIn4
 
 native WP_Hash(buffer[], len, const str[]);
 
@@ -112,7 +112,7 @@ public OnGameModeInit()
 #if GTYPE == 1
 	#include <YSI_Players\y_groups>
 #endif
-#include <YSI_Players\y_languages>
+/*#include <YSI_Players\y_languages>
 //#include <YSI_Players\y_text>
 //#include <YSI_Players\y_users>
 
@@ -120,7 +120,7 @@ public OnGameModeInit()
 #include <YSI_Server\y_flooding>
 #include <YSI_Server\y_punycode>
 #include <YSI_Server\y_scriptinit>
-#include <YSI_Server\y_td>
+#include <YSI_Server\y_td>*/
 
 #include <YSI_Storage\y_amx>
 ////#include <YSI_Storage\y_bitmap>
@@ -130,7 +130,7 @@ public OnGameModeInit()
 //#include <YSI_Storage\y_uvar>
 #include <YSI_Storage\y_xml>
 
-#include <YSI_Visual\y_areas>
+//#include <YSI_Visual\y_areas>
 //#include <YSI_Visual\y_classes>
 #include <YSI_Visual\y_commands>
 #include <YSI_Visual\y_dialog>
@@ -152,6 +152,8 @@ main()
 	printf("| Compiler: 0x%04x           |", __Pawn);
 	print("| Flags:                     |");
 	printf("|  %24s  |", COMPILE_FLAGS);
+	print("| Master:                    |");
+	printf("|  %24d  |", @_);
 	print("|                            |");
 	print("------------------------------\n");
 	//FIXES_ApplyAnimation(0, "", "", 0.0, 0, 0, 0, 0, 0, 0);
@@ -160,7 +162,7 @@ main()
 
 public OnScriptInit()
 {
-	Langs_Add("English", "EN");
+//	Langs_Add("English", "EN");
 	return 1;
 }
 
@@ -173,6 +175,8 @@ public OnTestsComplete(tests, checks, fails)
 	printf("| Compiler: 0x%04x           |", __Pawn);
 	print("| Flags:                     |");
 	printf("|  %24s  |", COMPILE_FLAGS);
+	print("| Master:                    |");
+	printf("|  %24d  |", @_);
 	print("|                            |");
 	print("------------------------------\n");
 }
