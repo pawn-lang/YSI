@@ -1,1 +1,0 @@
-move "scriptfiles\%~1" "scriptfiles\%~2"
