@@ -1,8 +1,1 @@
-set arg1=scriptfiles\%~1
-set arg1=%arg1:..=%
-set arg1=%arg1:\\=\%
-set arg2=scriptfiles\%~2
-set arg2=%arg2:..=%
-set arg2=%arg2:\\=\%
-move "%arg1%" "%arg2%"
-type nul > scriptfiles\YSI\.donescript
+move "scriptfiles\%~1" "scriptfiles\%~2"
