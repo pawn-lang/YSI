@@ -39,7 +39,7 @@
 #define YSI_HASHMAP_TESTS
 #define Y_COMMANDS_NO_IPC
 #define YSI_TESTS
-//#define JUST_TEST INI_WriteComments
+#define JUST_TEST Master_ModulesPhase3b
 
 native WP_Hash(buffer[], len, const str[]);
 
