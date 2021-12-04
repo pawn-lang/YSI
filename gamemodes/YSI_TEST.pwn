@@ -1,4 +1,5 @@
 //#pragma option -R
+//#pragma option -l
 //#define _DEBUG 7
 
 #if !defined _DEBUG
@@ -43,7 +44,8 @@
 
 native WP_Hash(buffer[], len, const str[]);
 
-#include <a_samp>
+#tryinclude <samp-stdlib\a_samp>
+#tryinclude <a_samp>
 //#include <../fixes/fixes>
 
 #tryinclude "..\sa-mp-fixes\fixes"
