@@ -14,16 +14,22 @@
 bool:ParseFile(const name[])
 {
 	printf("Parsing codepage \"%s\"...", name);
+	new num;
+	if (sscanf(name, "P<-_>d", num))
+	{
+		printf("Could not extract ID from \"%s\"", name);
+		return false;
+	}
 	new codepage[65536]; // Enough to store all DBCS data.
 	new src[64];
-	format(src, sizeof (src), "ucm\\%s.ucm", name);
+	format(src, sizeof (src), "ucm\\windows-%s.ucm", name);
 	new File:fin = fopen(src, io_read);
 	if (!fin)
 	{
 		printf("Could not open input file \"%s\"", src);
 		return false;
 	}
-	format(src, sizeof (src), "YSI\\codepages\\%s.txt", name);
+	format(src, sizeof (src), "YSI\\codepages\\%d.txt", num);
 	new File:fout = fopen(src, io_write);
 	if (!fout)
 	{
@@ -89,7 +95,7 @@ bool:ParseFile(const name[])
 			//
 		}
 	}
-	format(line, sizeof (line), "# This file was auto-generated from \"%s.ucm\"\n", name);
+	format(line, sizeof (line), "# This file was auto-generated from \"windows-%s.ucm\"\n", name);
 	fwrite(fout, line);
 	fwrite(fout, "# by \"codepage-parser.pwn\", (c) MPL 1.1, Alex \"Y_Less\" Cole, 2022.\n");
 	fwrite(fout, "#\n");
@@ -137,7 +143,7 @@ bool:ParseFile(const name[])
 
 main()
 {
-	ParseFile("aix-big5-4.3.6");
+	/*ParseFile("aix-big5-4.3.6");
 	ParseFile("aix-CNS11643.1986_1-4.3.6");
 	ParseFile("aix-CNS11643.1986_2-4.3.6");
 	ParseFile("aix-IBM_1046-4.3.6");
@@ -1185,7 +1191,126 @@ main()
 	ParseFile("windows-936-2000");
 	ParseFile("windows-949-2000");
 	ParseFile("windows-950-2000");
-	ParseFile("windows-950_hkscs-2001");
+	ParseFile("windows-950_hkscs-2001");*/
+	ParseFile("10000-2000");
+	ParseFile("10001-2000");
+	ParseFile("10002-2000");
+	ParseFile("10003-2000");
+	ParseFile("10004-2000");
+	ParseFile("10005-2000");
+	ParseFile("10006-2000");
+	ParseFile("10007-2000");
+	ParseFile("10008-2000");
+	ParseFile("10010-2000");
+	ParseFile("10017-2000");
+	ParseFile("10021-2000");
+	ParseFile("10029-2000");
+	ParseFile("10079-2000");
+	ParseFile("10081-2000");
+	ParseFile("10082-2000");
+	ParseFile("1026-2000");
+	ParseFile("1047-2000");
+	ParseFile("1140-2000");
+	ParseFile("1141-2000");
+	ParseFile("1142-2000");
+	ParseFile("1143-2000");
+	ParseFile("1144-2000");
+	ParseFile("1145-2000");
+	ParseFile("1146-2000");
+	ParseFile("1147-2000");
+	ParseFile("1148-2000");
+	ParseFile("1149-2000");
+	ParseFile("1250-2000");
+	ParseFile("1251-2000");
+	ParseFile("1252-2000");
+	ParseFile("1253-2000");
+	ParseFile("1254-2000");
+	ParseFile("1255-2000");
+	ParseFile("1256-2000");
+	ParseFile("1257-2000");
+	ParseFile("1258-2000");
+	ParseFile("1258_db-2013");
+	ParseFile("1361-2000");
+	ParseFile("20000-2000");
+	ParseFile("20001-2000");
+	ParseFile("20002-2000");
+	ParseFile("20003-2000");
+	ParseFile("20004-2000");
+	ParseFile("20005-2000");
+	ParseFile("20105-2000");
+	ParseFile("20106-2000");
+	ParseFile("20107-2000");
+	ParseFile("20108-2000");
+	ParseFile("20127-2000");
+	ParseFile("20261-2000");
+	ParseFile("20269-2000");
+	ParseFile("20273-2000");
+	ParseFile("20277-2000");
+	ParseFile("20278-2000");
+	ParseFile("20280-2000");
+	ParseFile("20284-2000");
+	ParseFile("20285-2000");
+	ParseFile("20290-2000");
+	ParseFile("20297-2000");
+	ParseFile("20420-2000");
+	ParseFile("20423-2000");
+	ParseFile("20424-2000");
+	ParseFile("20833-2000");
+	ParseFile("20838-2000");
+	ParseFile("20866-2000");
+	ParseFile("20871-2000");
+	ParseFile("20880-2000");
+	ParseFile("20905-2000");
+	ParseFile("20924-2000");
+	ParseFile("20932-2000");
+	ParseFile("20936-2000");
+	ParseFile("20949-2000");
+	ParseFile("21025-2000");
+	ParseFile("21027-2000");
+	ParseFile("21866-2000");
+	ParseFile("28591-2000");
+	ParseFile("28592-2000");
+	ParseFile("28593-2000");
+	ParseFile("28594-2000");
+	ParseFile("28595-2000");
+	ParseFile("28596-2000");
+	ParseFile("28597-2000");
+	ParseFile("28598-2000");
+	ParseFile("28599-2000");
+	ParseFile("28603-vista");
+	ParseFile("28605-2000");
+	ParseFile("37-2000");
+	ParseFile("38598-2000");
+	ParseFile("437-2000");
+	ParseFile("500-2000");
+	ParseFile("51932-2006");
+	ParseFile("51936-2000");
+	ParseFile("51949-2000");
+	ParseFile("708-2000");
+	ParseFile("720-2000");
+	ParseFile("737-2000");
+	ParseFile("775-2000");
+	ParseFile("850-2000");
+	ParseFile("852-2000");
+	ParseFile("855-2000");
+	ParseFile("857-2000");
+	ParseFile("858-2000");
+	ParseFile("860-2000");
+	ParseFile("861-2000");
+	ParseFile("862-2000");
+	ParseFile("863-2000");
+	ParseFile("864-2000");
+	ParseFile("865-2000");
+	ParseFile("866-2000");
+	ParseFile("869-2000");
+	ParseFile("870-2000");
+	ParseFile("874-2000");
+	ParseFile("875-2000");
+	ParseFile("932-2000");
+	ParseFile("936-2000");
+	ParseFile("949-2000");
+	ParseFile("950-2000");
+	ParseFile("950_hkscs-2001");
 }
 
 
