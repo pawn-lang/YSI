@@ -2,6 +2,15 @@
 //#pragma option -l
 //#define _DEBUG 7
 
+/*
+#pragma warning disable 213
+#pragma warning disable 214
+#pragma warning disable 234
+#pragma warning disable 204
+#pragma warning disable 239
+#pragma warning disable 237
+*/
+
 #if !defined _DEBUG
 	#define _DEBUG -1
 #endif
@@ -43,6 +52,8 @@
 //#define JUST_TEST Master_ModulesPhase3b
 
 native WP_Hash(buffer[], len, const str[]);
+
+#define STRONG_TAGS
 
 #tryinclude <samp-stdlib\a_samp>
 #tryinclude <a_samp>
