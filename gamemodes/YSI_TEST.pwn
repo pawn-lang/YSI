@@ -1,20 +1,38 @@
 //#pragma option -R
 //#pragma option -l
-//#define _DEBUG 7
+#define _DEBUG 0
 
-/*
+
 #pragma warning disable 213
 #pragma warning disable 214
 #pragma warning disable 234
 #pragma warning disable 204
 #pragma warning disable 239
 #pragma warning disable 237
-*/
+
 
 #if !defined _DEBUG
 	#define _DEBUG -1
 #endif
 #define FIXES_Single 0
+
+#define FIXES_ExplicitSettings 1
+#define FIXES_DefaultDisabled 1
+#define FIXES_EnableAll 0
+#define FIXES_EnableDeprecated 0
+#define FIXES_ExplicitOptions 1
+#define FIXES_SilentKick 0
+#define FIXES_Debug 0
+#define FIXES_NoSingleMsg 1
+#define FIXES_NoServerVarMsg 1
+#define FIXES_NoGetMaxPlayersMsg 1
+#define FIXES_NoPawndoc 1
+#define FIXES_CorrectInvalidTimerID 1
+#define FIXES_NoYSI 0
+#define FIXES_OneRandomVehicleColour 0
+#define FIXES_NoVehicleColourMsg 1
+#define FIXES_CountFilterscripts 0
+#define FIXES_NoFilterscriptsMsg 1
 
 #tryinclude "..\compile_flags.txt"
 #if !defined COMPILE_FLAGS
@@ -49,7 +67,9 @@
 #define YSI_HASHMAP_TESTS
 #define Y_COMMANDS_NO_IPC
 #define YSI_TESTS
-//#define JUST_TEST Master_ModulesPhase3b
+#define YSI_NO_HEAP_MALLOC
+
+//#define JUST_TEST y_commands_4
 
 native WP_Hash(buffer[], len, const str[]);
 
