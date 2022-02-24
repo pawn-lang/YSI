@@ -1,0 +1,37 @@
+# YSI Coding Style
+
+## Introduction
+
+YSI goes to great lengths to avoid conflicts with other arbitrary code; however, this does somewhat
+rely on the other code being vaguely sane.  If you start giving global variables extremely generic
+names like `string` and `count` then there's a very good chance that your code won't work with ANY
+libraries, let alone YSI.  Most code assumes that these `camelCase` (all words but the first start
+with an upper-case letter) simple names are only used by local variables.  Sadly this isn't always
+the case and I do want to embark on a project to replace all YSI local variables with ones less
+generic - I shouldn't need to, but probably do (likely using `camelCase__` style).
+
+## General Rules
+
+### Indentation Types
+
+### Naming Types
+
+* `camelCase` - Also known as `lowerCamelCase`; all words but the first one start with an upper-case
+letter.
+* `PascalCase` - Also known as `UpperCamelCase`; all words start with an upper-case letter.
+* `snake_case` - All words are lower-case and separated by `_`.
+* `SCREAMING_CASE` - All words are upper-case and separated by `_`.
+* `kebab-case` - All words are lower-case and separated by `-`.  This isn't easily usable in pawn as
+`-` isn't a valid identifier character.
+* `sPOngEbObCAsE` - Need I say more?
+
+## Variables
+
+Aside from the local variables mentioned above (which are `camelCase`) global variables in YSI
+usually take the following form: `YSI_gxPascalCase`.  The name starts with `YSI_` to avoid conflicts
+and then has the usage in `PascalCase` (all words start with an upper-case letter).  The `gx` part
+depends on the scope - `g` is global to the entire script, `gs` is a global static in the current
+file, `gsc` is a global static constant, and `gc` is a global constant.  Some full globals (`YSI_g`)
+might start with an underscore - `_YSI_g`, this is a common idiom used to indicate that while
+something might be visible to you it is internal and shouldn't be used.
+

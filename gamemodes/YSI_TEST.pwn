@@ -16,7 +16,7 @@
 #endif
 #define FIXES_Single 0
 
-#define FIXES_ExplicitSettings 1
+/*#define FIXES_ExplicitSettings 1
 #define FIXES_DefaultDisabled 1
 #define FIXES_EnableAll 0
 #define FIXES_EnableDeprecated 0
@@ -32,7 +32,7 @@
 #define FIXES_OneRandomVehicleColour 0
 #define FIXES_NoVehicleColourMsg 1
 #define FIXES_CountFilterscripts 0
-#define FIXES_NoFilterscriptsMsg 1
+#define FIXES_NoFilterscriptsMsg 1*/
 
 #tryinclude "..\compile_flags.txt"
 #if !defined COMPILE_FLAGS
@@ -125,6 +125,7 @@ public OnGameModeInit()
 #include <YSI_Coding\y_stringhash>
 #include <YSI_Coding\y_timers>
 #include <YSI_Coding\y_va>
+#include <YSI_Coding\y_ctrl>
 #include <YSI_Coding\y_functional>
 
 #include <YSI_Core\y_als>
