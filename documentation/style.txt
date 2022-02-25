@@ -10,11 +10,41 @@ with an upper-case letter) simple names are only used by local variables.  Sadly
 the case and I do want to embark on a project to replace all YSI local variables with ones less
 generic - I shouldn't need to, but probably do (likely using `camelCase__` style).
 
-## General Rules
+## Indentation Types
 
-### Indentation Types
+### Allman
 
-### Naming Types
+The superior indentation style.  Modern computers aren't 20 lines high and you can affort the space
+to nicely spread your code out.  Opening and closing braces (`{}`s) are always on new lines and
+align with each other to make spotting pairs easy.  YSI very strictly only uses this style, and so
+should you:
+
+```pawn
+Function()
+{
+	// Such nice alignment.
+	if (check)
+	{
+		// Code isn't cramped
+		printf("hi");
+	}
+	// Wow!
+}
+```
+
+### K&R
+
+Also exists, but is bad.  Don't put braces on lines with other things.
+
+### Kernel
+
+A hybrid abomination of both Allman and K&R.  Seriously, at least be consistent!
+
+### Others
+
+I'm not even going to go there.
+
+## Naming Types
 
 * `camelCase` - Also known as `lowerCamelCase`; all words but the first one start with an upper-case
 letter.
@@ -24,6 +54,13 @@ letter.
 * `kebab-case` - All words are lower-case and separated by `-`.  This isn't easily usable in pawn as
 `-` isn't a valid identifier character.
 * `sPOngEbObCAsE` - Need I say more?
+
+* `_leadingUnderscore` - A leading underscore can be used with any of the styles above and usually
+indicates that something is internal, but visible.  I.e. for some reason a function can't be made
+`static` to hide it away inside a library, but end-users still shouldn't call it.  For example the
+*y_iterate* function `Iter_Add` goes through some macros to expand iterator names in to iterator
+internal details then calls `_Iter_Add`.  End-users shouldn't use this function name directly from
+their code, but the function needs to be callable globally as macros will insert it in to user code.
 
 ## Variables
 
