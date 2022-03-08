@@ -3,14 +3,14 @@
 #pragma compress 0
 #define _DEBUG 0
 
-
-#pragma warning disable 213
-#pragma warning disable 214
-#pragma warning disable 234
-#pragma warning disable 204
-#pragma warning disable 239
-#pragma warning disable 237
-
+#if defined __PawnBuild
+	#pragma warning disable 213
+	#pragma warning disable 214
+	#pragma warning disable 234
+	#pragma warning disable 204
+	#pragma warning disable 239
+	#pragma warning disable 237
+#endif
 
 #if !defined _DEBUG
 	#define _DEBUG -1
