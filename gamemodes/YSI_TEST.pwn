@@ -1,5 +1,6 @@
 //#pragma option -R
 //#pragma option -l
+#pragma compress 0
 #define _DEBUG 0
 
 
