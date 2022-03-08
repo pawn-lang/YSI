@@ -1,9 +1,10 @@
-#pragma option -r
-//#pragma option -l
 #pragma compress 0
 #define _DEBUG 0
 
 #if defined __PawnBuild
+	#pragma option -r
+	//#pragma option -l
+
 	#pragma warning disable 213
 	#pragma warning disable 214
 	#pragma warning disable 234
