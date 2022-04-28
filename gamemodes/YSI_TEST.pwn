@@ -69,9 +69,10 @@
 #define YSI_HASHMAP_TESTS
 #define Y_COMMANDS_NO_IPC
 #define YSI_TESTS
+//#define YSI_COMPATIBILITY_MODE
 #define YSI_NO_HEAP_MALLOC
 
-//#define JUST_TEST y_commands_4
+//#define JUST_TEST y_va_recurse_local
 
 native WP_Hash(buffer[], len, const str[]);
 
