@@ -28,7 +28,7 @@ Write@XX_(a, b, base)
 		format(name, sizeof (name), "#if defined _inc_y_unique__%c%c0_%c%cz_%d\n", a2, b2, a2, b2, c), fwrite(f, name);
 		format(name, sizeof (name), "	#undef _inc_y_unique__%c%c0_%c%cz_%d\n", a2, b2, a2, b2, c), fwrite(f, name);
 		format(name, sizeof (name), "#endif\n"), fwrite(f, name);*/
-		format(name, sizeof (name), "static stock const Y_UNIQUE_%06d_%06d_CALLED = cellmin;\n", base, base + 64 - 1), fwrite(f, name);
+		format(name, sizeof (name), "static stock const Y_UNIQUE_%06d_%06d_CALLED = UNIQUE_SYMBOL;\n", base, base + 64 - 1), fwrite(f, name);
 		format(name, sizeof (name), "\n"), fwrite(f, name);
 		format(name, sizeof (name), "#if defined _inc_y_unique_%06d_%06d\n", base, base + 64 - 1), fwrite(f, name);
 		format(name, sizeof (name), "	#undef _inc_y_unique_%06d_%06d\n", base, base + 64 - 1), fwrite(f, name);
@@ -85,7 +85,7 @@ Write@X__(a, base)
 		format(name, sizeof (name), "#if defined _inc_y_unique__%c%c0_%c%cz_%d\n", a2, b2, a2, b2, c), fwrite(f, name);
 		format(name, sizeof (name), "	#undef _inc_y_unique__%c%c0_%c%cz_%d\n", a2, b2, a2, b2, c), fwrite(f, name);
 		format(name, sizeof (name), "#endif\n"), fwrite(f, name);*/
-		format(name, sizeof (name), "static stock const Y_UNIQUE_%06d_%06d_CALLED = cellmin;\n", base, base + 64 * 64 - 1), fwrite(f, name);
+		format(name, sizeof (name), "static stock const Y_UNIQUE_%06d_%06d_CALLED = UNIQUE_SYMBOL;\n", base, base + 64 * 64 - 1), fwrite(f, name);
 		format(name, sizeof (name), "\n"), fwrite(f, name);
 		format(name, sizeof (name), "#if defined _inc_y_unique_%06d_%06d\n", base, base + 64 * 64 - 1), fwrite(f, name);
 		format(name, sizeof (name), "	#undef _inc_y_unique_%06d_%06d\n", base, base + 64 * 64 - 1), fwrite(f, name);
@@ -138,7 +138,7 @@ Write@___()
 		format(name, sizeof (name), "#if defined _inc_y_unique__%c%c0_%c%cz_%d\n", a2, b2, a2, b2, c), fwrite(f, name);
 		format(name, sizeof (name), "	#undef _inc_y_unique__%c%c0_%c%cz_%d\n", a2, b2, a2, b2, c), fwrite(f, name);
 		format(name, sizeof (name), "#endif\n"), fwrite(f, name);*/
-		format(name, sizeof (name), "static stock const Y_UNIQUE_IMPL_CALLED = cellmin;\n"), fwrite(f, name);
+		format(name, sizeof (name), "static stock const Y_UNIQUE__CALLED = UNIQUE_SYMBOL;\n"), fwrite(f, name);
 		format(name, sizeof (name), "\n"), fwrite(f, name);
 		format(name, sizeof (name), "#if defined _inc_y_unique_\n"), fwrite(f, name);
 		format(name, sizeof (name), "	#undef _inc_y_unique_\n"), fwrite(f, name);
@@ -156,7 +156,9 @@ Write@___()
 					format(name, sizeof (name), "	#else\n"), fwrite(f, name);
 				else
 					format(name, sizeof (name), "	#%sif UNIQUE_SYMBOL < (%d)\n", i ? "else" : "", i * 64 * 64 * 8 + j * 64 * 64 + 64 * 64 - 1), fwrite(f, name);
+				format(name, sizeof (name), "		static stock const UNIQUE_SYMBOL_LESS_THAN_%06d = UNIQUE_SYMBOL;\n", i * 64 * 64 * 8 + j * 64 * 64 + 64 * 64 - 1), fwrite(f, name);
 				format(name, sizeof (name), "		#include \"y_unique_%06d_%06d\"\n", i * 64 * 64 * 8 + j * 64 * 64, i * 64 * 64 * 8 + j * 64 * 64 + 64 * 64 - 1), fwrite(f, name);
+				format(name, sizeof (name), "		#endinput\n"), fwrite(f, name);
 			}
 			format(name, sizeof (name), "	#endif\n"), fwrite(f, name);
 		}
