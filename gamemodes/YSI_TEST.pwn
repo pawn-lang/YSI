@@ -72,7 +72,7 @@
 //#define YSI_COMPATIBILITY_MODE
 #define YSI_NO_HEAP_MALLOC
 
-//#define JUST_TEST y_va_recurse_local
+#define JUST_TEST y_unique
 
 native WP_Hash(buffer[], len, const str[]);
 
