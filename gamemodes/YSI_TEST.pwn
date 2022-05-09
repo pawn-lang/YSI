@@ -13,6 +13,8 @@
 	#pragma warning disable 237
 #endif
 
+#define JUST_TEST y_iterate_NestedYield
+
 #if !defined _DEBUG
 	#define _DEBUG -1
 #endif
@@ -71,8 +73,6 @@
 #define YSI_TESTS
 //#define YSI_COMPATIBILITY_MODE
 #define YSI_NO_HEAP_MALLOC
-
-#define JUST_TEST y_unique
 
 native WP_Hash(buffer[], len, const str[]);
 
@@ -182,7 +182,8 @@ public OnGameModeInit()
 
 main()
 {
-	print("\n------------------------------");
+	print("");
+	print("------------------------------");
 	print("|                            |");
 	print("|     YSI auto-test mode     |");
 	print("|                            |");
@@ -192,7 +193,8 @@ main()
 	print("| Master:                    |");
 	printf("|  %24d  |", @_);
 	print("|                            |");
-	print("------------------------------\n");
+	print("------------------------------");
+	print("");
 	//FIXES_ApplyAnimation(0, "", "", 0.0, 0, 0, 0, 0, 0, 0);
 	//DisasmDump("YSI_TEST.asm");
 }
@@ -205,7 +207,8 @@ public OnScriptInit()
 
 public OnTestsComplete(tests, checks, fails)
 {
-	print("\n------------------------------");
+	print("");
+	print("------------------------------");
 	print("|                            |");
 	print("|     YSI auto-test done     |");
 	print("|                            |");
@@ -215,7 +218,8 @@ public OnTestsComplete(tests, checks, fails)
 	print("| Master:                    |");
 	printf("|  %24d  |", @_);
 	print("|                            |");
-	print("------------------------------\n");
+	print("------------------------------");
+	print("");
 }
 
 
