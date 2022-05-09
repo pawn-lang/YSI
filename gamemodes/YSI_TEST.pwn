@@ -182,7 +182,7 @@ public OnGameModeInit()
 
 main()
 {
-	print("");
+	print(" ");
 	print("------------------------------");
 	print("|                            |");
 	print("|     YSI auto-test mode     |");
@@ -194,7 +194,7 @@ main()
 	printf("|  %24d  |", @_);
 	print("|                            |");
 	print("------------------------------");
-	print("");
+	print(" ");
 	//FIXES_ApplyAnimation(0, "", "", 0.0, 0, 0, 0, 0, 0, 0);
 	//DisasmDump("YSI_TEST.asm");
 }
@@ -207,7 +207,7 @@ public OnScriptInit()
 
 public OnTestsComplete(tests, checks, fails)
 {
-	print("");
+	print(" ");
 	print("------------------------------");
 	print("|                            |");
 	print("|     YSI auto-test done     |");
@@ -219,7 +219,7 @@ public OnTestsComplete(tests, checks, fails)
 	printf("|  %24d  |", @_);
 	print("|                            |");
 	print("------------------------------");
-	print("");
+	print(" ");
 }
 
 
