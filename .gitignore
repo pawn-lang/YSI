@@ -13,3 +13,5 @@
 /plugins/sscanf.dll
 /server.cfg.real
 /server.cfg.test
+/logs
+/compile_flags.txt
