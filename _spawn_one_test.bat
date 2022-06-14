@@ -31,7 +31,7 @@ goto :eof
 	mklink /D scriptfiles ..\scriptfiles > nul
 	rem copy the important files
 	rem Write the current test to the config file
-	copy /A /Y ..\server.cfg.test server.cfg > nul
+	copy /A /Y ..\server.cfg.ysi server.cfg > nul
 	cd ..
 	goto :eof
 

@@ -1,0 +1,7 @@
+echo Executing YSI test...
+rcon_password ysi_test
+port 7777
+hostname YSI test
+gamemode0 mode 1
+weburl git.io/5.x
+
