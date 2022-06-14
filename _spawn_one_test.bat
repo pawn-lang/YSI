@@ -42,7 +42,7 @@ goto :eof
 	rem Run the server with the custom server.cfg - it closes itself after
 	cd %NAME%
 	echo samp-server.exe
-	samp-server.exe > nul
+	samp-server.exe
 	rem Copy server-log.txt somewhere
 	if exist "server_log.txt" (
 		move /Y server_log.txt ..\logs\%NAME%.txt > nul

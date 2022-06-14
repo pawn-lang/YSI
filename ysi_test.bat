@@ -46,15 +46,7 @@ goto :eof
 echo.
 mkdir .\logs 2> nul > nul
 
-rem Move the original somewhere safe
-move /Y server.cfg server.cfg.real 2> nul > nul
-move /Y server_log.txt server.txt.real 2> nul > nul
-
 call :main
-
-rem Get the original settings back
-move /Y server.cfg.real server.cfg 2> nul > nul
-move /Y server.txt.real server_log.txt 2> nul > nul
 
 goto :eof
 
