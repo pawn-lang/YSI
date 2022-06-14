@@ -4,7 +4,6 @@
 
 // Generic configurable settings.
 #tryinclude <compile_flags>
-#define MTYPE 0
 //#define JUST_TEST y_utils_IPToInt
 
 #if defined __PawnBuild
