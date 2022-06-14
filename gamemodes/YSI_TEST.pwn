@@ -1,9 +1,15 @@
 #pragma compress 0
+#pragma pack 0
 #define _DEBUG 0
+
+// Generic configurable settings.
+#tryinclude "..\compile_flags.txt"
+#define MTYPE 2
+//#define JUST_TEST y_iter_Iter_IsEmpty1
 
 #if defined __PawnBuild
 	#pragma option -r
-	//#pragma option -l
+	//#pragma option -a
 
 	#pragma warning disable 213
 	#pragma warning disable 214
@@ -13,11 +19,15 @@
 	#pragma warning disable 237
 #endif
 
-#define JUST_TEST y_iterate_NestedYield
+#if !defined COMPILE_FLAGS
+	#define COMPILE_FLAGS "Pawno"
+#endif
 
 #if !defined _DEBUG
 	#define _DEBUG -1
 #endif
+
+// Fixes settings.
 #define FIXES_Single 0
 
 /*#define FIXES_ExplicitSettings 1
@@ -38,21 +48,14 @@
 #define FIXES_CountFilterscripts 0
 #define FIXES_NoFilterscriptsMsg 1*/
 
-#tryinclude "..\compile_flags.txt"
-#if !defined COMPILE_FLAGS
-	#define COMPILE_FLAGS "Pawno"
-#endif
-
-#define MTYPE 2
-
 // Currently "MTYPE 2" with "GTYPE 2" gives the most horrendous crash when the
 // mode ends, that I've ever seen!
 // "MTYPE 0", "GTYPE 2" also fails.  Won't fix!  Fixed!
 #if !defined MTYPE
-	#define MTYPE 1 // 0 - 3 (None  , Server, Cloud , Client)
+	#define MTYPE 1 // 0 - 3 (None, Server, Cloud, Client)
 #endif
 #if !defined GTYPE
-	#define GTYPE 1 // 0 - 3 (First , Middle, End   , None  )
+	#define GTYPE 0 // 0 - 3 (None, Start, Middle, End)
 #endif
 
 #if MTYPE == 0
@@ -75,6 +78,14 @@
 #define YSI_NO_HEAP_MALLOC
 
 native WP_Hash(buffer[], len, const str[]);
+
+//native NopNative() = nop;
+
+/*IsNumeric(const number[])
+{
+	#pragma unused number
+	return 0;
+}*/
 
 #define STRONG_TAGS
 
@@ -116,27 +127,28 @@ public OnGameModeInit()
 
 #pragma dynamic 65536
 
-#if GTYPE == 0
+#if GTYPE == 1
 	#include <YSI_Players\y_groups>
 #endif
 
 // Failing tests are removed with "//", slow tests with "////".
+
+#include <YSI_Core\y_als>
+#include <YSI_Core\y_debug>
+#include <YSI_Core\y_testing>
+#include <YSI_Core\y_utils>
+#include <YSI_Coding\y_va>
+#include <YSI_Core\y_cell>
+#include <YSI_Core\y_master>
+
 #include <YSI_Coding\y_hooks>
 #include <YSI_Coding\y_inline>
 #include <YSI_Coding\y_malloc>
 #include <YSI_Coding\y_remote>
 #include <YSI_Coding\y_stringhash>
 #include <YSI_Coding\y_timers>
-#include <YSI_Coding\y_va>
 #include <YSI_Coding\y_ctrl>
 #include <YSI_Coding\y_functional>
-
-#include <YSI_Core\y_als>
-#include <YSI_Core\y_cell>
-#include <YSI_Core\y_debug>
-#include <YSI_Core\y_master>
-#include <YSI_Core\y_testing>
-#include <YSI_Core\y_utils>
 
 #include <YSI_Data\y_bintree>
 #include <YSI_Data\y_bit>
@@ -146,9 +158,10 @@ public OnGameModeInit()
 #include <YSI_Data\y_playerarray>
 #include <YSI_Data\y_playerset>
 
-#if GTYPE == 1
+#if GTYPE == 2
 	#include <YSI_Players\y_groups>
 #endif
+
 /*#include <YSI_Players\y_languages>
 //#include <YSI_Players\y_text>
 //#include <YSI_Players\y_users>
@@ -176,7 +189,7 @@ public OnGameModeInit()
 //#include <YSI_Visual\y_zonenames>
 #include <YSI_Visual\y_zonepulse>
 
-#if GTYPE == 2
+#if GTYPE == 3
 	#include <YSI_Players\y_groups>
 #endif
 
@@ -221,5 +234,4 @@ public OnTestsComplete(tests, checks, fails)
 	print("------------------------------");
 	print(" ");
 }
-
 
