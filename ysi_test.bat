@@ -100,8 +100,8 @@ goto :eof
 	goto :eof
 
 :all_builds
-	for /L %%g in (0, 1, 2) do (
-		for /L %%m in (0, 1, 2) do (
+	for /L %%g in (0, 1, 3) do (
+		for /L %%m in (0, 1, 3) do (
 			rem Spawn the processes.
 			for /L %%o in (0, 1, 1) do (
 				for /L %%d in (0, 1, 2) do (
@@ -117,8 +117,8 @@ goto :eof
 		)
 	)
 	rem Print the results.
-	for /L %%g in (0, 1, 2) do (
-		for /L %%m in (0, 1, 2) do (
+	for /L %%g in (0, 1, 3) do (
+		for /L %%m in (0, 1, 3) do (
 			for /L %%o in (0, 1, 1) do (
 				for /L %%d in (0, 1, 2) do (
 					call :print "_%%g%%m%%o%%d_%COMPILER%" "GTYPE=%%g MTYPE=%%m -O%%o -d%%d"
