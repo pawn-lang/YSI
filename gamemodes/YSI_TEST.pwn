@@ -4,12 +4,12 @@
 
 // Generic configurable settings.
 #tryinclude "..\compile_flags.txt"
-#define MTYPE 2
-//#define JUST_TEST y_iter_Iter_IsEmpty1
+#define MTYPE 0
+//#define JUST_TEST y_utils_IPToInt
 
 #if defined __PawnBuild
 	#pragma option -r
-	//#pragma option -a
+	//#pragma option -l
 
 	#pragma warning disable 213
 	#pragma warning disable 214
