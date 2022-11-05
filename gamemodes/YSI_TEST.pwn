@@ -8,13 +8,13 @@
 
 // Generic configurable settings.
 #tryinclude <compile_flags>
-#define JUST_TEST y_iterate_StressTest
+//#define JUST_TEST Master_ModulesPhase6
 //#define JUST_TEST DOESNT_EXIST
 //#define JUST_TEST_GROUP "y_amx"
 //#define RUN_SLOW_TESTS
 //#define RUN_TESTS
 #define YSI_TESTS
-//	#define RUN_PROFILINGS
+//#define RUN_PROFILINGS
 
 #if defined __PawnBuild
 	#pragma option -r
@@ -58,14 +58,12 @@
 #define FIXES_CountFilterscripts 0
 #define FIXES_NoFilterscriptsMsg 1*/
 
-// Currently "MTYPE 2" with "GTYPE 2" gives the most horrendous crash when the
-// mode ends, that I've ever seen!
-// "MTYPE 0", "GTYPE 2" also fails.  Won't fix!  Fixed!
 #if !defined MTYPE
-	#define MTYPE 1 // 0 - 3 (None, Server, Cloud, Client)
+	// Some module tests in non-type-2.
+	#define MTYPE 2 // 0 - 3 (None, Server, Cloud, Client)
 #endif
 #if !defined GTYPE
-	#define GTYPE 1 // 0 - 3 (None, Start, Middle, End)
+	#define GTYPE 2 // 0 - 3 (None, Start, Middle, End)
 #endif
 
 #if MTYPE == 0
@@ -416,7 +414,7 @@ Test_WritePackedString2(addr, const str[])
 	while (buffer & 0xFF);
 }
 
-@profileinit() StringWrite1A()
+/*@profileinit() StringWrite1A()
 {
 	gAddr = ref(gOutput);
 }
@@ -664,6 +662,46 @@ Test_WritePackedString2(addr, const str[])
 	AMX_WriteUnpackedString(gAddr, __COMPILER_UNPACK"Shorter string.");
 	Test_ReadUnpackedString2(gAddr, gOutput);
 	ASSERT_SAME(gOutput, "Shorter string.");
+}*/
+
+static stock
+	Iterator:y_iter_Next_Profile<1000>;
+
+@profileinit() y_iter_Next()
+{
+	Iter_Clear(y_iter_Next_Profile);
+	for (new i = 0; i != 200; ++i)
+	{
+		Iter_RandomAdd(y_iter_Next_Profile);
+	}
 }
+
+@profile() y_iter_Next()
+{
+	new x = Iter_First(y_iter_Next_Profile);
+	for (new i = 0; i != 100; ++i)
+	{
+		x = Iter_Next(y_iter_Next_Profile, x);
+	}
+}
+
+@profileinit() y_iter_Prev()
+{
+	/*Iter_Clear(y_iter_Next_Profile);
+	for (new i = 0; i != 200; ++i)
+	{
+		Iter_RandomAdd(y_iter_Next_Profile);
+	}*/
+}
+
+@profile() y_iter_Prev()
+{
+	new x = Iter_Last(y_iter_Next_Profile);
+	for (new i = 0; i != 100; ++i)
+	{
+		x = Iter_Prev(y_iter_Next_Profile, x);
+	}
+}
+
 
 
