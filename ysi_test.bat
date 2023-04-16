@@ -140,7 +140,7 @@ goto :eof
 :print
 	echo.
 	echo *** Checking: %~1
-	findstr /L "Fails: " logs\%MODE%%~1.txt
+	findstr /L "Fails: " logs\%MODE%%~1.server.txt
 	goto :eof
 
 :switch_new
