@@ -132,7 +132,7 @@ goto :eof
 	:wait_loop
 		rem Poor man's sleep 1.
 		call :sleep_1s
-		if not exist logs\%MODE%%~1.txt (
+		if not exist logs\%MODE%%~1.server.txt (
 			goto wait_loop
 		)
 	goto :eof
