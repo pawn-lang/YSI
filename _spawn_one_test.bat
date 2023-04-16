@@ -44,7 +44,7 @@ goto :eof
 	rem Run the server with the custom server.cfg - it closes itself after
 	cd %NAME%
 	echo omp-server.exe
-	omp-server.exe --config port=%PORT%
+	omp-server.exe --config network.port=%PORT%
 	rem Copy server-log.txt somewhere
 	if exist "server_log.txt" (
 		move /Y server_log.txt ..\logs\%NAME%.txt > nul
