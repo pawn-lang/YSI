@@ -1,4 +1,5 @@
 @echo off
+setlocal enableextensions enabledelayedexpansion
 
 set MODE=YSI_TEST
 set TARGET=
@@ -97,7 +98,8 @@ goto :eof
 			rem Spawn the processes.
 			for /L %%o in (0, 1, 1) do (
 				for /L %%d in (0, 1, 2) do (
-					call :spawn "_%%g%%m%%o%%d_%COMPILER%" "GTYPE=%%g MTYPE=%%m -O%%o -d%%d"
+					set /a port=7770 + %%o * 10 + %%d
+					call :spawn "_%%g%%m%%o%%d_%COMPILER%" "GTYPE=%%g MTYPE=%%m -O%%o -d%%d" !port!
 				)
 			)
 			rem Wait for all others to complete.
@@ -123,7 +125,7 @@ goto :eof
 :spawn
 	echo.
 	echo *** Running: %MODE%%~1.amx %~2
-	start cmd /c _spawn_one_test.bat %MODE% %1 %2
+	start cmd /c _spawn_one_test.bat %MODE% %1 %2 %3
 	goto :eof
 
 :wait
