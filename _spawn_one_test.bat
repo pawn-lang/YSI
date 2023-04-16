@@ -17,7 +17,7 @@ goto :eof
 	rem Can't pass string defines on the command-line
 	echo #define COMPILE_FLAGS "%FLAGS%" > %NAME%\qawno\include\compile_flags.inc
 	echo qawno\pawncc.exe "gamemodes\%MODE%.pwn" -v0 -i"qawno\include" -i"%NAME%\qawno\include" -;+ -(+ %FLAGS% _DEBUG=0 TEST_AUTO_EXIT=true -o"%NAME%\gamemodes\mode.amx"
-	qawno\pawncc.exe "gamemodes\%MODE%.pwn" -v0 -i"qawno\include" -i"%NAME%\qawno\include" -;+ -(+ %FLAGS% _DEBUG=0 TEST_AUTO_EXIT=true -o"%NAME%\gamemodes\mode.amx" 2> logs\%NAME%.compile.txt
+	qawno\pawncc.exe "gamemodes\%MODE%.pwn" -v0 -i"qawno\include" -i"%NAME%\qawno\include" -;+ -(+ %FLAGS% _DEBUG=0 TEST_AUTO_EXIT=true -o"%NAME%\gamemodes\mode.amx" 2> logs\%NAME%.compiler.txt
 	goto :eof
 
 :setup
