@@ -5,6 +5,8 @@
 /scriptfiles/DANGEROUS_SERVER_ROOT
 /pawno/pawnc.dll
 /pawno/pawncc.exe
+/qawno/pawnc.dll
+/qawno/pawncc.exe
 /plugins/Whirlpool.dll
 /plugins/crashdetect.dll
 /plugins/crashdetect.pdb

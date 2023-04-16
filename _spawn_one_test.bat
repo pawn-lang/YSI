@@ -14,9 +14,9 @@ goto :eof
 
 :build
 	rem Can't pass string defines on the command-line
-	echo #define COMPILE_FLAGS "%FLAGS%" > %NAME%\pawno\include\compile_flags.inc
-	echo pawno\pawncc.exe "gamemodes\%MODE%.pwn" -v0 -i"pawno\include" -i"%NAME%\pawno\include" -;+ -(+ %FLAGS% _DEBUG=0 TEST_AUTO_EXIT=true -o"%NAME%\gamemodes\mode.amx"
-	pawno\pawncc.exe "gamemodes\%MODE%.pwn" -v0 -i"pawno\include" -i"%NAME%\pawno\include" -;+ -(+ %FLAGS% _DEBUG=0 TEST_AUTO_EXIT=true -o"%NAME%\gamemodes\mode.amx" > nul
+	echo #define COMPILE_FLAGS "%FLAGS%" > %NAME%\qawno\include\compile_flags.inc
+	echo qawno\pawncc.exe "gamemodes\%MODE%.pwn" -v0 -i"qawno\include" -i"%NAME%\qawno\include" -;+ -(+ %FLAGS% _DEBUG=0 TEST_AUTO_EXIT=true -o"%NAME%\gamemodes\mode.amx"
+	qawno\pawncc.exe "gamemodes\%MODE%.pwn" -v0 -i"qawno\include" -i"%NAME%\qawno\include" -;+ -(+ %FLAGS% _DEBUG=0 TEST_AUTO_EXIT=true -o"%NAME%\gamemodes\mode.amx" > nul
 	goto :eof
 
 :setup
@@ -24,7 +24,7 @@ goto :eof
 	del logs\%NAME%.txt 2> nul
 	rem Create subdirectories
 	rmdir /S /Q %NAME% 2> nul
-	mkdir %NAME%\pawno\include
+	mkdir %NAME%\qawno\include
 	cd %NAME%
 	mkdir gamemodes
 	mklink samp-server.exe ..\samp-server.exe > nul

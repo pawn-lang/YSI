@@ -142,14 +142,14 @@ goto :eof
 	goto :eof
 
 :switch_new
-	cd pawno/
+	cd qawno/
 	call compiler_switch.bat "new"
 	cd ..
 	set COMPILER=new
 	goto :eof
 
 :switch_old
-	cd pawno/
+	cd qawno/
 	call compiler_switch.bat "old"
 	cd ..
 	set COMPILER=old

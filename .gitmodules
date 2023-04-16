@@ -1,3 +1,3 @@
 [submodule "YSI-Includes"]
-	path = pawno/include
-	url = git@github.com:pawn-lang/YSI-Includes.git
+	path = qawno/include
+	url = https://github.com/pawn-lang/YSI-Includes.git
