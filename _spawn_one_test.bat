@@ -47,8 +47,8 @@ goto :eof
 		echo omp-server.exe --config network.port=%PORT%
 		omp-server.exe --config network.port=%PORT%
 		rem Copy server-log.txt somewhere
-		if exist "server_log.txt" (
-			move /Y server_log.txt ..\logs\%NAME%.server.txt > nul
+		if exist "log.txt" (
+			move /Y log.txt ..\logs\%NAME%.server.txt > nul
 		)
 	) else (
 		echo Compilation failed
