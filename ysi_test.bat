@@ -99,7 +99,7 @@ goto :eof
 			for /L %%o in (0, 1, 1) do (
 				for /L %%d in (0, 1, 2) do (
 					set /a port=7770 + %%o * 10 + %%d
-					call :spawn "_%%g%%m%%o%%d_%COMPILER%" "GTYPE=%%g MTYPE=%%m -O%%o -d%%d" !port!
+					call :spawn "_%%g%%m%%o%%d_%COMPILER%" "GTYPE=%%g MTYPE=%%m -O%%o -d%%d" "!port!" "%COMPILER%"
 				)
 			)
 			rem Wait for all others to complete.
@@ -125,7 +125,7 @@ goto :eof
 :spawn
 	echo.
 	echo *** Running: %MODE%%~1.amx %~2
-	start cmd /c _spawn_one_test.bat %MODE% %1 %2 %3
+	start "YSI test: %~2, %~4 compiler" cmd /c _spawn_one_test.bat %MODE% %1 %2 %3
 	goto :eof
 
 :wait
