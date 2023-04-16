@@ -17,7 +17,7 @@ goto :eof
 	rem Can't pass string defines on the command-line
 	echo #define COMPILE_FLAGS "%FLAGS%" > %NAME%\qawno\include\compile_flags.inc
 	echo qawno\pawncc.exe "gamemodes\%MODE%.pwn" -v0 -i"qawno\include" -i"%NAME%\qawno\include" -;+ -(+ %FLAGS% _DEBUG=0 TEST_AUTO_EXIT=true -o"%NAME%\gamemodes\mode.amx"
-	qawno\pawncc.exe "gamemodes\%MODE%.pwn" -v0 -i"qawno\include" -i"%NAME%\qawno\include" -;+ -(+ %FLAGS% _DEBUG=0 TEST_AUTO_EXIT=true -o"%NAME%\gamemodes\mode.amx" > nul
+	qawno\pawncc.exe "gamemodes\%MODE%.pwn" -v0 -i"qawno\include" -i"%NAME%\qawno\include" -;+ -(+ %FLAGS% _DEBUG=0 TEST_AUTO_EXIT=true -o"%NAME%\gamemodes\mode.amx" 2> logs\%NAME%.compile.txt
 	goto :eof
 
 :setup
@@ -48,11 +48,11 @@ goto :eof
 		omp-server.exe --config network.port=%PORT%
 		rem Copy server-log.txt somewhere
 		if exist "server_log.txt" (
-			move /Y server_log.txt ..\logs\%NAME%.txt > nul
+			move /Y server_log.txt ..\logs\%NAME%.server.txt > nul
 		)
 	) else (
 		echo Compilation failed
-		echo Fails: N/A, compilation failed > ..\logs\%NAME%.txt
+		echo Fails: N/A, compilation failed > ..\logs\%NAME%.server.txt
 	)
 	cd ..
 	rmdir /S /Q %NAME%
