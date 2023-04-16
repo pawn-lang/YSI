@@ -27,11 +27,12 @@ goto :eof
 	mkdir %NAME%\qawno\include
 	cd %NAME%
 	mkdir gamemodes
-	mklink samp-server.exe ..\samp-server.exe > nul
-	mklink samp-npc.exe ..\samp-npc.exe > nul
+	mklink omp-server.exe ..\omp-server.exe > nul
 	mklink /D plugins ..\plugins > nul
+	mklink /D components ..\components > nul
 	mklink /D scriptfiles ..\scriptfiles > nul
 	mklink /D modules ..\modules > nul
+	mklink /D PHP ..\PHP > nul
 	rem copy the important files
 	rem Write the current test to the config file
 	copy /A /Y ..\server.cfg.ysi server.cfg > nul
@@ -41,8 +42,8 @@ goto :eof
 :run
 	rem Run the server with the custom server.cfg - it closes itself after
 	cd %NAME%
-	echo samp-server.exe
-	samp-server.exe
+	echo omp-server.exe
+	omp-server.exe
 	rem Copy server-log.txt somewhere
 	if exist "server_log.txt" (
 		move /Y server_log.txt ..\logs\%NAME%.txt > nul
